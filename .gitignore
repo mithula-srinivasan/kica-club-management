@@ -1,0 +1,22 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Excel files containing member information
+*.xlsx
+*.xls
+*.csv
+
+# macOS
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
