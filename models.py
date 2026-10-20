@@ -36,6 +36,11 @@ class Exec(Base):
         nullable=False
     )
 
+    password_hash: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True
+    )
+
     role: Mapped[str] = mapped_column(
         String(20),
         default="exec",

@@ -22,3 +22,8 @@ class PlayerUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=100)
     kica_id: str | None = Field(default=None, min_length=1, max_length=20)
     joined_on: date | None = None
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
