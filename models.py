@@ -84,6 +84,47 @@ class ExecSession(Base):
     )
 
 
+class PasswordSetupToken(Base):
+    __tablename__ = "password_setup_tokens"
+
+    token_id: Mapped[int] = mapped_column(primary_key=True)
+
+    exec_id: Mapped[int] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        index=True,
+        nullable=False
+    )
+
+    # SHA-256 hash of the setup token; the raw token only appears in the link
+    token_hash: Mapped[str] = mapped_column(
+        String(64),
+        unique=True,
+        nullable=False
+    )
+
+    created_by_exec_id: Mapped[int] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        nullable=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False
+    )
+
+    # Set when the link is used, so it can never be used again
+    used_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+    
+
 class Player(Base):
     __tablename__ = "players"
 
