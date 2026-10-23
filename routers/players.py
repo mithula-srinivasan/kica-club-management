@@ -4,24 +4,15 @@ from sqlalchemy.orm import Session
 
 from sqlalchemy.exc import IntegrityError
 from schemas import PlayerCreate, PlayerResponse, PlayerUpdate
-from database import SessionLocal
+from dependencies import get_current_exec, get_db
 from models import Player
 
 
 router = APIRouter(
     prefix="/players",
-    tags=["Players"]
+    tags=["Players"],
+    dependencies=[Depends(get_current_exec)]
 )
-
-
-def get_db():
-    db = SessionLocal()
-
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 @router.get("/", response_model=list[PlayerResponse])
 def get_players(

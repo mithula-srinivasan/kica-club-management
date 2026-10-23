@@ -27,3 +27,13 @@ class PlayerUpdate(BaseModel):
 class LoginRequest(BaseModel):
     email: str
     password: str
+    remember_me: bool = False
+
+
+class ExecResponse(BaseModel):
+    exec_id: int
+    name: str
+    email: str
+    role: str
+
+    model_config = ConfigDict(from_attributes=True)

@@ -54,6 +54,36 @@ class Exec(Base):
     )
 
 
+class ExecSession(Base):
+    __tablename__ = "exec_sessions"
+
+    session_id: Mapped[int] = mapped_column(primary_key=True)
+
+    exec_id: Mapped[int] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        index=True,
+        nullable=False
+    )
+
+    # SHA-256 hash of the session token; the raw token only lives in the cookie
+    token_hash: Mapped[str] = mapped_column(
+        String(64),
+        unique=True,
+        nullable=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False
+    )
+
+
 class Player(Base):
     __tablename__ = "players"
 
