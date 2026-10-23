@@ -53,6 +53,17 @@ class Exec(Base):
         nullable=False
     )
 
+        # NULL means the sign-up is still waiting for an admin to approve it
+    approved_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
+    )
+
+    approved_by_exec_id: Mapped[int | None] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        nullable=True
+    )
+
 
 class ExecSession(Base):
     __tablename__ = "exec_sessions"
@@ -123,7 +134,7 @@ class PasswordSetupToken(Base):
         DateTime(timezone=True),
         nullable=True
     )
-    
+
 
 class Player(Base):
     __tablename__ = "players"
