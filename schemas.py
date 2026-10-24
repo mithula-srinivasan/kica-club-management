@@ -1,5 +1,5 @@
-from datetime import date
-from pydantic import BaseModel, ConfigDict, Field
+from datetime import date, datetime
+from pydantic import BaseModel, EmailStr, ConfigDict, Field
 
 
 class PlayerCreate(BaseModel):
@@ -37,3 +37,20 @@ class ExecResponse(BaseModel):
     role: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+
+class PasswordSetupLinkRequest(BaseModel):
+    exec_id: int
+
+
+class PasswordSetupLinkResponse(BaseModel):
+    exec_name: str
+    setup_link: str
+    expires_at: datetime
+
+
+class SignupRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    email: EmailStr
+    password: str = Field(min_length=12, max_length=128)
