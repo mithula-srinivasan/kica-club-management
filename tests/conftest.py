@@ -63,3 +63,14 @@ def make_exec():
             return exec_user
 
     return _make_exec
+
+
+@pytest.fixture
+def log_in(client):
+    def _log_in(email="exec@example.com", password="correct-password", remember_me=False):
+        return client.post(
+            "/auth/login",
+            json={"email": email, "password": password, "remember_me": remember_me}
+        )
+
+    return _log_in
