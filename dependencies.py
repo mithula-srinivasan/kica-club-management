@@ -48,3 +48,15 @@ def get_current_exec(
         raise not_logged_in
 
     return exec_user
+
+
+def require_admin(
+    current_exec: Exec = Depends(get_current_exec)
+) -> Exec:
+    if current_exec.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+
+    return current_exec
