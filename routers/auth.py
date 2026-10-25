@@ -247,6 +247,13 @@ def forgot_password(
 
     now = datetime.now(timezone.utc)
 
+    # Tidy up: remove reset links that expired more than 30 days ago
+    db.execute(
+        delete(PasswordSetupToken).where(
+            PasswordSetupToken.expires_at < now - timedelta(days=30)
+        )
+    )
+
     # Expire any earlier unused links, so only the newest one works
     db.execute(
         update(PasswordSetupToken)
