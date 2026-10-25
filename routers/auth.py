@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from sqlalchemy import delete, select, update
@@ -97,6 +97,13 @@ def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Your account is awaiting admin approval"
         )
+
+    # Tidy up: remove everyone's expired sessions, which can never be used again
+    db.execute(
+        delete(ExecSession).where(
+            ExecSession.expires_at < datetime.now(timezone.utc)
+        )
+    )
 
     # Create a new session for this device
     token = generate_session_token()
