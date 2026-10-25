@@ -31,3 +31,14 @@ def generate_session_token() -> str:
 
 def hash_session_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
+
+
+SETUP_LINK_LENGTH = timedelta(hours=24)
+
+# Where the React app runs; setup links point to its "set password" page
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+RESET_LINK_LENGTH = timedelta(hours=1)
+
+# Where the React app runs; reset links point to its "reset password" page
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")

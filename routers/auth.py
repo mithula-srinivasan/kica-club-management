@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
+from email_service import send_email
 from dependencies import get_current_exec, get_db, require_admin
-from schemas import ExecResponse, LoginRequest, PasswordSetupLinkRequest, PasswordSetupLinkResponse, SignupRequest
+from schemas import ExecResponse, LoginRequest, PasswordSetupLinkRequest, PasswordSetupLinkResponse, SignupRequest, ForgotPasswordRequest, ResetPasswordRequest
 from models import Exec, ExecSession, PasswordSetupToken
 from security import (
     COOKIE_SECURE,
@@ -19,7 +20,8 @@ from security import (
     verify_password,
     FRONTEND_URL,
     SETUP_LINK_LENGTH,
-    hash_password
+    hash_password,
+    RESET_LINK_LENGTH
 )
 
 
@@ -211,4 +213,112 @@ def create_password_setup_link(
         "exec_name": target_exec.name,
         "setup_link": f"{FRONTEND_URL}/set-password#token={token}",
         "expires_at": expires_at
+    }
+
+
+@router.post("/forgot-password")
+def forgot_password(
+    request_data: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    # Same reply whether or not the account exists, so emails can't be checked
+    generic_reply = {
+        "message": "If an account exists for this email, a reset link has been sent."
+    }
+
+    exec_user = db.scalar(
+        select(Exec).where(Exec.email == request_data.email.strip().lower())
+    )
+
+    if (
+        exec_user is None
+        or not exec_user.is_active
+        or exec_user.approved_at is None
+    ):
+        return generic_reply
+
+    now = datetime.now(timezone.utc)
+
+    # Expire any earlier unused links, so only the newest one works
+    db.execute(
+        update(PasswordSetupToken)
+        .where(
+            PasswordSetupToken.exec_id == exec_user.exec_id,
+            PasswordSetupToken.used_at.is_(None),
+            PasswordSetupToken.expires_at > now
+        )
+        .values(expires_at=now)
+    )
+
+    token = generate_session_token()
+
+    db.add(
+        PasswordSetupToken(
+            exec_id=exec_user.exec_id,
+            token_hash=hash_session_token(token),
+            created_by_exec_id=exec_user.exec_id,
+            expires_at=now + RESET_LINK_LENGTH
+        )
+    )
+    db.commit()
+
+    reset_link = f"{FRONTEND_URL}/reset-password#token={token}"
+
+    # Send after the reply, so the response time doesn't reveal that the account exists
+    background_tasks.add_task(
+        send_email,
+        exec_user.email,
+        "Reset your KICA password",
+        f"Hi {exec_user.name},\n\n"
+        f"Use this link to choose a new password:\n{reset_link}\n\n"
+        "This link expires in 1 hour. If you didn't ask for this, you can ignore this email."
+    )
+
+    return generic_reply
+
+
+@router.post("/reset-password")
+def reset_password(
+    reset_data: ResetPasswordRequest,
+    db: Session = Depends(get_db)
+):
+    invalid_link = HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="This reset link is invalid or has expired"
+    )
+
+    now = datetime.now(timezone.utc)
+
+    # A valid link matches, hasn't been used, and hasn't expired
+    reset_token = db.scalar(
+        select(PasswordSetupToken)
+        .where(
+            PasswordSetupToken.token_hash == hash_session_token(reset_data.token),
+            PasswordSetupToken.used_at.is_(None),
+            PasswordSetupToken.expires_at > now
+        )
+        .with_for_update()
+    )
+
+    if reset_token is None:
+        raise invalid_link
+
+    exec_user = db.get(Exec, reset_token.exec_id)
+
+    if not exec_user.is_active:
+        raise invalid_link
+
+    exec_user.password_hash = hash_password(reset_data.new_password)
+    reset_token.used_at = now
+
+    # Log out every device, in case someone else had access to the account
+    db.execute(
+        delete(ExecSession).where(ExecSession.exec_id == exec_user.exec_id)
+    )
+
+    db.commit()
+
+    return {
+        "message": "Password reset. You can now log in with your new password."
     }
