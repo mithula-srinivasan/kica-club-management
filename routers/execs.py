@@ -1,11 +1,11 @@
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func, select
+from sqlalchemy import func, select, delete
 from sqlalchemy.orm import Session
 
 from dependencies import get_db, require_admin
-from models import Exec
+from models import Exec, ExecSession
 from schemas import ExecResponse
 
 
@@ -76,3 +76,119 @@ def reject_signup(
 
     db.delete(exec_user)
     db.commit()
+
+
+@router.post("/{exec_id}/make-admin", response_model=ExecResponse)
+def make_admin(
+    exec_id: int,
+    db: Session = Depends(get_db)
+):
+    exec_user = get_exec_or_404(db, exec_id)
+
+    if exec_user.approved_at is None or not exec_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Only approved, active Execs can be made admin"
+        )
+
+    if exec_user.role == "admin":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This Exec is already an admin"
+        )
+
+    exec_user.role = "admin"
+    db.commit()
+
+    return exec_user
+
+
+@router.post("/{exec_id}/remove-admin", response_model=ExecResponse)
+def remove_admin(
+    exec_id: int,
+    db: Session = Depends(get_db)
+):
+    exec_user = get_exec_or_404(db, exec_id)
+
+    if exec_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This Exec is not an admin"
+        )
+
+    # Never leave the club with no admin, or nobody could approve or manage accounts
+    active_admin_count = db.scalar(
+        select(func.count())
+        .select_from(Exec)
+        .where(Exec.role == "admin", Exec.is_active.is_(True))
+    )
+
+    if active_admin_count <= 1:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot remove the last admin"
+        )
+
+    exec_user.role = "exec"
+    db.commit()
+
+    return exec_user
+
+
+
+@router.post("/{exec_id}/deactivate", response_model=ExecResponse)
+def deactivate_exec(
+    exec_id: int,
+    current_admin: Exec = Depends(require_admin),
+    db: Session = Depends(get_db)
+):
+    exec_user = get_exec_or_404(db, exec_id)
+
+    # Stops an admin locking themselves out, and means the last admin can never be deactivated
+    if exec_user.exec_id == current_admin.exec_id:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You cannot deactivate your own account"
+        )
+
+    if exec_user.approved_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Pending sign-ups should be rejected, not deactivated"
+        )
+
+    if not exec_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This Exec is already deactivated"
+        )
+
+    exec_user.is_active = False
+
+    # Log them out on every device straight away
+    db.execute(
+        delete(ExecSession).where(ExecSession.exec_id == exec_user.exec_id)
+    )
+
+    db.commit()
+
+    return exec_user
+
+
+@router.post("/{exec_id}/reactivate", response_model=ExecResponse)
+def reactivate_exec(
+    exec_id: int,
+    db: Session = Depends(get_db)
+):
+    exec_user = get_exec_or_404(db, exec_id)
+
+    if exec_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This Exec is already active"
+        )
+
+    exec_user.is_active = True
+    db.commit()
+
+    return exec_user
