@@ -554,7 +554,7 @@ class AuditLog(Base):
 
     __table_args__ = (
         CheckConstraint(
-            "action IN ('CREATE', 'UPDATE', 'REVERSE', 'FINALIZE')",
+            "action IN ('CREATE', 'UPDATE', 'DELETE', 'REVERSE', 'FINALIZE')",
             name="ck_audit_action"
         ),
     )

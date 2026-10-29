@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from audit import record_audit
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select, delete
@@ -55,6 +56,12 @@ def approve_signup(
 
     exec_user.approved_at = datetime.now(timezone.utc)
     exec_user.approved_by_exec_id = current_admin.exec_id
+
+    record_audit(
+        db, current_admin, "UPDATE", "execs", exec_user.exec_id,
+        old_values={"approved_at": None},
+        new_values={"approved_at": exec_user.approved_at}
+    )
     db.commit()
 
     return exec_user
@@ -63,6 +70,7 @@ def approve_signup(
 @router.delete("/{exec_id}", status_code=status.HTTP_204_NO_CONTENT)
 def reject_signup(
     exec_id: int,
+    current_admin: Exec = Depends(require_admin),
     db: Session = Depends(get_db)
 ):
     exec_user = get_exec_or_404(db, exec_id)
@@ -74,6 +82,10 @@ def reject_signup(
             detail="Only pending sign-ups can be rejected"
         )
 
+    record_audit(
+        db, current_admin, "DELETE", "execs", exec_user.exec_id,
+        old_values={"name": exec_user.name, "email": exec_user.email}
+    )
     db.delete(exec_user)
     db.commit()
 
@@ -81,6 +93,7 @@ def reject_signup(
 @router.post("/{exec_id}/make-admin", response_model=ExecResponse)
 def make_admin(
     exec_id: int,
+    current_admin: Exec = Depends(require_admin),
     db: Session = Depends(get_db)
 ):
     exec_user = get_exec_or_404(db, exec_id)
@@ -98,6 +111,12 @@ def make_admin(
         )
 
     exec_user.role = "admin"
+
+    record_audit(
+        db, current_admin, "UPDATE", "execs", exec_user.exec_id,
+        old_values={"role": "exec"},
+        new_values={"role": "admin"}
+    )
     db.commit()
 
     return exec_user
@@ -106,6 +125,7 @@ def make_admin(
 @router.post("/{exec_id}/remove-admin", response_model=ExecResponse)
 def remove_admin(
     exec_id: int,
+    current_admin: Exec = Depends(require_admin),
     db: Session = Depends(get_db)
 ):
     exec_user = get_exec_or_404(db, exec_id)
@@ -130,6 +150,12 @@ def remove_admin(
         )
 
     exec_user.role = "exec"
+
+    record_audit(
+        db, current_admin, "UPDATE", "execs", exec_user.exec_id,
+        old_values={"role": "admin"},
+        new_values={"role": "exec"}
+    )
     db.commit()
 
     return exec_user
@@ -170,6 +196,11 @@ def deactivate_exec(
         delete(ExecSession).where(ExecSession.exec_id == exec_user.exec_id)
     )
 
+    record_audit(
+        db, current_admin, "UPDATE", "execs", exec_user.exec_id,
+        old_values={"is_active": True},
+        new_values={"is_active": False}
+    )
     db.commit()
 
     return exec_user
@@ -178,6 +209,7 @@ def deactivate_exec(
 @router.post("/{exec_id}/reactivate", response_model=ExecResponse)
 def reactivate_exec(
     exec_id: int,
+    current_admin: Exec = Depends(require_admin),
     db: Session = Depends(get_db)
 ):
     exec_user = get_exec_or_404(db, exec_id)
@@ -189,6 +221,12 @@ def reactivate_exec(
         )
 
     exec_user.is_active = True
+
+    record_audit(
+        db, current_admin, "UPDATE", "execs", exec_user.exec_id,
+        old_values={"is_active": False},
+        new_values={"is_active": True}
+    )
     db.commit()
 
     return exec_user

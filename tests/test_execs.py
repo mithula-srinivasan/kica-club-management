@@ -1,6 +1,10 @@
 from fastapi.testclient import TestClient
 
 from app import app
+from sqlalchemy import select
+
+from database import SessionLocal
+from models import AuditLog
 
 
 def test_regular_exec_cannot_use_admin_endpoints(client, make_exec, log_in):
@@ -89,3 +93,43 @@ def test_deactivating_logs_exec_out_everywhere(client, make_exec, log_in):
     client.post(f"/execs/{member.exec_id}/deactivate")
 
     assert member_client.get("/players/").status_code == 401
+
+
+def audit_entries():
+    with SessionLocal() as db:
+        return db.scalars(select(AuditLog).order_by(AuditLog.audit_id)).all()
+
+
+def test_approving_is_recorded_in_audit_log(client, make_exec, log_in):
+    admin = make_exec(email="admin@example.com", role="admin")
+    pending = make_exec(email="pending@example.com", approved=False)
+    log_in(email="admin@example.com")
+
+    client.post(f"/execs/{pending.exec_id}/approve")
+
+    [entry] = audit_entries()
+    assert entry.exec_id == admin.exec_id
+    assert entry.action == "UPDATE"
+    assert entry.record_id == pending.exec_id
+    assert entry.old_values == {"approved_at": None}
+
+
+def test_rejecting_keeps_name_in_audit_log(client, make_exec, log_in):
+    make_exec(email="admin@example.com", role="admin")
+    pending = make_exec(email="pending@example.com", name="Ahmed", approved=False)
+    log_in(email="admin@example.com")
+
+    client.delete(f"/execs/{pending.exec_id}")
+
+    [entry] = audit_entries()
+    assert entry.action == "DELETE"
+    assert entry.old_values == {"name": "Ahmed", "email": "pending@example.com"}
+
+
+def test_failed_action_leaves_no_audit_entry(client, make_exec, log_in):
+    admin = make_exec(email="admin@example.com", role="admin")
+    log_in(email="admin@example.com")
+
+    client.post(f"/execs/{admin.exec_id}/remove-admin")
+
+    assert audit_entries() == []
