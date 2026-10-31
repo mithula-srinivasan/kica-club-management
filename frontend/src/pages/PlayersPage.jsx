@@ -26,8 +26,9 @@ export default function PlayersPage() {
 
   // Filter in the browser: the whole list is small, so this is instant as you type
   const term = search.trim().toLowerCase()
+    // Ticked: only inactive players. Unticked: only active players.
   const shown = players.filter((player) => {
-    if (!showInactive && !player.is_active) {
+    if (player.is_active === showInactive) {
       return false
     }
 

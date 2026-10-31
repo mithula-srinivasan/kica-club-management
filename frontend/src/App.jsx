@@ -10,6 +10,8 @@ import SignupPage from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
 import PlayersPage from './pages/PlayersPage'
 import PlayerPage from './pages/PlayerPage'
+import AttendancePage from './pages/AttendancePage'
+import SessionPage from './pages/SessionPage'
 
 export default function App() {
   return (
@@ -30,7 +32,8 @@ export default function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/players" element={<PlayersPage />} />
             <Route path="/players/:playerId" element={<PlayerPage />} />
-            <Route path="/attendance" element={<Placeholder title="Attendance" />} />
+            <Route path="/attendance" element={<AttendancePage />} />
+            <Route path="/attendance/:sessionId" element={<SessionPage />} />
             <Route path="/fees" element={<Placeholder title="Fee Collection" />} />
             <Route path="/expenses" element={<Placeholder title="Club Expenses" />} />
             <Route path="/transfers" element={<Placeholder title="Money Transfers" />} />

@@ -34,3 +34,14 @@ export function today() {
 export function currentMonth() {
   return today().slice(0, 7)
 }
+
+
+// "2026-10-16" -> "Fri 16 Oct 2026"
+export function formatDay(isoDate) {
+  return new Date(`${isoDate}T00:00:00`).toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
