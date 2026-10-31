@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from audit import record_audit
 
 from sqlalchemy.exc import IntegrityError
 from schemas import PlayerCreate, PlayerResponse, PlayerUpdate
 from dependencies import get_current_exec, get_db
-from models import Player
+from models import Exec, Player
 
 
 router = APIRouter(
@@ -36,6 +37,7 @@ def get_players(
 @router.post("/", response_model=PlayerResponse, status_code=201)
 def create_player(
     player: PlayerCreate,
+    current_exec: Exec = Depends(get_current_exec),
     db: Session = Depends(get_db)
 ):
     # Remove accidental spaces
@@ -71,6 +73,19 @@ def create_player(
     db.add(new_player)
 
     try:
+        # Send the INSERT now so the new player gets its player_id, without saving yet
+        db.flush()
+
+        record_audit(
+            db, current_exec, "CREATE", "players", new_player.player_id,
+            new_values={
+                "name": name,
+                "kica_id": kica_id,
+                "joined_on": player.joined_on,
+                "is_active": True
+            }
+        )
+
         db.commit()
     except IntegrityError:
         db.rollback()
@@ -78,7 +93,7 @@ def create_player(
             status_code=409,
             detail="Unable to create player: a database constraint was violated"
         )
-
+    
     db.refresh(new_player)
 
     return new_player
@@ -88,6 +103,7 @@ def create_player(
 def update_player(
     player_id: int,
     updates: PlayerUpdate,
+    current_exec: Exec = Depends(get_current_exec),
     db: Session = Depends(get_db)
 ):
     # 1. Find the existing player
@@ -102,6 +118,8 @@ def update_player(
     # 2. Get only the fields the Exec wants to change
     changes = updates.model_dump(exclude_unset=True)
 
+    old_values = {}
+    new_values = {}
     # 3. Validate the supplied values
     for field, value in changes.items():
         if value is None:
@@ -119,9 +137,19 @@ def update_player(
                     detail=f"{field} cannot be empty"
                 )
 
-        # 4. Apply each change to the player object
+        # 4. Remember what changed, then apply it
+        if getattr(player, field) != value:
+            old_values[field] = getattr(player, field)
+            new_values[field] = value
+
         setattr(player, field, value)
 
+    if new_values:
+        record_audit(
+            db, current_exec, "UPDATE", "players", player.player_id,
+            old_values=old_values,
+            new_values=new_values
+        )
     # 5. Save the changes
     try:
         db.commit()
@@ -141,6 +169,7 @@ def update_player(
 def update_player_status(
     player_id: int,
     is_active: bool,
+    current_exec: Exec = Depends(get_current_exec),
     db: Session = Depends(get_db)
 ):
     player = db.get(Player, player_id)
@@ -149,6 +178,13 @@ def update_player_status(
         raise HTTPException(
             status_code=404,
             detail="Player not found"
+        )
+
+    if player.is_active != is_active:
+        record_audit(
+            db, current_exec, "UPDATE", "players", player.player_id,
+            old_values={"is_active": player.is_active},
+            new_values={"is_active": is_active}
         )
 
     player.is_active = is_active
