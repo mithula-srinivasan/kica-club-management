@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from decimal import Decimal
 from pydantic import BaseModel, EmailStr, ConfigDict, Field
 
 
@@ -90,3 +91,20 @@ class SessionDetailResponse(BaseModel):
 
 class AttendanceUpdate(BaseModel):
     player_ids: list[int]
+
+
+
+class MonthlyFeeResponse(BaseModel):
+    player_id: int
+    player_name: str
+    fee_month: date
+    base_fee: Decimal
+    adjustments: Decimal
+    amount_due: Decimal
+
+
+class FeeAdjustmentCreate(BaseModel):
+    player_id: int
+    fee_month: date
+    amount_change: Decimal = Field(max_digits=10, decimal_places=3)
+    reason: str = Field(min_length=1, max_length=500)

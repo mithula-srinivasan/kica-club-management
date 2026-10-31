@@ -1,5 +1,6 @@
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
+from decimal import Decimal
 
 # Point the app at the test database BEFORE anything imports database.py
 os.environ["DATABASE_URL"] = "postgresql+psycopg:///kica_test"
@@ -10,7 +11,7 @@ from sqlalchemy import text
 
 from app import app
 from database import Base, SessionLocal, engine
-from models import Exec, Player
+from models import Exec, FeeRate, Player
 from security import hash_password
 
 # Safety net: refuse to run if somehow pointed at any other database
@@ -87,3 +88,10 @@ def make_player():
             return player
 
     return _make_player
+
+
+@pytest.fixture(autouse=True)
+def default_fee_rate():
+    with SessionLocal() as db:
+        db.add(FeeRate(monthly_amount=Decimal("5.000"), effective_from=date(2000, 1, 1)))
+        db.commit()
