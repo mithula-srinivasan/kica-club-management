@@ -207,3 +207,34 @@ class ExecOption(BaseModel):
     name: str
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ExecCashHeld(BaseModel):
+    exec_id: int
+    name: str
+    amount: Decimal
+
+
+class PlayerOutstanding(BaseModel):
+    player_id: int
+    player_name: str
+    outstanding: Decimal
+
+
+class MonthSummary(BaseModel):
+    month: date
+    sessions_held: int
+    players_attended: int
+    fees_assessed: Decimal
+    payments_received: Decimal
+    expenses_paid: Decimal
+
+
+class DashboardResponse(BaseModel):
+    active_players: int
+    club_balance: Decimal
+    cash_held: list[ExecCashHeld]
+    total_outstanding: Decimal
+    players_owing: int
+    total_credit: Decimal
+    month: MonthSummary
