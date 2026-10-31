@@ -46,6 +46,13 @@ export default function OpeningBalancesPage() {
 
   return (
     <>
+
+      <p className="warning">
+        ⚠️ Only for entering the starting figures once, when the app takes over from Excel.
+        Do not use this for day-to-day changes. Every change is recorded.
+      </p>
+
+      <section className="card"></section>
       <section className="card">
         <h2>Opening balances</h2>
         <p className="hint">

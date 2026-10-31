@@ -20,6 +20,7 @@ import ExecsPage from './pages/admin/ExecsPage'
 import SignupsPage from './pages/admin/SignupsPage'
 import FeeAdjustmentsPage from './pages/admin/FeeAdjustmentsPage'
 import OpeningBalancesPage from './pages/admin/OpeningBalancesPage'
+import ActivityLogPage from './pages/admin/ActivityLogPage'
 
 
 
@@ -53,7 +54,7 @@ export default function App() {
               <Route path="execs" element={<ExecsPage />} />
               <Route path="fees" element={<FeeAdjustmentsPage />} />
               <Route path="opening-balances" element={<OpeningBalancesPage />} />
-              <Route path="activity" element={<Placeholder title="Activity log" />} />
+              <Route path="activity" element={<ActivityLogPage />} />
             </Route>
           </Route>
 

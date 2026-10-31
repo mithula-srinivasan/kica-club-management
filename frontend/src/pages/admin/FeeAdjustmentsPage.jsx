@@ -41,6 +41,13 @@ export default function FeeAdjustmentsPage() {
 
   return (
     <>
+       <p className="warning">
+        ⚠️ Only for exceptions agreed by the committee. Normal fees are worked out
+        automatically from attendance. Every change is recorded.
+      </p>
+
+      <AdjustmentForm players={players} onSaved={reloadHistory} />
+    
       <AdjustmentForm players={players} onSaved={reloadHistory} />
 
       <section className="card">
