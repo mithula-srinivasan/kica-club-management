@@ -738,3 +738,37 @@ button.small {
   justify-content: flex-end;
   gap: 6px;
 }
+
+
+
+.inline-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.inline-label input,
+.inline-label select {
+  width: auto;
+}
+
+/* A row of radio buttons */
+.choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+/* A small amount box inside a table */
+.amount-input {
+  max-width: 140px;
+}
+
+/* A form inside a card (not the card itself) */
+.stacked-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}

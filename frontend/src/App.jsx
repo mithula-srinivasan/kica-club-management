@@ -18,6 +18,8 @@ import TransfersPage from './pages/TransfersPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import ExecsPage from './pages/admin/ExecsPage'
 import SignupsPage from './pages/admin/SignupsPage'
+import FeeAdjustmentsPage from './pages/admin/FeeAdjustmentsPage'
+import OpeningBalancesPage from './pages/admin/OpeningBalancesPage'
 
 
 
@@ -49,8 +51,8 @@ export default function App() {
               <Route index element={<Navigate to="signups" replace />} />
               <Route path="signups" element={<SignupsPage />} />
               <Route path="execs" element={<ExecsPage />} />
-              <Route path="fees" element={<Placeholder title="Fee adjustments" />} />
-              <Route path="opening-balances" element={<Placeholder title="Opening balances" />} />
+              <Route path="fees" element={<FeeAdjustmentsPage />} />
+              <Route path="opening-balances" element={<OpeningBalancesPage />} />
               <Route path="activity" element={<Placeholder title="Activity log" />} />
             </Route>
           </Route>

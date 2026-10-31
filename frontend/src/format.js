@@ -50,3 +50,15 @@ export function formatDay(isoDate) {
 export function methodLabel(method) {
   return method === 'bank_transfer' ? 'Bank transfer' : 'Cash'
 }
+
+
+// A moment in time, e.g. "31 Oct 2026, 21:45", shown in the viewer's local time
+export function formatTimestamp(isoDateTime) {
+  return new Date(isoDateTime).toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
