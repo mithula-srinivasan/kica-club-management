@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { api } from './api'
+export const MIN_PASSWORD_LENGTH = 12
 
 const AuthContext = createContext(null)
 

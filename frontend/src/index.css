@@ -215,3 +215,23 @@ button.danger {
   width: 100%;
   max-width: 400px;
 }
+
+
+a {
+  color: var(--primary);
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.auth-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.95rem;
+}

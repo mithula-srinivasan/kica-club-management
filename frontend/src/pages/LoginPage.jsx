@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth'
 
 export default function LoginPage() {
@@ -73,6 +73,11 @@ export default function LoginPage() {
         <button type="submit" disabled={submitting}>
           {submitting ? 'Logging in...' : 'Log in'}
         </button>
+
+        <div className="auth-links">
+          <Link to="/forgot-password">Forgot password?</Link>
+          <Link to="/signup">Create an account</Link>
+        </div>
       </form>
     </div>
   )
