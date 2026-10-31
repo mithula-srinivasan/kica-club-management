@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from dependencies import get_db, require_admin
 from models import Exec, ExecSession
-from schemas import ExecResponse
+from schemas import ExecResponse, ExecAdminResponse
 
 
 router = APIRouter(
@@ -27,6 +27,17 @@ def get_exec_or_404(db: Session, exec_id: int) -> Exec:
         )
 
     return exec_user
+
+
+@router.get("/", response_model=list[ExecAdminResponse])
+def list_execs(db: Session = Depends(get_db)):
+    # Approved Execs only: pending sign-ups are listed separately
+    return db.scalars(
+        select(Exec)
+        .where(Exec.approved_at.is_not(None))
+        .order_by(Exec.name)
+    ).all()
+
 
 
 @router.get("/pending", response_model=list[ExecResponse])

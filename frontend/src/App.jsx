@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Navigate, BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth'
 import Layout from './components/Layout'
 import RequireAuth from './components/RequireAuth'
@@ -15,6 +15,10 @@ import SessionPage from './pages/SessionPage'
 import FeeCollectionPage from './pages/FeeCollectionPage'
 import ExpensesPage from './pages/ExpensesPage'
 import TransfersPage from './pages/TransfersPage'
+import AdminLayout from './pages/admin/AdminLayout'
+import ExecsPage from './pages/admin/ExecsPage'
+import SignupsPage from './pages/admin/SignupsPage'
+
 
 
 export default function App() {
@@ -41,7 +45,14 @@ export default function App() {
             <Route path="/fees" element={<FeeCollectionPage />} />
             <Route path="/expenses" element={<ExpensesPage />} />
             <Route path="/transfers" element={<TransfersPage />} />
-            <Route path="/admin" element={<Placeholder title="Admin" />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Navigate to="signups" replace />} />
+              <Route path="signups" element={<SignupsPage />} />
+              <Route path="execs" element={<ExecsPage />} />
+              <Route path="fees" element={<Placeholder title="Fee adjustments" />} />
+              <Route path="opening-balances" element={<Placeholder title="Opening balances" />} />
+              <Route path="activity" element={<Placeholder title="Activity log" />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<Placeholder title="Page not found" />} />

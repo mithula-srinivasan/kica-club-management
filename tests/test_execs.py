@@ -133,3 +133,16 @@ def test_failed_action_leaves_no_audit_entry(client, make_exec, log_in):
     client.post(f"/execs/{admin.exec_id}/remove-admin")
 
     assert audit_entries() == []
+
+
+def test_list_execs_shows_approved_including_inactive(client, make_exec, log_in):
+    make_exec(email="admin@example.com", name="Admin", role="admin")
+    make_exec(email="former@example.com", name="Former", is_active=False)
+    make_exec(email="pending@example.com", name="Pending", approved=False)
+    log_in(email="admin@example.com")
+
+    execs = client.get("/execs/").json()
+
+    assert [e["name"] for e in execs] == ["Admin", "Former"]
+    assert execs[1]["is_active"] is False
+    assert "password_hash" not in execs[0]

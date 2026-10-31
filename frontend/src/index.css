@@ -702,3 +702,39 @@ button.small {
 .owing-table td.row-actions {
   width: 25%;
 }
+
+
+
+/* Sub-tabs inside a page, e.g. the Admin sections */
+.sub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sub-tabs a {
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.sub-tabs a:hover {
+  background: var(--surface);
+}
+
+.sub-tabs a.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Several small buttons side by side in a table row */
+.row-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}

@@ -285,3 +285,17 @@ class PlayerOpeningBalanceResponse(BaseModel):
 class OpeningBalancesResponse(BaseModel):
     execs: list[ExecOpeningBalanceResponse]
     players: list[PlayerOpeningBalanceResponse]
+
+
+class SessionDateChange(BaseModel):
+    session_date: date
+
+
+class ExecAdminResponse(BaseModel):
+    exec_id: int
+    name: str
+    email: str
+    role: str
+    is_active: bool
+
+    model_config = ConfigDict(from_attributes=True)
