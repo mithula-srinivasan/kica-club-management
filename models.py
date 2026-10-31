@@ -332,6 +332,23 @@ class Payment(Base):
         nullable=False
     )
 
+    method: Mapped[str] = mapped_column(
+        String(20),
+        server_default="cash",
+        nullable=False
+    )
+
+    note: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    # Sent by the app with each new payment form, so submitting it twice records it once
+    idempotency_key: Mapped[str | None] = mapped_column(
+        String(64),
+        nullable=True
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -346,6 +363,14 @@ class Payment(Base):
         CheckConstraint(
             "status IN ('active', 'reversed')",
             name="ck_payment_status"
+        ),
+        CheckConstraint(
+            "method IN ('cash', 'bank_transfer')",
+            name="ck_payment_method"
+        ),
+        UniqueConstraint(
+            "idempotency_key",
+            name="uq_payments_idempotency_key"
         ),
     )
 
