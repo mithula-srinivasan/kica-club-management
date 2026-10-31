@@ -63,3 +63,30 @@ class ForgotPasswordRequest(BaseModel):
 class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str = Field(min_length=12, max_length=128)
+
+
+class SessionCreate(BaseModel):
+    session_date: date
+
+
+class SessionResponse(BaseModel):
+    session_id: int
+    session_date: date
+    present_count: int
+
+
+class AttendancePlayer(BaseModel):
+    player_id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SessionDetailResponse(BaseModel):
+    session_id: int
+    session_date: date
+    present_players: list[AttendancePlayer]
+
+
+class AttendanceUpdate(BaseModel):
+    player_ids: list[int]

@@ -10,7 +10,7 @@ from sqlalchemy import text
 
 from app import app
 from database import Base, SessionLocal, engine
-from models import Exec
+from models import Exec, Player
 from security import hash_password
 
 # Safety net: refuse to run if somehow pointed at any other database
@@ -74,3 +74,16 @@ def log_in(client):
         )
 
     return _log_in
+
+
+@pytest.fixture
+def make_player():
+    def _make_player(name="Player One", kica_id="K001", is_active=True):
+        with SessionLocal() as db:
+            player = Player(name=name, kica_id=kica_id, is_active=is_active)
+            db.add(player)
+            db.commit()
+            db.refresh(player)
+            return player
+
+    return _make_player
