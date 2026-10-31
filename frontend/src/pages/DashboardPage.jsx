@@ -1,37 +1,28 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
-import { currentMonth, kwd, monthLabel } from '../format'
 import Figure from '../components/Figure'
+import { currentMonth, kwd, monthLabel } from '../format'
 
 export default function DashboardPage() {
   const [month, setMonth] = useState(currentMonth)
   const [dashboard, setDashboard] = useState(null)
-  const [owing, setOwing] = useState([])
-  const [unpaid, setUnpaid] = useState([])
   const [error, setError] = useState('')
 
   useEffect(() => {
     let ignore = false
-    const params = { month: `${month}-01` }
 
-    Promise.all([
-      api('/dashboard/', { params }),
-      api('/dashboard/outstanding'),
-      api('/dashboard/unpaid', { params }),
-    ])
-      .then(([dashboardData, owingData, unpaidData]) => {
-        if (ignore) return
-        setDashboard(dashboardData)
-        setOwing(owingData)
-        setUnpaid(unpaidData)
-        setError('')
+    api('/dashboard/', { params: { month: `${month}-01` } })
+      .then((data) => {
+        if (!ignore) {
+          setDashboard(data)
+          setError('')
+        }
       })
       .catch((err) => {
         if (!ignore) setError(err.message)
       })
 
-    // If the month changes before these replies arrive, ignore the old replies
     return () => {
       ignore = true
     }
@@ -46,7 +37,6 @@ export default function DashboardPage() {
   }
 
   const summary = dashboard.month
-  const label = monthLabel(summary.month)
 
   return (
     <div className="page">
@@ -57,63 +47,41 @@ export default function DashboardPage() {
         <Stat
           label="Owed by members"
           value={kwd(dashboard.total_outstanding)}
-          note={`${dashboard.players_owing} players owing`}
+          note={`${dashboard.players_owing} players owing · See who →`}
+          to="/fees"
         />
         <Stat label="Paid in advance" value={kwd(dashboard.total_credit)} />
         <Stat label="Active players" value={dashboard.active_players} />
       </section>
 
-      <div className="two-columns">
-        <section className="card">
-          <h2>Cash held by Execs</h2>
+      <section className="card">
+        <h2>Cash held by Execs</h2>
 
-          {dashboard.cash_held.length === 0 ? (
-            <p className="hint">No club money recorded yet.</p>
-          ) : (
-            <table>
-              <tbody>
-                {dashboard.cash_held.map((row) => (
-                  <tr key={row.exec_id}>
-                    <td>{row.name}</td>
-                    <td className="amount">{kwd(row.amount)}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td>Total</td>
-                  <td className="amount">{kwd(dashboard.club_balance)}</td>
+        {dashboard.cash_held.length === 0 ? (
+          <p className="hint">No club money recorded yet.</p>
+        ) : (
+          <table>
+            <tbody>
+              {dashboard.cash_held.map((row) => (
+                <tr key={row.exec_id}>
+                  <td>{row.name}</td>
+                  <td className="amount">{kwd(row.amount)}</td>
                 </tr>
-              </tfoot>
-            </table>
-          )}
-        </section>
-
-        <section className="card">
-          <h2>Who owes</h2>
-
-          {owing.length === 0 ? (
-            <p className="hint">Nobody owes anything.</p>
-          ) : (
-            <table>
-              <tbody>
-                {owing.map((row) => (
-                  <tr key={row.player_id}>
-                    <td>
-                      <Link to={`/players/${row.player_id}`}>{row.player_name}</Link>
-                    </td>
-                    <td className="amount">{kwd(row.outstanding)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </section>
-      </div>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td>Total</td>
+                <td className="amount">{kwd(dashboard.club_balance)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        )}
+      </section>
 
       <section className="card">
         <div className="section-header">
-          <h2>{label}</h2>
+          <h2>{monthLabel(summary.month)}</h2>
           <input
             type="month"
             value={month}
@@ -130,35 +98,30 @@ export default function DashboardPage() {
           <Figure label="Expenses paid" value={kwd(summary.expenses_paid)} />
         </div>
 
-        <h3>Not yet paid for {label}</h3>
-
-        {unpaid.length === 0 ? (
-          <p className="hint">Everyone who attended has paid for this month.</p>
-        ) : (
-          <table>
-            <tbody>
-              {unpaid.map((row) => (
-                <tr key={row.player_id}>
-                  <td>
-                    <Link to={`/players/${row.player_id}`}>{row.player_name}</Link>
-                  </td>
-                  <td className="amount">{kwd(row.outstanding)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <p className="section-link">
+          <Link to="/fees">See who hasn't paid →</Link>
+        </p>
       </section>
     </div>
   )
 }
 
-function Stat({ label, value, note }) {
-  return (
-    <div className="card stat">
+function Stat({ label, value, note, to }) {
+  const content = (
+    <>
       <span className="stat-label">{label}</span>
       <span className="stat-value">{value}</span>
       {note && <span className="hint">{note}</span>}
-    </div>
+    </>
   )
+
+  if (to) {
+    return (
+      <Link to={to} className="card stat stat-link">
+        {content}
+      </Link>
+    )
+  }
+
+  return <div className="card stat">{content}</div>
 }

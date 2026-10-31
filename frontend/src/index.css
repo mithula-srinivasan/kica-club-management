@@ -663,3 +663,42 @@ button.small {
   gap: 12px;
   padding: 4px 0;
 }
+
+
+/* A small link-button, e.g. "Record payment" in a list */
+.button.small-button {
+  min-height: 34px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* A dashboard figure that links somewhere */
+.stat-link {
+  color: inherit;
+  text-decoration: none;
+  border-color: var(--primary);
+}
+
+.stat-link:hover {
+  background: var(--primary-soft);
+}
+
+.section-link {
+  margin: 16px 0 0;
+}
+
+
+/* "Who owes" and "Unpaid" lists: name on the left, amount in the middle, button on the right */
+.owing-table td:first-child {
+  width: 45%;
+}
+
+.owing-table td.money {
+  width: 30%;
+  text-align: center;
+}
+
+.owing-table td.row-actions {
+  width: 25%;
+}

@@ -1,9 +1,9 @@
 import { Fragment, useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
 import PlayerPicker from '../components/PlayerPicker'
-import { formatDate, kwd, methodLabel, today } from '../format'
+import { currentMonth, formatDate, kwd, methodLabel, monthLabel, today } from '../format'
 
 const USUAL_FEE = '5.000'
 const RECENT_LIMIT = 50
@@ -14,10 +14,15 @@ function newFormKey() {
 
 export default function FeeCollectionPage() {
   const { user } = useAuth()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
   const [players, setPlayers] = useState(null)
   const [payments, setPayments] = useState([])
+  const [refreshCount, setRefreshCount] = useState(0)
   const [error, setError] = useState('')
+
+  // /fees?player=12 chooses that player in the payment form
+  const initialPlayerId = Number(searchParams.get('player')) || null
 
   useEffect(() => {
     Promise.all([api('/players/'), api('/payments/')])
@@ -28,13 +33,21 @@ export default function FeeCollectionPage() {
       .catch((err) => setError(err.message))
   }, [])
 
-  function reloadPayments() {
+  // Clicking "Record payment" on a list scrolls back up to the form
+  useEffect(() => {
+    if (initialPlayerId) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [location.key, initialPlayerId])
+
+  function refreshAfterChange() {
     api('/payments/')
       .then(setPayments)
       .catch((err) => setError(err.message))
+    setRefreshCount((count) => count + 1)
   }
 
-    async function reversePayment(payment, reason) {
+  async function reversePayment(payment, reason) {
     const updated = await api(`/payments/${payment.payment_id}/reverse`, {
       method: 'POST',
       body: { reason },
@@ -42,14 +55,12 @@ export default function FeeCollectionPage() {
     setPayments((current) =>
       current.map((p) => (p.payment_id === updated.payment_id ? updated : p))
     )
+    setRefreshCount((count) => count + 1)
   }
 
   if (!players) {
     return error ? <p className="error">{error}</p> : <p className="loading">Loading...</p>
   }
-
-  // Coming from a player's page: /fees?player=12 chooses that player straight away
-  const initialPlayerId = Number(searchParams.get('player')) || null
 
   return (
     <div className="page">
@@ -58,10 +69,16 @@ export default function FeeCollectionPage() {
       {error && <p className="error">{error}</p>}
 
       <RecordPaymentForm
+        key={location.key}
         players={players}
         initialPlayerId={initialPlayerId}
-        onRecorded={reloadPayments}
+        onRecorded={refreshAfterChange}
       />
+
+      <div className="two-columns">
+        <WhoOwes refreshCount={refreshCount} />
+        <UnpaidForMonth refreshCount={refreshCount} />
+      </div>
 
       <RecentPayments payments={payments} user={user} onReverse={reversePayment} />
     </div>
@@ -359,5 +376,114 @@ function ReverseForm({ payment, onReverse, onCancel }) {
         </button>
       </div>
     </form>
+  )
+}
+
+
+function WhoOwes({ refreshCount }) {
+  const [owing, setOwing] = useState(null)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let ignore = false
+
+    api('/dashboard/outstanding')
+      .then((data) => {
+        if (!ignore) setOwing(data)
+      })
+      .catch((err) => {
+        if (!ignore) setError(err.message)
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [refreshCount])
+
+  return (
+    <section className="card">
+      <h2>Who owes</h2>
+
+      {error && <p className="error">{error}</p>}
+
+      {owing === null ? (
+        <p className="hint">Loading...</p>
+      ) : owing.length === 0 ? (
+        <p className="hint">Nobody owes anything.</p>
+      ) : (
+        <OwingTable rows={owing} />
+      )}
+    </section>
+  )
+}
+
+function UnpaidForMonth({ refreshCount }) {
+  const [month, setMonth] = useState(currentMonth)
+  const [unpaid, setUnpaid] = useState(null)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let ignore = false
+
+    api('/dashboard/unpaid', { params: { month: `${month}-01` } })
+      .then((data) => {
+        if (!ignore) {
+          setUnpaid(data)
+          setError('')
+        }
+      })
+      .catch((err) => {
+        if (!ignore) setError(err.message)
+      })
+
+    return () => {
+      ignore = true
+    }
+  }, [month, refreshCount])
+
+  return (
+    <section className="card">
+      <div className="section-header">
+        <h2>Unpaid for {monthLabel(`${month}-01`)}</h2>
+        <input
+          type="month"
+          value={month}
+          onChange={(event) => event.target.value && setMonth(event.target.value)}
+          aria-label="Choose month"
+        />
+      </div>
+
+      {error && <p className="error">{error}</p>}
+
+      {unpaid === null ? (
+        <p className="hint">Loading...</p>
+      ) : unpaid.length === 0 ? (
+        <p className="hint">Everyone who attended has paid for this month.</p>
+      ) : (
+        <OwingTable rows={unpaid} />
+      )}
+    </section>
+  )
+}
+
+function OwingTable({ rows }) {
+  return (
+    <table className="owing-table">
+      <tbody>
+        {rows.map((row) => (
+          <tr key={row.player_id}>
+            <td>
+              <Link to={`/players/${row.player_id}`}>{row.player_name}</Link>
+            </td>
+            <td className="money">{kwd(row.outstanding)}</td>
+            <td className="row-actions">
+              <Link className="button small-button" to={`/fees?player=${row.player_id}`}>
+                Record payment
+              </Link>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
