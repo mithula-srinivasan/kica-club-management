@@ -1,6 +1,4 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
-
+from club_time import kuwait_today
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -16,8 +14,6 @@ from schemas import (
     PaymentReverse,
     PlayerStatement,
 )
-
-KUWAIT = ZoneInfo("Asia/Kuwait")
 
 
 router = APIRouter(
@@ -101,7 +97,7 @@ def record_payment(
         )
 
 
-    if payment_data.paid_on > datetime.now(KUWAIT).date():
+    if payment_data.paid_on > kuwait_today():
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Payment date cannot be in the future"

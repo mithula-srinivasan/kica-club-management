@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import players, auth, execs, club_sessions, fees, payments, expenses
+from routers import players, auth, execs, club_sessions, fees, payments, expenses, transfers
 
 app = FastAPI(title="KICA Club Management API")
 
@@ -10,4 +10,5 @@ app.include_router(club_sessions.router)
 app.include_router(fees.router)
 app.include_router(payments.router)
 app.include_router(expenses.router)
+app.include_router(transfers.router)
 

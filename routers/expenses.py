@@ -1,5 +1,4 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from club_time import kuwait_today
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -10,7 +9,6 @@ from dependencies import get_current_exec, get_db
 from models import Exec, Expense
 from schemas import ExpenseCreate, ExpenseResponse, ExpenseReverse
 
-KUWAIT = ZoneInfo("Asia/Kuwait")
 
 
 router = APIRouter(
@@ -56,7 +54,7 @@ def record_expense(
     current_exec: Exec = Depends(get_current_exec),
     db: Session = Depends(get_db)
 ):
-    if expense_data.expense_date > datetime.now(KUWAIT).date():
+    if expense_data.expense_date > kuwait_today():
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Expense date cannot be in the future"

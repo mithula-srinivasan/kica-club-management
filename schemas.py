@@ -176,3 +176,34 @@ class ExpenseResponse(BaseModel):
 
 class ExpenseReverse(BaseModel):
     reason: str = Field(min_length=1, max_length=500)
+
+
+class TransferCreate(BaseModel):
+    from_exec_id: int
+    amount: Decimal = Field(gt=0, max_digits=10, decimal_places=3)
+    transferred_on: date
+
+
+class TransferResponse(BaseModel):
+    transfer_id: int
+    from_exec_id: int
+    from_exec_name: str
+    to_exec_id: int
+    to_exec_name: str
+    amount: Decimal
+    transferred_on: date
+    status: str
+    recorded_by_exec_id: int
+    recorded_by_name: str
+    created_at: datetime
+
+
+class TransferReverse(BaseModel):
+    reason: str = Field(min_length=1, max_length=500)
+
+
+class ExecOption(BaseModel):
+    exec_id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
