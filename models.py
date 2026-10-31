@@ -583,3 +583,75 @@ class AuditLog(Base):
             name="ck_audit_action"
         ),
     )
+
+
+
+class ExecOpeningBalance(Base):
+    __tablename__ = "exec_opening_balances"
+
+    # One row per Exec, so the Exec's id is also the primary key
+    exec_id: Mapped[int] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        primary_key=True
+    )
+
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(10, 3),
+        nullable=False
+    )
+
+    as_of: Mapped[date] = mapped_column(
+        Date,
+        nullable=False
+    )
+
+    set_by_exec_id: Mapped[int] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        nullable=False
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "amount >= 0",
+            name="ck_exec_opening_balance_not_negative"
+        ),
+    )
+
+
+class PlayerOpeningBalance(Base):
+    __tablename__ = "player_opening_balances"
+
+    player_id: Mapped[int] = mapped_column(
+        ForeignKey("players.player_id"),
+        primary_key=True
+    )
+
+    # Positive: the player owed this much. Negative: the player had this much credit.
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(10, 3),
+        nullable=False
+    )
+
+    as_of: Mapped[date] = mapped_column(
+        Date,
+        nullable=False
+    )
+
+    set_by_exec_id: Mapped[int] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        nullable=False
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False
+    )

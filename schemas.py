@@ -144,6 +144,7 @@ class StatementMonth(BaseModel):
     amount_due: Decimal
     amount_paid: Decimal
     remaining: Decimal
+    is_opening_balance: bool = False
 
 
 class PlayerStatement(BaseModel):
@@ -250,3 +251,37 @@ class AuditLogResponse(BaseModel):
     old_values: dict | None
     new_values: dict | None
     created_at: datetime
+
+
+
+class ExecOpeningBalanceSet(BaseModel):
+    amount: Decimal = Field(ge=0, max_digits=10, decimal_places=3)
+    as_of: date
+
+
+class PlayerOpeningBalanceSet(BaseModel):
+    amount: Decimal = Field(max_digits=10, decimal_places=3)
+    as_of: date
+
+
+class ExecOpeningBalanceResponse(BaseModel):
+    exec_id: int
+    name: str
+    amount: Decimal
+    as_of: date
+    set_by_name: str
+    updated_at: datetime
+
+
+class PlayerOpeningBalanceResponse(BaseModel):
+    player_id: int
+    player_name: str
+    amount: Decimal
+    as_of: date
+    set_by_name: str
+    updated_at: datetime
+
+
+class OpeningBalancesResponse(BaseModel):
+    execs: list[ExecOpeningBalanceResponse]
+    players: list[PlayerOpeningBalanceResponse]

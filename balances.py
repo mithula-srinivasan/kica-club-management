@@ -6,7 +6,16 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from fees import ZERO, monthly_fees
-from models import ClubSession, Exec, Expense, Payment, Player, Transfer
+from models import (
+    ClubSession,
+    Exec,
+    ExecOpeningBalance,
+    Expense,
+    Payment,
+    Player,
+    PlayerOpeningBalance,
+    Transfer,
+)
 
 
 def total_paid(db: Session, player_id: int) -> Decimal:
@@ -28,6 +37,43 @@ def paid_by_player(db: Session) -> dict:
     )
 
 
+def fees_by_player(db: Session) -> dict:
+    grouped = defaultdict(list)
+
+    for fee in monthly_fees(db):
+        grouped[fee["player_id"]].append(fee)
+
+    return grouped
+
+
+def opening_balances_by_player(db: Session) -> dict:
+    return {
+        row.player_id: row
+        for row in db.scalars(select(PlayerOpeningBalance))
+    }
+
+
+def include_opening_balance(
+    fees: list[dict],
+    paid: Decimal,
+    opening: PlayerOpeningBalance | None
+) -> tuple[list[dict], Decimal]:
+    if opening is None:
+        return fees, paid
+
+    # Owed from before the app: treated as the oldest fee, so it is paid off first
+    if opening.amount > 0:
+        opening_line = {
+            "fee_month": opening.as_of,
+            "amount_due": opening.amount,
+            "is_opening_balance": True
+        }
+        return [opening_line] + fees, paid
+
+    # Credit from before the app: treated as money already paid
+    return fees, paid - opening.amount
+
+
 def apply_oldest_first(fees: list[dict], paid: Decimal) -> tuple[list[dict], Decimal]:
     # Spread the money paid across the fees, oldest month first
     unapplied = paid
@@ -41,7 +87,8 @@ def apply_oldest_first(fees: list[dict], paid: Decimal) -> tuple[list[dict], Dec
             "fee_month": fee["fee_month"],
             "amount_due": fee["amount_due"],
             "amount_paid": applied,
-            "remaining": fee["amount_due"] - applied
+            "remaining": fee["amount_due"] - applied,
+            "is_opening_balance": fee.get("is_opening_balance", False)
         })
 
     return months, unapplied
@@ -51,9 +98,11 @@ def player_statement(db: Session, player: Player) -> dict:
     fees = monthly_fees(db, player_id=player.player_id)
     paid = total_paid(db, player.player_id)
 
-    # Apply everything paid to the oldest fees first
-    months, unapplied = apply_oldest_first(fees, paid)
+    fees, paid = include_opening_balance(
+        fees, paid, db.get(PlayerOpeningBalance, player.player_id)
+    )
 
+    months, unapplied = apply_oldest_first(fees, paid)
     total_due = sum((fee["amount_due"] for fee in fees), ZERO)
 
     return {
@@ -67,9 +116,14 @@ def player_statement(db: Session, player: Player) -> dict:
     }
 
 
-
 def cash_held_by_exec(db: Session) -> list[dict]:
     held = defaultdict(lambda: ZERO)
+
+    # Money each Exec was holding when the app took over from Excel
+    for exec_id, amount in db.execute(
+        select(ExecOpeningBalance.exec_id, ExecOpeningBalance.amount)
+    ):
+        held[exec_id] += amount
 
     # Money in: payments each Exec collected
     for exec_id, total in db.execute(
@@ -115,14 +169,11 @@ def cash_held_by_exec(db: Session) -> list[dict]:
 
 
 def all_player_balances(db: Session) -> list[dict]:
-    total_due = defaultdict(lambda: ZERO)
+    grouped = fees_by_player(db)
+    paid_totals = paid_by_player(db)
+    openings = opening_balances_by_player(db)
 
-    for fee in monthly_fees(db):
-        total_due[fee["player_id"]] += fee["amount_due"]
-
-    total_paid = paid_by_player(db)
-
-    player_ids = set(total_due) | set(total_paid)
+    player_ids = set(grouped) | set(paid_totals) | set(openings)
 
     if not player_ids:
         return []
@@ -137,8 +188,13 @@ def all_player_balances(db: Session) -> list[dict]:
     balances = []
 
     for player_id in player_ids:
-        due = total_due[player_id]
-        paid = total_paid.get(player_id, ZERO)
+        fees, paid = include_opening_balance(
+            grouped.get(player_id, []),
+            paid_totals.get(player_id, ZERO),
+            openings.get(player_id)
+        )
+
+        due = sum((fee["amount_due"] for fee in fees), ZERO)
         covered = min(due, paid)
 
         balances.append({
@@ -198,22 +254,30 @@ def month_summary(db: Session, fee_month: date) -> dict:
 
 
 def unpaid_for_month(db: Session, fee_month: date) -> list[dict]:
-    fees_by_player = defaultdict(list)
-
-    for fee in monthly_fees(db):
-        fees_by_player[fee["player_id"]].append(fee)
-
-    total_paid = paid_by_player(db)
+    grouped = fees_by_player(db)
+    paid_totals = paid_by_player(db)
+    openings = opening_balances_by_player(db)
     unpaid = []
 
-    for player_id, fees in fees_by_player.items():
-        months, _ = apply_oldest_first(fees, total_paid.get(player_id, ZERO))
+    for player_id, player_fees in grouped.items():
+        player_name = player_fees[0]["player_name"]
+
+        fees, paid = include_opening_balance(
+            player_fees,
+            paid_totals.get(player_id, ZERO),
+            openings.get(player_id)
+        )
+        months, _ = apply_oldest_first(fees, paid)
 
         for month in months:
-            if month["fee_month"] == fee_month and month["remaining"] > 0:
+            if (
+                not month["is_opening_balance"]
+                and month["fee_month"] == fee_month
+                and month["remaining"] > 0
+            ):
                 unpaid.append({
                     "player_id": player_id,
-                    "player_name": fees[0]["player_name"],
+                    "player_name": player_name,
                     "outstanding": month["remaining"]
                 })
 
