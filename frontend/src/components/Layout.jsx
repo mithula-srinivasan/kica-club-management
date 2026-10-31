@@ -13,9 +13,9 @@ export default function Layout() {
           <NavLink to="/" end>Dashboard</NavLink>
           <NavLink to="/players">Players</NavLink>
           <NavLink to="/attendance">Attendance</NavLink>
-          <NavLink to="/payments">Payments</NavLink>
-          <NavLink to="/expenses">Expenses</NavLink>
-          <NavLink to="/transfers">Transfers</NavLink>
+          <NavLink to="/fees">Fee Collection</NavLink>
+          <NavLink to="/expenses">Club Expenses</NavLink>
+          <NavLink to="/transfers">Money Transfers</NavLink>
           {user.role === 'admin' && <NavLink to="/admin">Admin</NavLink>}
         </nav>
 

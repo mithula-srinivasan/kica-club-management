@@ -34,6 +34,23 @@ def get_players(
     return players
 
 
+
+@router.get("/{player_id}", response_model=PlayerResponse)
+def get_player(
+    player_id: int,
+    db: Session = Depends(get_db)
+):
+    player = db.get(Player, player_id)
+
+    if player is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Player not found"
+        )
+
+    return player
+
+
 @router.post("/", response_model=PlayerResponse, status_code=201)
 def create_player(
     player: PlayerCreate,

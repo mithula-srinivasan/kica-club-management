@@ -74,3 +74,16 @@ def test_status_change_is_logged(client, make_exec, log_in):
     entry = audit_entries()[-1]
     assert entry.old_values == {"is_active": True}
     assert entry.new_values == {"is_active": False}
+
+
+
+def test_get_single_player(client, make_exec, log_in):
+    make_exec()
+    log_in()
+    player_id = create_player(client).json()["player_id"]
+
+    response = client.get(f"/players/{player_id}")
+
+    assert response.status_code == 200
+    assert response.json()["kica_id"] == "K001"
+    assert client.get("/players/999").status_code == 404

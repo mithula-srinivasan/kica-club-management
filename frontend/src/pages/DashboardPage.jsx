@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api'
 import { currentMonth, kwd, monthLabel } from '../format'
+import Figure from '../components/Figure'
 
 export default function DashboardPage() {
   const [month, setMonth] = useState(currentMonth)
@@ -158,15 +159,6 @@ function Stat({ label, value, note }) {
       <span className="stat-label">{label}</span>
       <span className="stat-value">{value}</span>
       {note && <span className="hint">{note}</span>}
-    </div>
-  )
-}
-
-function Figure({ label, value }) {
-  return (
-    <div className="figure">
-      <span className="stat-label">{label}</span>
-      <strong>{value}</strong>
     </div>
   )
 }
