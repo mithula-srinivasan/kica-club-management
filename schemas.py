@@ -238,3 +238,15 @@ class DashboardResponse(BaseModel):
     players_owing: int
     total_credit: Decimal
     month: MonthSummary
+
+
+class AuditLogResponse(BaseModel):
+    audit_id: int
+    exec_id: int
+    exec_name: str
+    action: str
+    table_name: str
+    record_id: int
+    old_values: dict | None
+    new_values: dict | None
+    created_at: datetime
