@@ -579,3 +579,87 @@ button.small {
   padding: 12px 28px;
   font-size: 1.1rem;
 }
+
+
+/* A form field whose control isn't a single input (e.g. the player picker) */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.highlight-card {
+  border: 2px solid var(--primary);
+}
+
+/* Player picker */
+.picker-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.picker-option {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-weight: 400;
+  text-align: left;
+}
+
+.picker-option:hover {
+  background: var(--primary-soft);
+}
+
+.picked {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  background: var(--primary-soft);
+}
+
+/* Wide tables scroll sideways on small screens instead of stretching the page */
+.table-scroll {
+  overflow-x: auto;
+}
+
+
+
+/* Money in a left-aligned column: digits still line up */
+.money {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The reverse form that opens under a payment row */
+.reverse-row td {
+  background: var(--danger-soft);
+}
+
+.reverse-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0;
+}

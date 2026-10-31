@@ -12,6 +12,7 @@ import PlayersPage from './pages/PlayersPage'
 import PlayerPage from './pages/PlayerPage'
 import AttendancePage from './pages/AttendancePage'
 import SessionPage from './pages/SessionPage'
+import FeeCollectionPage from './pages/FeeCollectionPage'
 
 export default function App() {
   return (
@@ -34,7 +35,7 @@ export default function App() {
             <Route path="/players/:playerId" element={<PlayerPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
             <Route path="/attendance/:sessionId" element={<SessionPage />} />
-            <Route path="/fees" element={<Placeholder title="Fee Collection" />} />
+            <Route path="/fees" element={<FeeCollectionPage />} />
             <Route path="/expenses" element={<Placeholder title="Club Expenses" />} />
             <Route path="/transfers" element={<Placeholder title="Money Transfers" />} />
             <Route path="/admin" element={<Placeholder title="Admin" />} />

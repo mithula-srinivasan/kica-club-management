@@ -45,3 +45,8 @@ export function formatDay(isoDate) {
     year: 'numeric',
   })
 }
+
+
+export function methodLabel(method) {
+  return method === 'bank_transfer' ? 'Bank transfer' : 'Cash'
+}
