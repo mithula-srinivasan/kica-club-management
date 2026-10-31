@@ -154,3 +154,25 @@ class PlayerStatement(BaseModel):
     outstanding: Decimal
     credit: Decimal
     months: list[StatementMonth]
+
+
+
+class ExpenseCreate(BaseModel):
+    description: str = Field(min_length=1, max_length=500)
+    amount: Decimal = Field(gt=0, max_digits=10, decimal_places=3)
+    expense_date: date
+
+
+class ExpenseResponse(BaseModel):
+    expense_id: int
+    description: str
+    amount: Decimal
+    expense_date: date
+    status: str
+    recorded_by_exec_id: int
+    recorded_by_name: str
+    created_at: datetime
+
+
+class ExpenseReverse(BaseModel):
+    reason: str = Field(min_length=1, max_length=500)
