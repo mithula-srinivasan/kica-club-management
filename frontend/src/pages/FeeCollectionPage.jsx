@@ -4,6 +4,7 @@ import { api } from '../api'
 import { useAuth } from '../auth'
 import PlayerPicker from '../components/PlayerPicker'
 import { currentMonth, formatDate, kwd, methodLabel, monthLabel, today } from '../format'
+import ReverseForm from '../components/ReverseForm'
 
 const USUAL_FEE = '5.000'
 const RECENT_LIMIT = 50
@@ -294,7 +295,12 @@ function RecentPayments({ payments, user, onReverse }) {
                       <tr className="reverse-row">
                         <td colSpan={6}>
                           <ReverseForm
-                            payment={payment}
+                            label={`Reason for reversing ${kwd(payment.amount)} from ${payment.player_name}`}
+                            confirmMessage={
+                              `Reverse ${kwd(payment.amount)} from ${payment.player_name}?\n\n` +
+                              'It will stay in the history, marked as reversed, and the player will owe this amount again.'
+                            }
+                            buttonText="Reverse payment"
                             onCancel={() => setReversingId(null)}
                             onReverse={async (reason) => {
                               await onReverse(payment, reason)
@@ -316,66 +322,6 @@ function RecentPayments({ payments, user, onReverse }) {
         <p className="hint">Showing the {RECENT_LIMIT} most recent payments.</p>
       )}
     </section>
-  )
-}
-
-function ReverseForm({ payment, onReverse, onCancel }) {
-  const [reason, setReason] = useState('')
-  const [error, setError] = useState('')
-  const [saving, setSaving] = useState(false)
-
-  async function handleSubmit(event) {
-    event.preventDefault()
-    setError('')
-
-    if (!reason.trim()) {
-      setError('Please give a reason for reversing this payment.')
-      return
-    }
-
-    const confirmed = window.confirm(
-      `Reverse ${kwd(payment.amount)} from ${payment.player_name}?\n\n` +
-        'It will stay in the history, marked as reversed, and the player will owe this amount again.'
-    )
-
-    if (!confirmed) {
-      return
-    }
-
-    setSaving(true)
-
-    try {
-      await onReverse(reason.trim())
-    } catch (err) {
-      setError(err.message)
-      setSaving(false)
-    }
-  }
-
-  return (
-    <form className="reverse-form" onSubmit={handleSubmit}>
-      <label>
-        Reason for reversing {kwd(payment.amount)} from {payment.player_name}
-        <input
-          value={reason}
-          onChange={(event) => setReason(event.target.value)}
-          maxLength={500}
-          placeholder="e.g. entered the wrong amount"
-          autoFocus
-        />
-      </label>
-
-      {error && <p className="error">{error}</p>}
-
-      <div className="actions">
-        <button type="submit" className="danger" disabled={saving}>
-          {saving ? 'Reversing...' : 'Reverse payment'}
-        </button>
-        <button type="button" className="secondary" onClick={onCancel}>
-          Cancel
-        </button>
-      </div>
-    </form>
   )
 }
 
