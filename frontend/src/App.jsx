@@ -7,6 +7,7 @@ import Placeholder from './pages/Placeholder'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import SignupPage from './pages/SignupPage'
+import DashboardPage from './pages/DashboardPage'
 
 export default function App() {
   return (
@@ -24,7 +25,7 @@ export default function App() {
               </RequireAuth>
             }
           >
-            <Route path="/" element={<Placeholder title="Dashboard" />} />
+            <Route path="/" element={<DashboardPage />} />
             <Route path="/players" element={<Placeholder title="Players" />} />
             <Route path="/attendance" element={<Placeholder title="Attendance" />} />
             <Route path="/payments" element={<Placeholder title="Payments" />} />
