@@ -368,3 +368,64 @@ tfoot td {
 .muted {
   color: var(--muted);
 }
+
+
+.back-link {
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+/* A link that looks like a button */
+.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.button:hover {
+  background: var(--primary-hover);
+}
+
+.badge.muted-badge {
+  margin-left: 10px;
+  background: var(--bg);
+  color: var(--muted);
+  vertical-align: middle;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+}
+
+.details dt {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.details dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.card .figures {
+  margin-bottom: 16px;
+}
+
+.paid {
+  color: var(--success);
+  font-weight: 600;
+}
+
+tr.reversed td {
+  color: var(--muted);
+  text-decoration: line-through;
+}

@@ -9,6 +9,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import SignupPage from './pages/SignupPage'
 import DashboardPage from './pages/DashboardPage'
 import PlayersPage from './pages/PlayersPage'
+import PlayerPage from './pages/PlayerPage'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           >
             <Route path="/" element={<DashboardPage />} />
             <Route path="/players" element={<PlayersPage />} />
+            <Route path="/players/:playerId" element={<PlayerPage />} />
             <Route path="/attendance" element={<Placeholder title="Attendance" />} />
             <Route path="/fees" element={<Placeholder title="Fee Collection" />} />
             <Route path="/expenses" element={<Placeholder title="Club Expenses" />} />
