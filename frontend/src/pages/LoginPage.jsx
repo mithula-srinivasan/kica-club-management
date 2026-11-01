@@ -35,6 +35,14 @@ export default function LoginPage() {
   return (
     <div className="auth-page">
       <form className="card" onSubmit={handleSubmit}>
+        <img
+          src="/kica-logo.png"
+          alt="KICA"
+          className="auth-logo"
+          onError={(event) => {
+            event.currentTarget.style.display = 'none'
+          }}
+        />
         <h1>KICA login</h1>
 
         {error && <p className="error">{error}</p>}

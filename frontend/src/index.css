@@ -1,16 +1,38 @@
+/* ========== Colours: black, off-white, dark red ========== */
 :root {
-  --bg: #f4f6f8;
-  --surface: #ffffff;
-  --text: #1d2330;
-  --muted: #5f6b7a;
-  --border: #dde1e7;
-  --primary: #1f5f99;
-  --primary-hover: #174a78;
-  --primary-soft: #e6eef7;
-  --danger: #b42318;
-  --danger-soft: #fdecea;
-  --success: #1e6b3a;
-  --success-soft: #e7f4ec;
+  --bg: #000000;
+  --sidebar: #000000;
+  --surface: #0f0f0f;
+  --surface-2: #1a1a1a;
+
+  --text: #f2efe9;
+  --muted: #a8a39b;
+
+  /* Off-white lines, slightly softened so they don't overpower the content */
+  --border: rgba(242, 239, 233, 0.3);
+
+   /* Fluorescent violet for highlights; a lighter violet for violet text, so it stays readable */
+  --accent: #7c3aed;
+  --accent-hover: #8b5cf6;
+  --accent-text: #c084fc;
+  --accent-soft: rgba(124, 58, 237, 0.22);
+
+  /* Red is kept only for danger: errors, delete, reverse */
+  --danger: #dc2626;
+  --danger-hover: #ef4444;
+  --danger-text: #f87171;
+  --danger-soft: rgba(220, 38, 38, 0.18);
+
+  /* Main buttons: off-white with black text */
+  --button: #f2efe9;
+  --button-hover: #ffffff;
+  --on-button: #000000;
+
+  --success: #4ade80;
+  --success-hover: #86efac;
+  --success-soft: rgba(74, 222, 128, 0.12);
+
+  color-scheme: dark;
 
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
@@ -27,7 +49,7 @@ body {
 }
 
 h1 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   margin: 0 0 16px;
 }
 
@@ -36,73 +58,229 @@ h2 {
   margin: 0 0 12px;
 }
 
-/* Top bar */
-.top-bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 20px;
-  padding: 10px 16px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+h3 {
+  font-size: 1rem;
+  margin: 20px 0 8px;
 }
 
-.brand {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--primary);
-}
-
-.top-bar nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  flex: 1;
-}
-
-.top-bar nav a {
-  padding: 8px 12px;
-  border-radius: 6px;
-  color: var(--muted);
+/* Links (e.g. player names): red, bold, underlined only on hover */
+a {
+  color: var(--accent-text);
+  font-weight: 600;
   text-decoration: none;
 }
 
-.top-bar nav a:hover {
-  background: var(--bg);
+a:hover {
+  text-decoration: underline;
 }
 
-.top-bar nav a.active {
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-weight: 600;
+/* ========== App layout: side menu + top bar ========== */
+.shell {
+  min-height: 100vh;
+  display: flex;
 }
 
-.user {
+.sidebar {
+  position: sticky;
+  top: 0;
+  width: 240px;
+  height: 100vh;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 14px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+}
+
+.brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 0 8px;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text);
 }
 
-.badge {
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-size: 0.8rem;
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.side-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.side-nav a {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.side-nav a:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.side-nav a.active {
+  background: var(--accent-soft);
+  color: var(--text);
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--accent-text);
+}
+
+/* Fee Collection: always a solid dark red button so it stands out */
+.side-nav a.featured {
+  margin: 6px 0;
+  background: var(--accent);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.side-nav a.featured:hover {
+  background: var(--accent-hover);
+  color: var(--text);
+}
+
+.side-nav a.featured.active {
+  box-shadow: inset 0 0 0 2px var(--text);
+}
+
+.sidebar-user {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px 0;
+  border-top: 1px solid var(--border);
+}
+
+.sidebar-name {
   font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.menu-button,
+.top-brand {
+  display: none;
+}
+
+.top-brand {
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.global-search {
+  position: relative;
+  flex: 1;
+  max-width: 480px;
+}
+
+.search-results {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 420px;
+}
+
+.search-group {
+  padding: 8px 12px 2px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.search-empty {
+  padding: 8px 12px;
+  color: var(--muted);
 }
 
 main {
-  max-width: 1000px;
+  width: 100%;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 28px 24px;
 }
 
-/* Cards, forms and buttons */
+.backdrop {
+  display: none;
+}
+
+/* Phones and small tablets: the side menu slides in from the ☰ button */
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .menu-button,
+  .top-brand {
+    display: inline-flex;
+  }
+
+  .top-bar {
+    padding: 10px 16px;
+  }
+
+  main {
+    padding: 18px 16px;
+  }
+}
+
+/* ========== Cards, forms and buttons ========== */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 20px;
 }
 
@@ -110,6 +288,12 @@ form.card {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* The main form on a page: highlighted with a red edge */
+.highlight-card {
+  border-color: var(--accent);
+  box-shadow: inset 4px 0 0 var(--accent);
 }
 
 label {
@@ -132,69 +316,266 @@ textarea {
   min-height: 42px;
   padding: 8px 10px;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 8px;
   font: inherit;
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--text);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  border-color: var(--text);
+}
+
+input::placeholder {
+  color: var(--muted);
 }
 
 label.checkbox input {
   width: 20px;
   min-height: 20px;
+  accent-color: var(--accent);
 }
 
 button {
   min-height: 42px;
   padding: 8px 16px;
-  border: 1px solid var(--primary);
-  border-radius: 6px;
-  background: var(--primary);
-  color: #ffffff;
+  border: 1px solid var(--button);
+  border-radius: 8px;
+  background: var(--button);
+  color: var(--on-button);
   font: inherit;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
 button:hover {
-  background: var(--primary-hover);
+  background: var(--button-hover);
 }
 
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: default;
 }
 
 button.secondary {
   background: transparent;
-  color: var(--primary);
+  color: var(--text);
   border-color: var(--border);
+  font-weight: 600;
 }
 
 button.secondary:hover {
-  background: var(--bg);
+  background: var(--surface-2);
 }
 
 button.danger {
   background: var(--danger);
   border-color: var(--danger);
+  color: var(--text);
 }
 
-/* Messages */
+button.danger:hover {
+  background: var(--danger-hover);
+}
+
+button.danger-text {
+  color: var(--danger-text);
+  border-color: var(--danger);
+}
+
+button.danger:hover {
+  background: var(--accent-hover);
+}
+
+button.danger-text {
+  color: var(--accent-text);
+  border-color: var(--accent);
+}
+
+button.small {
+  min-height: 34px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+}
+
+/* A link that looks like a button */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--button);
+  color: var(--on-button);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.button:hover {
+  background: var(--button-hover);
+  text-decoration: none;
+}
+
+.button.small-button {
+  min-height: 34px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.button-large {
+  min-height: 52px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+}
+
+/* Green "go" buttons: Approve and Record payment */
+button.green,
+.button.green {
+  background: var(--success);
+  border-color: var(--success);
+  color: #000000;
+}
+
+button.green:hover,
+.button.green:hover {
+  background: var(--success-hover);
+  border-color: var(--success-hover);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.inline-form label {
+  flex: 1;
+  min-width: 200px;
+}
+
+.inline-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.inline-label input,
+.inline-label select {
+  width: auto;
+}
+
+.stacked-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.amount-input {
+  max-width: 140px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 12px;
+}
+
+.toolbar input[type='search'] {
+  flex: 1;
+  min-width: 220px;
+}
+
+/* ========== Messages ========== */
 .error,
-.success {
+.success,
+.notice,
+.warning {
   margin: 0;
-  padding: 10px 12px;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
 }
 
 .error {
   background: var(--danger-soft);
-  color: var(--danger);
+  color: var(--text);
+  border-color: var(--danger);
 }
 
 .success {
   background: var(--success-soft);
   color: var(--success);
+  border-color: var(--success);
+}
+
+.notice {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.warning {
+  background: var(--accent-soft);
+  color: var(--text);
+  border-color: var(--accent);
+  border-left-width: 6px;
+  font-weight: 500;
+}
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.muted {
+  color: var(--muted);
 }
 
 .loading {
@@ -203,12 +584,37 @@ button.danger {
   color: var(--muted);
 }
 
-/* Login and other account pages */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.badge.muted-badge {
+  margin-left: 10px;
+  border-color: var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  vertical-align: middle;
+}
+
+.paid {
+  color: var(--success);
+  font-weight: 700;
+}
+
+/* ========== Login and other account pages ========== */
 .auth-page {
   min-height: 100vh;
   display: grid;
   place-items: center;
   padding: 16px;
+  background: var(--bg);
 }
 
 .auth-page .card {
@@ -216,16 +622,11 @@ button.danger {
   max-width: 400px;
 }
 
-
-a {
-  color: var(--primary);
-}
-
-.hint {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-weight: 400;
+.auth-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  align-self: center;
 }
 
 .auth-links {
@@ -236,8 +637,7 @@ a {
   font-size: 0.95rem;
 }
 
-
-/* Page layout */
+/* ========== Page layout ========== */
 .page {
   display: flex;
   flex-direction: column;
@@ -248,9 +648,9 @@ a {
   margin: 0;
 }
 
-h3 {
-  font-size: 1rem;
-  margin: 20px 0 8px;
+.back-link {
+  text-decoration: none;
+  align-self: flex-start;
 }
 
 .two-columns {
@@ -276,7 +676,39 @@ h3 {
   width: auto;
 }
 
-/* Headline figures */
+.section-link {
+  margin: 16px 0 0;
+}
+
+.sub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sub-tabs a {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.sub-tabs a:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.sub-tabs a.active {
+  background: var(--accent-soft);
+  color: var(--text);
+  font-weight: 700;
+  box-shadow: inset 0 -2px 0 var(--accent-text);
+}
+
+/* ========== Dashboard figures: every box the same border ========== */
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -295,9 +727,25 @@ h3 {
 }
 
 .stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.6rem;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
+}
+
+/* A clickable box: same border as the others; its note is red to show it leads somewhere */
+.stat-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.stat-link:hover {
+  background: var(--surface-2);
+  text-decoration: none;
+}
+
+.stat-link .hint {
+  color: var(--accent-text);
+  font-weight: 600;
 }
 
 .figures {
@@ -306,97 +754,40 @@ h3 {
   gap: 12px;
 }
 
+.card .figures {
+  margin-bottom: 16px;
+}
+
 .figure {
   display: flex;
   flex-direction: column;
   padding: 12px;
-  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 8px;
 }
 
-/* Tables */
-table {
-  width: 100%;
-  border-collapse: collapse;
+/* ========== Player page ========== */
+.pay-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: var(--accent-soft);
 }
 
-th,
-td {
-  padding: 10px 4px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
+.pay-summary {
+  display: flex;
+  flex-direction: column;
 }
 
-th {
-  color: var(--muted);
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.amount {
-  text-align: right;
-  white-space: nowrap;
+.pay-amount {
+  font-size: 1.9rem;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
-}
-
-tfoot td {
-  font-weight: 700;
-  border-bottom: none;
-}
-
-
-
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 20px;
-  margin-bottom: 12px;
-}
-
-.toolbar input[type='search'] {
-  flex: 1;
-  min-width: 220px;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-
-.back-link {
-  text-decoration: none;
-  align-self: flex-start;
-}
-
-/* A link that looks like a button */
-.button {
-  display: inline-flex;
-  align-items: center;
-  min-height: 42px;
-  padding: 8px 16px;
-  border-radius: 6px;
-  background: var(--primary);
-  color: #ffffff;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.button:hover {
-  background: var(--primary-hover);
-}
-
-.badge.muted-badge {
-  margin-left: 10px;
-  background: var(--bg);
-  color: var(--muted);
-  vertical-align: middle;
 }
 
 .details {
@@ -416,190 +807,95 @@ tfoot td {
   font-weight: 600;
 }
 
-.card .figures {
-  margin-bottom: 16px;
+/* ========== Tables ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.paid {
-  color: var(--success);
-  font-weight: 600;
+th,
+td {
+  padding: 10px 4px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
 }
 
-tr.reversed td {
+th {
   color: var(--muted);
-  text-decoration: line-through;
-}
-
-
-.inline-form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.inline-form label {
-  flex: 1;
-  min-width: 200px;
-}
-
-/* Attendance tick list */
-.checklist {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 8px;
-}
-
-.check-row {
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-weight: 400;
-  cursor: pointer;
-}
-
-.check-row input {
-  width: 20px;
-  min-height: 20px;
-}
-
-.check-row.checked {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-}
-
-.check-name {
-  flex: 1;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
-/* Save bar that stays visible at the bottom of the screen */
-.save-bar {
-  position: sticky;
-  bottom: 0;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+tbody tr:hover td {
+  background: var(--surface-2);
 }
 
-button.danger-text {
-  align-self: flex-start;
-  color: var(--danger);
+.amount {
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-
-.notice {
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 6px;
-  background: var(--primary-soft);
-  color: var(--text);
+.money {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-button.small {
-  min-height: 34px;
-  padding: 4px 12px;
-  font-size: 0.9rem;
+tfoot td {
+  font-weight: 700;
+  border-bottom: none;
+}
+
+.reverse-row td {
+  background: var(--danger-soft);
 }
 
 .row-actions {
   text-align: right;
 }
 
-
-.actions {
+.row-buttons {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Buttons in a page header sit on the right, even when they wrap to a new line */
-.header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   justify-content: flex-end;
-  gap: 10px;
-  margin-left: auto;
-}
-
-
-/* A label with its control on the same line, e.g. "Show [dropdown]" */
-.inline-label {
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-}
-
-.inline-label select {
-  width: auto;
-}
-
-/* The highlighted "Still to pay / Record payment" panel on a player's page */
-.pay-panel {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 20px;
-  border: 2px solid var(--primary);
-  border-radius: 12px;
-  background: var(--primary-soft);
-}
-
-.pay-summary {
-  display: flex;
-  flex-direction: column;
-}
-
-.pay-amount {
-  font-size: 1.8rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.button-large {
-  min-height: 52px;
-  padding: 12px 28px;
-  font-size: 1.1rem;
-}
-
-
-/* A form field whose control isn't a single input (e.g. the player picker) */
-.field {
-  display: flex;
-  flex-direction: column;
   gap: 6px;
-  font-weight: 500;
 }
 
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+.table-scroll {
+  overflow-x: auto;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* Who owes / Unpaid lists */
+.owing-table td:first-child {
+  width: 45%;
+}
+
+.owing-table td.money {
+  width: 30%;
+  text-align: center;
+}
+
+.owing-table td.row-actions {
+  width: 25%;
+}
+
+/* Reverse form under a row */
+.reverse-row td {
+  background: var(--accent-soft);
+}
+
+.reverse-form {
+  display: flex;
+  flex-direction: column;
   gap: 12px;
+  padding: 4px 0;
 }
 
-.highlight-card {
-  border: 2px solid var(--primary);
-}
-
-/* Player picker */
+/* ========== Player picker and search results ========== */
 .picker-list {
   list-style: none;
   margin: 6px 0 0;
@@ -624,7 +920,7 @@ button.small {
 }
 
 .picker-option:hover {
-  background: var(--primary-soft);
+  background: var(--surface-2);
 }
 
 .picked {
@@ -634,175 +930,92 @@ button.small {
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
-  border: 1px solid var(--primary);
-  border-radius: 6px;
-  background: var(--primary-soft);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--accent-soft);
 }
 
-/* Wide tables scroll sideways on small screens instead of stretching the page */
-.table-scroll {
-  overflow-x: auto;
+/* ========== Attendance ========== */
+.checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
 }
 
-
-
-/* Money in a left-aligned column: digits still line up */
-.money {
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-/* The reverse form that opens under a payment row */
-.reverse-row td {
-  background: var(--danger-soft);
-}
-
-.reverse-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 4px 0;
-}
-
-
-/* A small link-button, e.g. "Record payment" in a list */
-.button.small-button {
-  min-height: 34px;
-  padding: 4px 12px;
-  font-size: 0.9rem;
-  white-space: nowrap;
-}
-
-/* A dashboard figure that links somewhere */
-.stat-link {
-  color: inherit;
-  text-decoration: none;
-  border-color: var(--primary);
-}
-
-.stat-link:hover {
-  background: var(--primary-soft);
-}
-
-.section-link {
-  margin: 16px 0 0;
-}
-
-
-/* "Who owes" and "Unpaid" lists: name on the left, amount in the middle, button on the right */
-.owing-table td:first-child {
-  width: 45%;
-}
-
-.owing-table td.money {
-  width: 30%;
-  text-align: center;
-}
-
-.owing-table td.row-actions {
-  width: 25%;
-}
-
-
-
-/* Sub-tabs inside a page, e.g. the Admin sections */
-.sub-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
-}
-
-.sub-tabs a {
-  padding: 8px 12px;
-  border-radius: 6px;
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.sub-tabs a:hover {
-  background: var(--surface);
-}
-
-.sub-tabs a.active {
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-weight: 600;
-}
-
-/* Several small buttons side by side in a table row */
-.row-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 6px;
-}
-
-
-
-.inline-label {
+.check-row {
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.check-row:hover {
+  background: var(--surface-2);
+}
+
+.check-row input {
+  width: 20px;
+  min-height: 20px;
+  accent-color: var(--accent);
+}
+
+.check-row.checked {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.check-name {
+  flex: 1;
   font-weight: 500;
 }
 
-.inline-label input,
-.inline-label select {
-  width: auto;
-}
-
-/* A row of radio buttons */
-.choice-row {
+.save-bar {
+  position: sticky;
+  bottom: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
 }
 
-/* A small amount box inside a table */
-.amount-input {
-  max-width: 140px;
-}
-
-/* A form inside a card (not the card itself) */
-.stacked-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-/* A caution message at the top of a page */
-.warning {
-  margin: 0;
-  padding: 12px 14px;
-  border: 1px solid #e0a800;
-  border-left-width: 6px;
-  border-radius: 6px;
-  background: #fff7e0;
-  color: #6b4e00;
-  font-weight: 500;
-}
-
-
+/* ========== Activity log ========== */
 .change-list {
   list-style: none;
   margin: 0;
   padding: 0;
   font-size: 0.9rem;
+  line-height: 1.4;
 }
 
-.nowrap {
-  white-space: nowrap;
+.activity-filters .inline-label,
+.activity-filters select {
+  font-size: 0.9rem;
 }
 
+.activity-filters select {
+  min-height: 36px;
+}
 
-/* Activity log: wide gaps between columns, taller rows */
 .activity-table th,
 .activity-table td {
   padding: 16px 40px 16px 0;
   vertical-align: top;
+}
+
+.activity-table th {
+  font-size: 1rem;
 }
 
 .activity-table th:last-child,
@@ -810,7 +1023,6 @@ button.small {
   padding-right: 0;
 }
 
-/* Fixed widths for When, Who and What, so Details gets the rest */
 .activity-table td:nth-child(1) {
   width: 190px;
 }
@@ -823,29 +1035,6 @@ button.small {
   width: 240px;
 }
 
-.activity-table .change-list {
-  line-height: 1.4;
-}
-
 .activity-table .change-list li + li {
   margin-top: 8px;
-}
-
-
-
-
-
-/* Activity log filters: same small size as the description above them */
-.activity-filters .inline-label,
-.activity-filters select {
-  font-size: 0.9rem;
-}
-
-.activity-filters select {
-  min-height: 36px;
-}
-
-/* Activity log column headings: normal text size */
-.activity-table th {
-  font-size: 1rem;
 }
