@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+# Read settings such as the Gmail details from a private .env file, if there is one
+load_dotenv()
+
 from fastapi import FastAPI
 from routers import players, auth, execs, club_sessions, fees, payments, expenses, transfers, dashboard, audit_logs, opening_balances
 
