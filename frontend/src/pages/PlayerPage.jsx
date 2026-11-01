@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
-import Figure from '../components/Figure'
-import { formatDate, kwd, monthLabel } from '../format'
+import { formatDate, kwd, methodLabel, monthLabel } from '../format'
 
 export default function PlayerPage() {
   const { playerId } = useParams()
@@ -65,17 +64,25 @@ export default function PlayerPage() {
     <div className="page">
       <Link to="/players" className="back-link">← All players</Link>
 
-      <div className="section-header">
-        <h1>
-          {player.name}
-          {!player.is_active && <span className="badge muted-badge">Inactive</span>}
-        </h1>
-        <Link className="button" to={`/fees?player=${player.player_id}`}>
-          Record payment
-        </Link>
-      </div>
+      <h1>
+        {player.name}
+        {!player.is_active && <span className="badge muted-badge">Inactive</span>}
+      </h1>
 
       {error && <p className="error">{error}</p>}
+
+      <section className="pay-panel">
+        <div className="pay-summary">
+          <span className="stat-label">Still to pay</span>
+          <span className="pay-amount">{kwd(statement.outstanding)}</span>
+          {Number(statement.credit) > 0 && (
+            <span className="hint">Paid in advance: {kwd(statement.credit)}</span>
+          )}
+        </div>
+        <Link className="button button-large green" to={`/fees?player=${player.player_id}`}>
+          Record payment
+        </Link>
+      </section>
 
       {editing ? (
         <EditPlayerForm
@@ -94,12 +101,12 @@ export default function PlayerPage() {
               <dd>{player.kica_id ?? '—'}</dd>
             </div>
             <div>
-              <dt>Joined</dt>
-              <dd>{player.joined_on ? formatDate(player.joined_on) : '—'}</dd>
-            </div>
-            <div>
               <dt>Status</dt>
               <dd>{player.is_active ? 'Active' : 'Inactive'}</dd>
+            </div>
+            <div>
+              <dt>Joined</dt>
+              <dd>{player.joined_on ? formatDate(player.joined_on) : '—'}</dd>
             </div>
           </dl>
 
@@ -184,17 +191,14 @@ function EditPlayerForm({ player, onSaved, onCancel }) {
 }
 
 function FeeHistory({ statement }) {
-  // Newest month first; the opening balance (the oldest) ends up at the bottom
-  const months = [...statement.months].reverse()
+  // Newest month first. Months with no fee (e.g. fully waived) are left out.
+  const months = statement.months
+    .filter((month) => Number(month.amount_due) > 0)
+    .reverse()
 
   return (
     <section className="card">
       <h2>Fees</h2>
-
-      <div className="figures">
-        <Figure label="Still to pay" value={kwd(statement.outstanding)} />
-        <Figure label="Paid in advance" value={kwd(statement.credit)} />
-      </div>
 
       {months.length === 0 ? (
         <p className="hint">No fees yet. A fee appears once the player attends a session.</p>
@@ -217,7 +221,13 @@ function FeeHistory({ statement }) {
                     : monthLabel(month.fee_month)}
                 </td>
                 <td className="amount">{kwd(month.amount_due)}</td>
-                <td className="amount">{kwd(month.amount_paid)}</td>
+                <td className="amount">
+                  {Number(month.amount_paid) > 0 ? (
+                    kwd(month.amount_paid)
+                  ) : (
+                    <span className="muted">—</span>
+                  )}
+                </td>
                 <td className="amount">
                   {Number(month.remaining) > 0 ? (
                     kwd(month.remaining)
@@ -235,39 +245,60 @@ function FeeHistory({ statement }) {
 }
 
 function PaymentHistory({ payments }) {
+  const [showReversed, setShowReversed] = useState(false)
+
+  const reversedCount = payments.filter((payment) => payment.status === 'reversed').length
+  const shown = showReversed
+    ? payments
+    : payments.filter((payment) => payment.status !== 'reversed')
+
   return (
     <section className="card">
-      <h2>Payments received</h2>
+      <div className="section-header">
+        <h2>Payments received</h2>
+        {reversedCount > 0 && (
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={showReversed}
+              onChange={(event) => setShowReversed(event.target.checked)}
+            />
+            Show reversed ({reversedCount})
+          </label>
+        )}
+      </div>
 
-      {payments.length === 0 ? (
+      {shown.length === 0 ? (
         <p className="hint">No payments recorded yet.</p>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th className="amount">Amount</th>
-              <th>Method</th>
-              <th>Collected by</th>
-            </tr>
-          </thead>
-          <tbody>
-            {payments.map((payment) => (
-              <tr
-                key={payment.payment_id}
-                className={payment.status === 'reversed' ? 'reversed' : undefined}
-              >
-                <td>{formatDate(payment.paid_on)}</td>
-                <td className="amount">{kwd(payment.amount)}</td>
-                <td>{payment.method === 'bank_transfer' ? 'Bank transfer' : 'Cash'}</td>
-                <td>
-                  {payment.recorded_by_name}
-                  {payment.status === 'reversed' && ' (reversed)'}
-                </td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Collected by</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {shown.map((payment) => (
+                <tr
+                  key={payment.payment_id}
+                  className={payment.status === 'reversed' ? 'reversed' : undefined}
+                >
+                  <td>{formatDate(payment.paid_on)}</td>
+                  <td className="money">{kwd(payment.amount)}</td>
+                  <td>{methodLabel(payment.method)}</td>
+                  <td>
+                    {payment.recorded_by_name}
+                    {payment.status === 'reversed' && ' (reversed)'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   )

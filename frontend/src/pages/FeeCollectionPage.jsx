@@ -237,11 +237,29 @@ function RecordPaymentForm({ players, initialPlayerId, onRecorded }) {
 
 function RecentPayments({ payments, user, onReverse }) {
   const [reversingId, setReversingId] = useState(null)
-  const recent = payments.slice(0, RECENT_LIMIT)
+  const [showReversed, setShowReversed] = useState(false)
+
+  const reversedCount = payments.filter((payment) => payment.status === 'reversed').length
+  const visible = showReversed
+    ? payments
+    : payments.filter((payment) => payment.status !== 'reversed')
+  const recent = visible.slice(0, RECENT_LIMIT)
 
   return (
     <section className="card">
-      <h2>Recent payments</h2>
+      <div className="section-header">
+        <h2>Recent payments</h2>
+        {reversedCount > 0 && (
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={showReversed}
+              onChange={(event) => setShowReversed(event.target.checked)}
+            />
+            Show reversed ({reversedCount})
+          </label>
+        )}
+      </div>
 
       {recent.length === 0 ? (
         <p className="hint">No payments recorded yet.</p>
@@ -318,7 +336,7 @@ function RecentPayments({ payments, user, onReverse }) {
         </div>
       )}
 
-      {payments.length > RECENT_LIMIT && (
+      {visible.length > RECENT_LIMIT && (
         <p className="hint">Showing the {RECENT_LIMIT} most recent payments.</p>
       )}
     </section>

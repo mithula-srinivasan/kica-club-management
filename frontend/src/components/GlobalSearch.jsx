@@ -18,6 +18,7 @@ const FEATURES = [
   { label: 'Fee adjustments', to: '/admin/fees', keywords: 'admin waive waiver discount adjust adjustment fee', admin: true },
   { label: 'Opening balances', to: '/admin/opening-balances', keywords: 'admin opening balances starting figures excel', admin: true },
   { label: 'Activity log', to: '/admin/activity', keywords: 'admin activity audit log history changes', admin: true },
+  { label: 'Download club data', to: '/admin/backup', keywords: 'admin backup download export excel data', admin: true },
 ]
 
 export default function GlobalSearch() {

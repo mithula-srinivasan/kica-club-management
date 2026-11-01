@@ -21,7 +21,7 @@ import SignupsPage from './pages/admin/SignupsPage'
 import FeeAdjustmentsPage from './pages/admin/FeeAdjustmentsPage'
 import OpeningBalancesPage from './pages/admin/OpeningBalancesPage'
 import ActivityLogPage from './pages/admin/ActivityLogPage'
-
+import BackupPage from './pages/admin/BackupPage'
 
 
 export default function App() {
@@ -55,6 +55,7 @@ export default function App() {
               <Route path="fees" element={<FeeAdjustmentsPage />} />
               <Route path="opening-balances" element={<OpeningBalancesPage />} />
               <Route path="activity" element={<ActivityLogPage />} />
+              <Route path="backup" element={<BackupPage />} />
             </Route>
           </Route>
 

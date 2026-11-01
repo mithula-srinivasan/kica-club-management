@@ -18,7 +18,10 @@ export default function AdminLayout() {
         <NavLink to="fees">Fee adjustments</NavLink>
         <NavLink to="opening-balances">Opening balances</NavLink>
         <NavLink to="activity">Activity log</NavLink>
+        <NavLink to="backup">Backup</NavLink>
       </nav>
+
+      
 
       <Outlet />
     </div>
