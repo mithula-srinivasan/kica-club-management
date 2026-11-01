@@ -1035,3 +1035,8 @@ tfoot td {
   font-size: 0.75rem;
   white-space: nowrap;
 }
+
+/* Login, sign-up and password pages: centred titles */
+.auth-page h1 {
+  text-align: center;
+}

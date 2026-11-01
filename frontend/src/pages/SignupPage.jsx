@@ -59,6 +59,14 @@ export default function SignupPage() {
   return (
     <div className="auth-page">
       <form className="card" onSubmit={handleSubmit}>
+        <img
+          src="/kica-logo.png"
+          alt="KICA"
+          className="auth-logo"
+          onError={(event) => {
+            event.currentTarget.style.display = 'none'
+          }}
+        />
         <h1>Create an account</h1>
 
         {error && <p className="error">{error}</p>}
