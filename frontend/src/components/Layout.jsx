@@ -5,7 +5,7 @@ import GlobalSearch from './GlobalSearch'
 
 const LINKS = [
   { to: '/', label: 'Dashboard', end: true },
-  { to: '/fees', label: 'Fee Collection', featured: true },
+  { to: '/fees', label: 'Fee Collection'},
   { to: '/attendance', label: 'Attendance' },
   { to: '/players', label: 'Players' },
   { to: '/expenses', label: 'Club Expenses' },
@@ -36,7 +36,6 @@ export default function Layout() {
               key={link.to}
               to={link.to}
               end={link.end}
-              className={link.featured ? 'featured' : undefined}
             >
               {link.label}
             </NavLink>

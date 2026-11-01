@@ -11,11 +11,11 @@
   /* Off-white lines, slightly softened so they don't overpower the content */
   --border: rgba(242, 239, 233, 0.3);
 
-   /* Fluorescent violet for highlights; a lighter violet for violet text, so it stays readable */
-  --accent: #7c3aed;
-  --accent-hover: #8b5cf6;
-  --accent-text: #c084fc;
-  --accent-soft: rgba(124, 58, 237, 0.22);
+  /* Lilac for highlights; a paler lilac for text, so it stays readable */
+  --accent: #b794f4;
+  --accent-hover: #c4a7f7;
+  --accent-text: #dcc6ff;
+  --accent-soft: rgba(183, 148, 244, 0.16);
 
   /* Red is kept only for danger: errors, delete, reverse */
   --danger: #dc2626;
@@ -121,11 +121,13 @@ a:hover {
 
 .side-nav a {
   padding: 10px 12px;
+  border: 1px solid transparent;
   border-radius: 8px;
-  color: var(--muted);
+  color: var(--text);
   font-weight: 500;
   text-decoration: none;
 }
+
 
 .side-nav a:hover {
   background: var(--surface-2);
@@ -134,27 +136,12 @@ a:hover {
 
 .side-nav a.active {
   background: var(--accent-soft);
-  color: var(--text);
-  font-weight: 700;
-  box-shadow: inset 3px 0 0 var(--accent-text);
-}
-
-/* Fee Collection: always a solid dark red button so it stands out */
-.side-nav a.featured {
-  margin: 6px 0;
-  background: var(--accent);
+  border-color: var(--accent);
   color: var(--text);
   font-weight: 700;
 }
 
-.side-nav a.featured:hover {
-  background: var(--accent-hover);
-  color: var(--text);
-}
 
-.side-nav a.featured.active {
-  box-shadow: inset 0 0 0 2px var(--text);
-}
 
 .sidebar-user {
   display: flex;
@@ -293,7 +280,6 @@ form.card {
 /* The main form on a page: highlighted with a red edge */
 .highlight-card {
   border-color: var(--accent);
-  box-shadow: inset 4px 0 0 var(--accent);
 }
 
 label {
@@ -563,7 +549,6 @@ button.green:hover,
   background: var(--accent-soft);
   color: var(--text);
   border-color: var(--accent);
-  border-left-width: 6px;
   font-weight: 500;
 }
 
@@ -683,17 +668,23 @@ button.green:hover,
 .sub-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+  gap: 6px;
 }
 
 .sub-tabs a {
   padding: 8px 12px;
+  border: 1px solid transparent;
   border-radius: 8px;
   color: var(--muted);
   font-weight: 500;
   text-decoration: none;
+}
+
+.sub-tabs a.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text);
+  font-weight: 700;
 }
 
 .sub-tabs a:hover {
@@ -701,12 +692,6 @@ button.green:hover,
   color: var(--text);
 }
 
-.sub-tabs a.active {
-  background: var(--accent-soft);
-  color: var(--text);
-  font-weight: 700;
-  box-shadow: inset 0 -2px 0 var(--accent-text);
-}
 
 /* ========== Dashboard figures: every box the same border ========== */
 .stats {
@@ -1000,6 +985,11 @@ tfoot td {
 }
 
 .activity-filters .inline-label,
+
+.activity-filters {
+  margin-top: 16px;
+}
+
 .activity-filters select {
   font-size: 0.9rem;
 }
@@ -1037,4 +1027,11 @@ tfoot td {
 
 .activity-table .change-list li + li {
   margin-top: 8px;
+}
+
+
+/* Attendance boxes: the name stands out, the KICA ID is small and quiet */
+.check-row .muted {
+  font-size: 0.75rem;
+  white-space: nowrap;
 }

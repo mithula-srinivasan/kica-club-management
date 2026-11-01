@@ -93,7 +93,7 @@ export default function DashboardPage() {
         <div className="figures">
           <Figure label="Sessions held" value={summary.sessions_held} />
           <Figure label="Players attended" value={summary.players_attended} />
-          <Figure label="Fees for the month" value={kwd(summary.fees_assessed)} />
+          <Figure label="Total owed for the month" value={kwd(summary.fees_assessed)} />
           <Figure label="Money received" value={kwd(summary.payments_received)} />
           <Figure label="Expenses paid" value={kwd(summary.expenses_paid)} />
         </div>
