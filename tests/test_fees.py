@@ -142,3 +142,58 @@ def test_new_rate_applies_only_from_its_start(client, make_exec, log_in, make_pl
     fees = player_fees(client, alice.player_id)
 
     assert [fee["amount_due"] for fee in fees] == ["5.000", "6.000"]
+
+
+
+def add_rate(client, amount, effective_from):
+    return client.post(
+        "/fees/rates",
+        json={"monthly_amount": amount, "effective_from": effective_from}
+    )
+
+
+def test_admin_can_set_a_future_rate(client, make_exec, log_in, make_player):
+    make_exec(role="admin", name="Mithula")
+    log_in()
+    alice = make_player()
+
+    response = add_rate(client, "6.000", "2030-01-15")
+    attend(client, "2030-01-10", [alice.player_id])
+
+    assert response.status_code == 201
+    assert response.json()["effective_from"] == "2030-01-01"
+    assert response.json()["changed_by_name"] == "Mithula"
+    assert player_fees(client, alice.player_id)[0]["amount_due"] == "6.000"
+
+
+def test_new_rate_cannot_start_in_a_past_month(client, make_exec, log_in):
+    make_exec(role="admin")
+    log_in()
+
+    assert add_rate(client, "6.000", "2020-01-01").status_code == 422
+
+
+def test_only_one_rate_can_start_in_a_month(client, make_exec, log_in):
+    make_exec(role="admin")
+    log_in()
+    add_rate(client, "6.000", "2030-01-01")
+
+    assert add_rate(client, "7.000", "2030-01-01").status_code == 409
+
+
+def test_regular_exec_cannot_change_the_rate(client, make_exec, log_in):
+    make_exec()
+    log_in()
+
+    assert add_rate(client, "6.000", "2030-01-01").status_code == 403
+
+
+def test_upcoming_rate_can_be_removed_but_started_rate_cannot(client, make_exec, log_in):
+    make_exec(role="admin")
+    log_in()
+    upcoming_id = add_rate(client, "6.000", "2030-01-01").json()["fee_rate_id"]
+    rates = client.get("/fees/rates").json()
+    started_id = next(r["fee_rate_id"] for r in rates if r["effective_from"] == "2000-01-01")
+
+    assert client.delete(f"/fees/rates/{upcoming_id}").status_code == 204
+    assert client.delete(f"/fees/rates/{started_id}").status_code == 409

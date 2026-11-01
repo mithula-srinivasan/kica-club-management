@@ -299,3 +299,15 @@ class ExecAdminResponse(BaseModel):
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class FeeRateCreate(BaseModel):
+    monthly_amount: Decimal = Field(gt=0, max_digits=10, decimal_places=3)
+    effective_from: date
+
+
+class FeeRateResponse(BaseModel):
+    fee_rate_id: int
+    monthly_amount: Decimal
+    effective_from: date
+    changed_by_name: str | None
