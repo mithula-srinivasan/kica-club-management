@@ -8,6 +8,7 @@ export default function ExpensesPage() {
   const { user } = useAuth()
   const [expenses, setExpenses] = useState(null)
   const [reversingId, setReversingId] = useState(null)
+  const [showReversed, setShowReversed] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -34,8 +35,14 @@ export default function ExpensesPage() {
   }
 
   if (!expenses) {
+    
     return error ? <p className="error">{error}</p> : <p className="loading">Loading...</p>
   }
+
+  const reversedCount = expenses.filter((expense) => expense.status === 'reversed').length
+  const shown = showReversed
+      ? expenses
+      : expenses.filter((expense) => expense.status !== 'reversed')
 
   return (
     <div className="page">
@@ -46,9 +53,21 @@ export default function ExpensesPage() {
       <RecordExpenseForm onRecorded={reloadExpenses} />
 
       <section className="card">
-        <h2>Expense history</h2>
+        <div className="section-header">
+          <h2>Expense history</h2>
+          {reversedCount > 0 && (
+            <label className="checkbox">
+              <input
+                type="checkbox"
+                checked={showReversed}
+                onChange={(event) => setShowReversed(event.target.checked)}
+              />
+              Show reversed ({reversedCount})
+            </label>
+          )}
+        </div>
 
-        {expenses.length === 0 ? (
+        {shown.length === 0 ? (
           <p className="hint">No expenses recorded yet.</p>
         ) : (
           <div className="table-scroll">
@@ -63,7 +82,7 @@ export default function ExpensesPage() {
                 </tr>
               </thead>
               <tbody>
-                {expenses.map((expense) => {
+                {shown.map((expense) => {
                   const reversed = expense.status === 'reversed'
                   const canReverse =
                     !reversed &&

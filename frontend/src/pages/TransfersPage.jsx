@@ -9,6 +9,7 @@ export default function TransfersPage() {
   const [transfers, setTransfers] = useState(null)
   const [otherExecs, setOtherExecs] = useState([])
   const [reversingId, setReversingId] = useState(null)
+  const [showReversed, setShowReversed] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -38,8 +39,14 @@ export default function TransfersPage() {
   }
 
   if (!transfers) {
+    
     return error ? <p className="error">{error}</p> : <p className="loading">Loading...</p>
   }
+
+  const reversedCount = transfers.filter((transfer) => transfer.status === 'reversed').length
+  const shown = showReversed
+      ? transfers
+      : transfers.filter((transfer) => transfer.status !== 'reversed')
 
   return (
     <div className="page">
@@ -52,7 +59,7 @@ export default function TransfersPage() {
       <section className="card">
         <h2>Transfer history</h2>
 
-        {transfers.length === 0 ? (
+        {shown.length === 0 ? (
           <p className="hint">No transfers recorded yet.</p>
         ) : (
           <div className="table-scroll">
@@ -68,7 +75,7 @@ export default function TransfersPage() {
                 </tr>
               </thead>
               <tbody>
-                {transfers.map((transfer) => {
+                {shown.map((transfer) => {
                   const reversed = transfer.status === 'reversed'
                   const canReverse =
                     !reversed &&
