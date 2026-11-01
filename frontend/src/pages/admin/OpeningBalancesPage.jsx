@@ -52,7 +52,6 @@ export default function OpeningBalancesPage() {
         Do not use this for day-to-day changes. Every change is recorded.
       </p>
 
-      <section className="card"></section>
       <section className="card">
         <h2>Opening balances</h2>
         <p className="hint">

@@ -74,22 +74,22 @@ export default function ExecsPage() {
                     <td>{exec.is_active ? 'Active' : <span className="muted">Inactive</span>}</td>
                     <td className="row-actions">
                       <div className="row-buttons">
-                        {exec.role === 'admin' ? (
-                          <button
-                            className="secondary small"
-                            onClick={() =>
-                              changeExec(
-                                exec,
-                                'remove-admin',
-                                isMe
-                                  ? 'Step down as admin? You will lose access to the Admin area.'
-                                  : `Remove admin access from ${exec.name}?`,
-                                `${exec.name} is no longer an admin.`
-                              )
-                            }
-                          >
-                            Remove admin
-                          </button>
+                          {exec.role === 'admin' ? (
+                          !isMe && (
+                            <button
+                              className="secondary small"
+                              onClick={() =>
+                                changeExec(
+                                  exec,
+                                  'remove-admin',
+                                  `Remove admin access from ${exec.name}?`,
+                                  `${exec.name} is no longer an admin.`
+                                )
+                              }
+                            >
+                              Remove admin
+                            </button>
+                          )
                         ) : (
                           exec.is_active && (
                             <button
