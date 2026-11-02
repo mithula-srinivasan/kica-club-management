@@ -5,10 +5,10 @@ import GlobalSearch from './GlobalSearch'
 
 const LINKS = [
   { to: '/', label: 'Dashboard', end: true },
-  { to: '/fees', label: 'Fee Collection'},
   { to: '/attendance', label: 'Attendance' },
   { to: '/players', label: 'Players' },
-  { to: '/expenses', label: 'Club Expenses' },
+  { to: '/fees', label: 'Fee Collection' },
+  { to: '/expenses', label: 'Expenses' },
   { to: '/transfers', label: 'Money Transfers' },
 ]
 

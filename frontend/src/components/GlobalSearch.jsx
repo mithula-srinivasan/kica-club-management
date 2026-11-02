@@ -11,7 +11,7 @@ const FEATURES = [
   { label: 'Recent payments', to: '/fees', keywords: 'payments history reverse mistake' },
   { label: 'Attendance', to: '/attendance', keywords: 'attendance session sessions mark present create' },
   { label: 'Players', to: '/players', keywords: 'players members list add new player' },
-  { label: 'Club Expenses', to: '/expenses', keywords: 'expenses expense spend spent hall rental costs' },
+  { label: 'Expenses', to: '/expenses', keywords: 'expenses expense spend spent hall rental costs club' },
   { label: 'Money Transfers', to: '/transfers', keywords: 'transfers transfer handover cash received money' },
   { label: 'Approve sign-ups', to: '/admin/signups', keywords: 'admin approve sign-ups signups pending reject', admin: true },
   { label: 'Manage Execs', to: '/admin/execs', keywords: 'admin execs exec deactivate reactivate make admin', admin: true },

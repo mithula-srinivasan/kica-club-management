@@ -46,7 +46,7 @@ export default function ExpensesPage() {
 
   return (
     <div className="page">
-      <h1>Club Expenses</h1>
+      <h1>Expenses</h1>
 
       {error && <p className="error">{error}</p>}
 
