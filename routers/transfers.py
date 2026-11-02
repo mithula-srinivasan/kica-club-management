@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from audit import record_audit
 from club_time import KUWAIT, kuwait_today
-from dependencies import get_current_exec, get_db
+from dependencies import choose_handler, get_current_exec, get_db
 from models import Exec, Transfer
 from schemas import ExecOption, TransferCreate, TransferResponse, TransferReverse
 
@@ -73,18 +73,21 @@ def record_transfer(
     current_exec: Exec = Depends(get_current_exec),
     db: Session = Depends(get_db)
 ):
-    if transfer_data.from_exec_id == current_exec.exec_id:
+    # The receiver records the transfer; admins can record one on behalf of the receiver
+    receiver = choose_handler(db, current_exec, transfer_data.to_exec_id)
+
+    if transfer_data.from_exec_id == receiver.exec_id:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="You cannot transfer money to yourself"
+            detail="The giving and receiving Exec must be different"
         )
 
     sender = db.get(Exec, transfer_data.from_exec_id)
 
-    if sender is None or not sender.is_active or sender.approved_at is None:
+    if sender is None or sender.approved_at is None:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="The giving Exec must be an active, approved Exec"
+            detail="The giving Exec must be an approved Exec"
         )
 
     if transfer_data.transferred_on > kuwait_today():
@@ -93,10 +96,11 @@ def record_transfer(
             detail="Transfer date cannot be in the future"
         )
 
+
     transfer = Transfer(
         from_exec_id=sender.exec_id,
         # The person receiving the money is the one who records it
-        to_exec_id=current_exec.exec_id,
+        to_exec_id=receiver.exec_id,
         amount=transfer_data.amount,
         transferred_at=datetime.combine(transfer_data.transferred_on, time(), tzinfo=KUWAIT),
         recorded_by_exec_id=current_exec.exec_id,

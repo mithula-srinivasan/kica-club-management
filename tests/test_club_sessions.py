@@ -92,15 +92,54 @@ def test_unknown_player_is_rejected(client, make_exec, log_in):
 
     assert set_attendance(client, session_id, [999]).status_code == 404
 
-
-def test_cannot_delete_session_with_attendance(client, make_exec, log_in, make_player):
+def test_deleting_session_removes_attendance_and_fees(client, make_exec, log_in, make_player):
     make_exec()
     log_in()
     alice = make_player()
     session_id = create_session(client).json()["session_id"]
     set_attendance(client, session_id, [alice.player_id])
 
-    assert client.delete(f"/sessions/{session_id}").status_code == 409
+    response = client.delete(f"/sessions/{session_id}")
 
-    set_attendance(client, session_id, [])
-    assert client.delete(f"/sessions/{session_id}").status_code == 204
+    assert response.status_code == 204
+    assert client.get(f"/sessions/{session_id}").status_code == 404
+    assert client.get(f"/fees/players/{alice.player_id}").json() == []
+
+    entry = audit_entries()[-1]
+    assert entry.action == "DELETE"
+    assert entry.old_values == {
+        "session_date": "2026-10-16",
+        "present_player_ids": [alice.player_id]
+    }
+
+
+def test_change_session_date_moves_attendance_and_fee(client, make_exec, log_in, make_player):
+    make_exec()
+    log_in()
+    alice = make_player()
+    session_id = create_session(client, "2026-09-25").json()["session_id"]
+    set_attendance(client, session_id, [alice.player_id])
+
+    response = client.patch(f"/sessions/{session_id}", json={"session_date": "2026-10-16"})
+
+    assert response.status_code == 200
+    assert response.json()["session_date"] == "2026-10-16"
+    assert [p["name"] for p in response.json()["present_players"]] == ["Player One"]
+
+    fees = client.get(f"/fees/players/{alice.player_id}").json()
+    assert [fee["fee_month"] for fee in fees] == ["2026-10-01"]
+
+    entry = audit_entries()[-1]
+    assert entry.old_values == {"session_date": "2026-09-25"}
+    assert entry.new_values == {"session_date": "2026-10-16"}
+
+
+def test_cannot_change_to_a_date_that_already_has_a_session(client, make_exec, log_in):
+    make_exec()
+    log_in()
+    create_session(client, "2026-10-16")
+    session_id = create_session(client, "2026-10-17").json()["session_id"]
+
+    response = client.patch(f"/sessions/{session_id}", json={"session_date": "2026-10-16"})
+
+    assert response.status_code == 409

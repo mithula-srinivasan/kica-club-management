@@ -60,3 +60,25 @@ def require_admin(
         )
 
     return current_exec
+
+
+def choose_handler(db: Session, current_exec: Exec, handler_id: int | None) -> Exec:
+    # Who actually handled the money: yourself, or (admins only) another Exec who forgot to record it
+    if handler_id is None or handler_id == current_exec.exec_id:
+        return current_exec
+
+    if current_exec.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admins can record this on behalf of another Exec"
+        )
+
+    handler = db.get(Exec, handler_id)
+
+    if handler is None or handler.approved_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Choose an approved Exec"
+        )
+
+    return handler

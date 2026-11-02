@@ -118,6 +118,7 @@ class PaymentCreate(BaseModel):
     method: Literal["cash", "bank_transfer"]
     note: str | None = Field(default=None, max_length=500)
     idempotency_key: str | None = Field(default=None, max_length=64)
+    collected_by_exec_id: int | None = None
 
 
 class PaymentResponse(BaseModel):
@@ -129,6 +130,8 @@ class PaymentResponse(BaseModel):
     method: str
     note: str | None
     status: str
+    collected_by_exec_id: int
+    collected_by_name: str
     recorded_by_exec_id: int
     recorded_by_name: str
     created_at: datetime
@@ -161,7 +164,8 @@ class PlayerStatement(BaseModel):
 class ExpenseCreate(BaseModel):
     description: str = Field(min_length=1, max_length=500)
     amount: Decimal = Field(gt=0, max_digits=10, decimal_places=3)
-    expense_date: date
+    expense_date: date    
+    paid_by_exec_id: int | None = None
 
 
 class ExpenseResponse(BaseModel):
@@ -170,6 +174,8 @@ class ExpenseResponse(BaseModel):
     amount: Decimal
     expense_date: date
     status: str
+    paid_by_exec_id: int
+    paid_by_name: str
     recorded_by_exec_id: int
     recorded_by_name: str
     created_at: datetime
@@ -183,6 +189,7 @@ class TransferCreate(BaseModel):
     from_exec_id: int
     amount: Decimal = Field(gt=0, max_digits=10, decimal_places=3)
     transferred_on: date
+    to_exec_id: int | None = None
 
 
 class TransferResponse(BaseModel):

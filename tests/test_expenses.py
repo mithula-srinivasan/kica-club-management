@@ -133,3 +133,23 @@ def test_expense_cannot_be_reversed_twice(client, make_exec, log_in):
     response = client.post(f"/expenses/{expense_id}/reverse", json={"reason": "Again"})
 
     assert response.status_code == 409
+
+
+def test_admin_records_expense_paid_by_another_exec(client, make_exec, log_in):
+    make_exec(email="admin@example.com", name="Siva", role="admin")
+    gowri = make_exec(email="gowri@example.com", name="Gowri")
+    log_in(email="admin@example.com")
+
+    response = spend(client, paid_by_exec_id=gowri.exec_id)
+
+    assert response.status_code == 201
+    assert response.json()["paid_by_name"] == "Gowri"
+    assert response.json()["recorded_by_name"] == "Siva"
+
+
+def test_regular_exec_cannot_record_expense_for_another(client, make_exec, log_in):
+    make_exec(email="a@example.com")
+    other = make_exec(email="b@example.com")
+    log_in(email="a@example.com")
+
+    assert spend(client, paid_by_exec_id=other.exec_id).status_code == 403

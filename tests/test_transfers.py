@@ -76,13 +76,16 @@ def test_cannot_receive_from_yourself(client, make_exec, log_in):
     assert receive(client, me.exec_id).status_code == 422
 
 
-def test_giver_must_be_active_and_approved(client, make_exec, log_in):
+def test_giver_must_be_approved_but_may_be_inactive(client, make_exec, log_in):
     make_exec()
     former = make_exec(email="former@example.com", is_active=False)
     pending = make_exec(email="pending@example.com", approved=False)
     log_in()
 
-    assert receive(client, former.exec_id).status_code == 422
+    # Someone who has left may have handed over money before going
+    assert receive(client, former.exec_id).status_code == 201
+
+    # A sign-up that was never approved can't have handled club money
     assert receive(client, pending.exec_id).status_code == 422
 
 
@@ -167,3 +170,35 @@ def test_transfer_cannot_be_reversed_twice(client, make_exec, log_in):
     response = client.post(f"/transfers/{transfer_id}/reverse", json={"reason": "Again"})
 
     assert response.status_code == 409
+
+
+
+def test_admin_records_transfer_between_two_other_execs(client, make_exec, log_in):
+    make_exec(email="admin@example.com", name="Siva", role="admin")
+    srini = make_exec(email="srini@example.com", name="Srini")
+    vidya = make_exec(email="vidya@example.com", name="Vidya")
+    log_in(email="admin@example.com")
+
+    response = receive(client, srini.exec_id, to_exec_id=vidya.exec_id)
+
+    assert response.status_code == 201
+    assert response.json()["from_exec_name"] == "Srini"
+    assert response.json()["to_exec_name"] == "Vidya"
+    assert response.json()["recorded_by_name"] == "Siva"
+
+
+def test_regular_exec_cannot_record_transfer_for_another_receiver(client, make_exec, log_in):
+    make_exec(email="a@example.com")
+    srini = make_exec(email="srini@example.com")
+    vidya = make_exec(email="vidya@example.com")
+    log_in(email="a@example.com")
+
+    assert receive(client, srini.exec_id, to_exec_id=vidya.exec_id).status_code == 403
+
+
+def test_giver_and_receiver_must_be_different(client, make_exec, log_in):
+    make_exec(email="admin@example.com", role="admin")
+    srini = make_exec(email="srini@example.com")
+    log_in(email="admin@example.com")
+
+    assert receive(client, srini.exec_id, to_exec_id=srini.exec_id).status_code == 422

@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from audit import record_audit
-from dependencies import get_current_exec, get_db
+from dependencies import choose_handler, get_current_exec, get_db
 from models import Exec, Expense
 from schemas import ExpenseCreate, ExpenseResponse, ExpenseReverse
 
@@ -28,6 +28,8 @@ def describe_expenses(db: Session, expenses: list[Expense]) -> list[dict]:
             "amount": e.amount,
             "expense_date": e.expense_date,
             "status": e.status,
+            "paid_by_exec_id": e.paid_by_exec_id,
+            "paid_by_name": exec_names[e.paid_by_exec_id],
             "recorded_by_exec_id": e.recorded_by_exec_id,
             "recorded_by_name": exec_names[e.recorded_by_exec_id],
             "created_at": e.created_at
@@ -67,13 +69,15 @@ def record_expense(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Description cannot be empty"
         )
+    # Admins can record an expense that another Exec paid
+    payer = choose_handler(db, current_exec, expense_data.paid_by_exec_id)
 
     expense = Expense(
         description=description,
         amount=expense_data.amount,
         expense_date=expense_data.expense_date,
         # The person recording the expense paid it from the club money they hold
-        paid_by_exec_id=current_exec.exec_id,
+        paid_by_exec_id=payer.exec_id,
         recorded_by_exec_id=current_exec.exec_id,
         funding_source="club_funds",
         status="active"
@@ -86,7 +90,8 @@ def record_expense(
         new_values={
             "description": description,
             "amount": expense.amount,
-            "expense_date": expense.expense_date
+            "expense_date": expense.expense_date,
+            "paid_by_exec_id": payer.exec_id
         }
     )
 

@@ -214,3 +214,30 @@ def test_payment_cannot_be_reversed_twice(client, make_exec, log_in, make_player
     response = client.post(f"/payments/{payment_id}/reverse", json={"reason": "Again"})
 
     assert response.status_code == 409
+
+
+def test_admin_records_payment_collected_by_another_exec(client, make_exec, log_in, make_player):
+    make_exec(email="admin@example.com", name="Siva", role="admin")
+    srinadh = make_exec(email="srinadh@example.com", name="Srinadh")
+    log_in(email="admin@example.com")
+    alice = make_player()
+
+    response = pay(client, alice.player_id, "5.000", collected_by_exec_id=srinadh.exec_id)
+
+    assert response.status_code == 201
+    assert response.json()["collected_by_name"] == "Srinadh"
+    assert response.json()["recorded_by_name"] == "Siva"
+
+    cash_held = client.get("/dashboard/").json()["cash_held"]
+    assert cash_held == [{"exec_id": srinadh.exec_id, "name": "Srinadh", "amount": "5.000"}]
+
+
+def test_regular_exec_cannot_record_on_behalf_of_another(client, make_exec, log_in, make_player):
+    make_exec(email="a@example.com")
+    other = make_exec(email="b@example.com")
+    log_in(email="a@example.com")
+    alice = make_player()
+
+    response = pay(client, alice.player_id, "5.000", collected_by_exec_id=other.exec_id)
+
+    assert response.status_code == 403

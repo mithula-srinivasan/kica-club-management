@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from audit import record_audit
 from balances import player_statement
-from dependencies import get_current_exec, get_db
+from dependencies import choose_handler, get_current_exec, get_db
 from models import Exec, Payment, Player
 from schemas import (
     PaymentCreate,
@@ -42,6 +42,8 @@ def describe_payments(db: Session, payments: list[Payment]) -> list[dict]:
             "method": p.method,
             "note": p.note,
             "status": p.status,
+            "collected_by_exec_id": p.collected_by_exec_id,
+            "collected_by_name": exec_names[p.collected_by_exec_id],
             "recorded_by_exec_id": p.recorded_by_exec_id,
             "recorded_by_name": exec_names[p.recorded_by_exec_id],
             "created_at": p.created_at
@@ -103,6 +105,9 @@ def record_payment(
             detail="Payment date cannot be in the future"
         )
 
+    # Admins can record a payment that another Exec collected
+    collector = choose_handler(db, current_exec, payment_data.collected_by_exec_id)
+
     payment = Payment(
         player_id=payment_data.player_id,
         amount=payment_data.amount,
@@ -110,7 +115,7 @@ def record_payment(
         method=payment_data.method,
         note=(payment_data.note or "").strip() or None,
         # The person recording the payment is always the one who collected it
-        collected_by_exec_id=current_exec.exec_id,
+        collected_by_exec_id=collector.exec_id,
         recorded_by_exec_id=current_exec.exec_id,
         status="active",
         idempotency_key=payment_data.idempotency_key
@@ -127,7 +132,7 @@ def record_payment(
                 "amount": payment.amount,
                 "paid_on": payment.paid_on,
                 "method": payment.method,
-                "collected_by_exec_id": current_exec.exec_id
+                "collected_by_exec_id": collector.exec_id
             }
         )
 
