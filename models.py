@@ -144,7 +144,7 @@ class Player(Base):
     kica_id: Mapped[str] = mapped_column(
         String(20),
         unique=True,
-        nullable=True
+        nullable=False
     )
 
     name: Mapped[str] = mapped_column(

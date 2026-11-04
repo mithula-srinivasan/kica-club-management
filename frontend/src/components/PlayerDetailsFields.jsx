@@ -20,10 +20,10 @@ export function genderLabel(gender) {
 
 // Starting values for the form.
 // No player = a new player. Inputs can't show null, so null becomes ''.
+// (No KICA ID: it is given automatically and cannot be changed.)
 export function formValues(player) {
   return {
     name: player?.name ?? '',
-    kica_id: player?.kica_id ?? '',
     parent_name: player?.parent_name ?? '',
     email: player?.email ?? '',
     phone_1: player?.phone_1 ?? '+965 ',
@@ -68,17 +68,12 @@ export default function PlayerDetailsFields({ values, onChange, isNew }) {
         </label>
 
         <label>
-          KICA ID
-          <input {...field('kica_id')} maxLength={20} required />
+          Parent name
+          <input {...field('parent_name')} maxLength={100} required />
         </label>
       </div>
 
       <div className="form-row">
-        <label>
-          Parent name
-          <input {...field('parent_name')} maxLength={100} required />
-        </label>
-
         <label>
           Email
           <input type="email" {...field('email')} maxLength={255} required />

@@ -8,8 +8,7 @@ Gender = Literal["male", "female", "other"]
 
 
 class PlayerCreate(BaseModel):
-    # Required
-    kica_id: str = Field(min_length=1, max_length=20)
+    # Required (the KICA ID is given automatically)
     name: str = Field(min_length=1, max_length=100)
     joined_on: date
     phone_1: str = Field(min_length=1, max_length=30)
@@ -25,7 +24,7 @@ class PlayerCreate(BaseModel):
 
 class PlayerResponse(BaseModel):
     player_id: int
-    kica_id: str | None
+    kica_id: str
     name: str
     joined_on: date | None
     is_active: bool
@@ -42,7 +41,6 @@ class PlayerResponse(BaseModel):
 
 class PlayerUpdate(BaseModel):
     name: str | None = Field(default=None, max_length=100)
-    kica_id: str | None = Field(default=None, max_length=20)
     joined_on: date | None = None
     phone_1: str | None = Field(default=None, max_length=30)
     phone_2: str | None = Field(default=None, max_length=30)
@@ -53,6 +51,7 @@ class PlayerUpdate(BaseModel):
     date_of_birth: date | None = None
 
 
+    
 class LoginRequest(BaseModel):
     email: str
     password: str

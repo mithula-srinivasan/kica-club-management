@@ -122,7 +122,6 @@ export default function PlayersPage() {
     </div>
   )
 }
-
 function AddPlayerForm({ onCancel }) {
   const navigate = useNavigate()
   const [values, setValues] = useState(() => formValues())
@@ -154,6 +153,7 @@ function AddPlayerForm({ onCancel }) {
   return (
     <form className="card" onSubmit={handleSubmit}>
       <h2>Add a player</h2>
+      <p className="hint">The KICA ID is given automatically when you add the player.</p>
 
       {error && <p className="error">{error}</p>}
 

@@ -15,7 +15,6 @@ def audit_entries():
 def player_details(**changes):
     """Everything a new player needs. Pass keyword arguments to change or add fields."""
     details = {
-        "kica_id": "K001",
         "name": "Player One",
         "joined_on": "2026-01-10",
         "phone_1": "+965 5000 0000",
@@ -42,18 +41,44 @@ def test_create_player_is_logged(client, make_exec, log_in):
     assert entry.exec_id == exec_user.exec_id
     assert entry.action == "CREATE"
     assert entry.record_id == response.json()["player_id"]
-    assert entry.new_values["kica_id"] == "K001"
+    assert entry.new_values["kica_id"] == "KICA001"
     assert entry.new_values["parent_name"] == "Lakshmi"
 
 
-def test_duplicate_kica_id_is_rejected_and_not_logged(client, make_exec, log_in):
+def test_new_players_get_kica_ids_in_order(client, make_exec, log_in):
     make_exec()
     log_in()
-    create_player(client)
 
-    response = create_player(client, name="Someone Else")
+    first = create_player(client).json()
+    second = create_player(client, name="Player Two").json()
 
-    assert response.status_code == 409
+    assert first["kica_id"] == "KICA001"
+    assert second["kica_id"] == "KICA002"
+
+
+def test_kica_id_continues_after_the_highest_number(client, make_exec, make_player, log_in):
+    make_exec()
+    log_in()
+    make_player(name="Yokshith", kica_id="KICA057")
+    make_player(name="Odd One", kica_id="K999")   # not KICA + digits, so ignored
+
+    response = create_player(client)
+
+    assert response.json()["kica_id"] == "KICA058"
+
+
+def test_kica_id_cannot_be_chosen_or_changed(client, make_exec, log_in):
+    make_exec()
+    log_in()
+
+    response = create_player(client, kica_id="KICA500")
+    assert response.json()["kica_id"] == "KICA001"
+
+    player_id = response.json()["player_id"]
+    response = client.patch(f"/players/{player_id}", json={"kica_id": "KICA500"})
+
+    assert response.status_code == 200
+    assert response.json()["kica_id"] == "KICA001"
     assert len(audit_entries()) == 1
 
 
@@ -62,7 +87,7 @@ def test_update_logs_only_changed_fields(client, make_exec, log_in):
     log_in()
     player_id = create_player(client).json()["player_id"]
 
-    client.patch(f"/players/{player_id}", json={"name": "New Name", "kica_id": "K001"})
+    client.patch(f"/players/{player_id}", json={"name": "New Name", "parent_name": "Lakshmi"})
 
     entry = audit_entries()[-1]
     assert entry.action == "UPDATE"
@@ -100,7 +125,7 @@ def test_get_single_player(client, make_exec, log_in):
     response = client.get(f"/players/{player_id}")
 
     assert response.status_code == 200
-    assert response.json()["kica_id"] == "K001"
+    assert response.json()["kica_id"] == "KICA001"
     assert client.get("/players/999").status_code == 404
 
 
@@ -108,7 +133,7 @@ def test_new_player_needs_every_required_field(client, make_exec, log_in):
     make_exec()
     log_in()
 
-    for field in ["phone_1", "email", "date_of_birth", "parent_name"]:
+    for field in ["name", "phone_1", "email", "date_of_birth", "parent_name"]:
         details = player_details()
         del details[field]
 
@@ -178,7 +203,7 @@ def test_required_details_cannot_be_cleared(client, make_exec, log_in):
     log_in()
     player_id = create_player(client).json()["player_id"]
 
-    for field in ["name", "kica_id", "phone_1", "parent_name", "email", "date_of_birth"]:
+    for field in ["name", "phone_1", "parent_name", "email", "date_of_birth"]:
         response = client.patch(f"/players/{player_id}", json={field: None})
         assert response.status_code == 422, field
 

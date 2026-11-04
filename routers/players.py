@@ -1,5 +1,7 @@
+import re
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -16,15 +18,18 @@ router = APIRouter(
     dependencies=[Depends(get_current_exec)]
 )
 
-# Fields every player must have, with the name shown in error messages
+# Fields every player must have, with the name shown in error messages.
+# (The KICA ID is not here: it is given automatically and cannot be changed.)
 REQUIRED_FIELDS = {
     "name": "Name",
-    "kica_id": "KICA ID",
     "phone_1": "Phone 1",
     "email": "Email",
     "date_of_birth": "Date of birth",
     "parent_name": "Parent name",
 }
+
+# "KICA" followed by digits, e.g. KICA057
+KICA_ID_FORMAT = re.compile(r"KICA(\d+)")
 
 
 def clean(value):
@@ -41,6 +46,19 @@ def check_date_of_birth(date_of_birth):
             status_code=422,
             detail="Date of birth cannot be in the future"
         )
+
+
+def next_kica_id(db: Session) -> str:
+    """The next KICA ID: the highest number used so far + 1, e.g. KICA058."""
+    highest = 0
+
+    for kica_id in db.scalars(select(Player.kica_id)):
+        match = KICA_ID_FORMAT.fullmatch(kica_id)
+
+        if match:
+            highest = max(highest, int(match.group(1)))
+
+    return f"KICA{highest + 1:03d}"
 
 
 @router.get("/", response_model=list[PlayerResponse])
@@ -89,16 +107,11 @@ def create_player(
 
     check_date_of_birth(details["date_of_birth"])
 
-    # 3. The KICA ID must be unique
-    existing_player = db.scalar(
-        select(Player).where(Player.kica_id == details["kica_id"])
-    )
+    # 3. Stop two Execs adding a player at the same moment from getting the same ID.
+    #    Other Execs can still read players; anyone adding one waits until we save.
+    db.execute(text("LOCK TABLE players IN EXCLUSIVE MODE"))
 
-    if existing_player is not None:
-        raise HTTPException(
-            status_code=409,
-            detail="This KICA ID is already registered"
-        )
+    details["kica_id"] = next_kica_id(db)
 
     # 4. Create the player and log it
     new_player = Player(**details, is_active=True)
@@ -182,7 +195,7 @@ def update_player(
         db.rollback()
         raise HTTPException(
             status_code=409,
-            detail="Unable to update player: KICA ID may already exist"
+            detail="Unable to update player: a database constraint was violated"
         )
 
     db.refresh(player)

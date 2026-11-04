@@ -161,12 +161,7 @@ function PlayerDetails({ player, onEdit, onToggleActive }) {
               )}
             </dd>
           </div>
-          <div>
-            <dt>Email</dt>
-            <dd>
-              <a href={`mailto:${player.email}`}>{player.email}</a>
-            </dd>
-          </div>
+          
           <div>
             <dt>Date of birth</dt>
             <dd>{formatDate(player.date_of_birth)}</dd>
@@ -178,6 +173,12 @@ function PlayerDetails({ player, onEdit, onToggleActive }) {
           <div>
             <dt>FIDE ID</dt>
             <dd>{player.fide_id ?? notSet}</dd>
+          </div>
+          <div className="full-row">
+            <dt>Email</dt>
+            <dd>
+              <a href={`mailto:${player.email}`}>{player.email}</a>
+            </dd>
           </div>
         </dl>
 

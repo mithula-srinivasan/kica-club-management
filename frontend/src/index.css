@@ -792,6 +792,19 @@ button.green:hover,
   font-weight: 600;
 }
 
+/* A detail that takes a whole row by itself (e.g. long emails) */
+.details .full-row {
+  grid-column: 1 / -1;
+}
+
+.details dd {
+  overflow-wrap: anywhere;
+}
+
+.details > div {
+  min-width: 0;
+}
+
 /* ========== Tables ========== */
 table {
   width: 100%;
