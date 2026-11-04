@@ -1,0 +1,65 @@
+from getpass import getpass
+
+from sqlalchemy import select
+
+from database import SessionLocal
+from models import Exec
+from security import hash_password
+
+
+def main():
+    with SessionLocal() as db:
+        name = input("Admin name: ").strip()
+        email = input("Admin email: ").strip().lower()
+
+        if not name or not email:
+            print("Name and email are required.")
+            return
+
+        existing = db.scalar(
+            select(Exec).where(Exec.email == email)
+        )
+
+        if existing:
+            print("An account with this email already exists.")
+            return
+
+        set_password = input("Set password now? (y/n): ").strip().lower()
+
+        if set_password == "y":
+            password = getpass("Password: ")
+            confirm = getpass("Confirm password: ")
+
+            if password != confirm:
+                print("Passwords do not match.")
+                return
+
+            if len(password) < 12:
+                print("Password must contain at least 12 characters.")
+                return
+
+            hashed_password = hash_password(password)
+
+        elif set_password == "n":
+            hashed_password = None
+
+        else:
+            print("Please enter y or n.")
+            return
+
+        admin = Exec(
+            name=name,
+            email=email,
+            role="admin",
+            is_active=True,
+            password_hash=hashed_password
+        )
+
+        db.add(admin)
+        db.commit()
+
+        print(f"Admin account created for {name}.")
+
+
+if __name__ == "__main__":
+    main()

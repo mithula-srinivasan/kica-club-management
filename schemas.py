@@ -4,10 +4,23 @@ from pydantic import BaseModel, EmailStr, ConfigDict, Field
 from typing import Literal
 
 
+Gender = Literal["male", "female", "other"]
+
+
 class PlayerCreate(BaseModel):
+    # Required
     kica_id: str = Field(min_length=1, max_length=20)
     name: str = Field(min_length=1, max_length=100)
     joined_on: date
+    phone_1: str = Field(min_length=1, max_length=30)
+    email: EmailStr
+    date_of_birth: date
+    parent_name: str = Field(min_length=1, max_length=100)
+
+    # Optional
+    phone_2: str | None = Field(default=None, max_length=30)
+    fide_id: str | None = Field(default=None, max_length=20)
+    gender: Gender | None = None
 
 
 class PlayerResponse(BaseModel):
@@ -16,14 +29,28 @@ class PlayerResponse(BaseModel):
     name: str
     joined_on: date | None
     is_active: bool
+    phone_1: str
+    phone_2: str | None
+    email: str
+    parent_name: str
+    fide_id: str | None
+    gender: str | None
+    date_of_birth: date
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class PlayerUpdate(BaseModel):
-    name: str | None = Field(default=None, min_length=1, max_length=100)
-    kica_id: str | None = Field(default=None, min_length=1, max_length=20)
+    name: str | None = Field(default=None, max_length=100)
+    kica_id: str | None = Field(default=None, max_length=20)
     joined_on: date | None = None
+    phone_1: str | None = Field(default=None, max_length=30)
+    phone_2: str | None = Field(default=None, max_length=30)
+    email: EmailStr | None = None
+    parent_name: str | None = Field(default=None, max_length=100)
+    fide_id: str | None = Field(default=None, max_length=20)
+    gender: Gender | None = None
+    date_of_birth: date | None = None
 
 
 class LoginRequest(BaseModel):

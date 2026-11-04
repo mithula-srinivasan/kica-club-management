@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
-from sqlalchemy.orm import Session
-from audit import record_audit
-
 from sqlalchemy.exc import IntegrityError
-from schemas import PlayerCreate, PlayerResponse, PlayerUpdate
+from sqlalchemy.orm import Session
+
+from audit import record_audit
+from club_time import kuwait_today
 from dependencies import get_current_exec, get_db
 from models import Exec, Player
+from schemas import PlayerCreate, PlayerResponse, PlayerUpdate
 
 
 router = APIRouter(
@@ -14,6 +15,33 @@ router = APIRouter(
     tags=["Players"],
     dependencies=[Depends(get_current_exec)]
 )
+
+# Fields every player must have, with the name shown in error messages
+REQUIRED_FIELDS = {
+    "name": "Name",
+    "kica_id": "KICA ID",
+    "phone_1": "Phone 1",
+    "email": "Email",
+    "date_of_birth": "Date of birth",
+    "parent_name": "Parent name",
+}
+
+
+def clean(value):
+    """Trim spaces from text. Blank text becomes None. Other values are unchanged."""
+    if isinstance(value, str):
+        value = value.strip()
+        return value or None
+    return value
+
+
+def check_date_of_birth(date_of_birth):
+    if date_of_birth is not None and date_of_birth > kuwait_today():
+        raise HTTPException(
+            status_code=422,
+            detail="Date of birth cannot be in the future"
+        )
+
 
 @router.get("/", response_model=list[PlayerResponse])
 def get_players(
@@ -29,10 +57,7 @@ def get_players(
 
     statement = statement.order_by(Player.name)
 
-    players = db.scalars(statement).all()
-
-    return players
-
+    return db.scalars(statement).all()
 
 
 @router.get("/{player_id}", response_model=PlayerResponse)
@@ -43,10 +68,7 @@ def get_player(
     player = db.get(Player, player_id)
 
     if player is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Player not found"
-        )
+        raise HTTPException(status_code=404, detail="Player not found")
 
     return player
 
@@ -57,20 +79,19 @@ def create_player(
     current_exec: Exec = Depends(get_current_exec),
     db: Session = Depends(get_db)
 ):
-    # Remove accidental spaces
-    name = player.name.strip()
-    kica_id = player.kica_id.strip()
+    # 1. Tidy every field: trim spaces, blank -> None
+    details = {field: clean(value) for field, value in player.model_dump().items()}
 
-    # Prevent empty names or IDs
-    if not name or not kica_id:
-        raise HTTPException(
-            status_code=422,
-            detail="Name and KICA ID cannot be empty"
-        )
+    # 2. Required fields must not be blank (e.g. "   " for a name)
+    for field, label in REQUIRED_FIELDS.items():
+        if details[field] is None:
+            raise HTTPException(status_code=422, detail=f"{label} is required")
 
-    # Check whether the KICA ID already exists
+    check_date_of_birth(details["date_of_birth"])
+
+    # 3. The KICA ID must be unique
     existing_player = db.scalar(
-        select(Player).where(Player.kica_id == kica_id)
+        select(Player).where(Player.kica_id == details["kica_id"])
     )
 
     if existing_player is not None:
@@ -79,14 +100,8 @@ def create_player(
             detail="This KICA ID is already registered"
         )
 
-    # Create the new player
-    new_player = Player(
-        name=name,
-        kica_id=kica_id,
-        joined_on=player.joined_on,
-        is_active=True
-    )
-
+    # 4. Create the player and log it
+    new_player = Player(**details, is_active=True)
     db.add(new_player)
 
     try:
@@ -95,12 +110,7 @@ def create_player(
 
         record_audit(
             db, current_exec, "CREATE", "players", new_player.player_id,
-            new_values={
-                "name": name,
-                "kica_id": kica_id,
-                "joined_on": player.joined_on,
-                "is_active": True
-            }
+            new_values={**details, "is_active": True}
         )
 
         db.commit()
@@ -110,7 +120,7 @@ def create_player(
             status_code=409,
             detail="Unable to create player: a database constraint was violated"
         )
-    
+
     db.refresh(new_player)
 
     return new_player
@@ -127,39 +137,36 @@ def update_player(
     player = db.get(Player, player_id)
 
     if player is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Player not found"
-        )
+        raise HTTPException(status_code=404, detail="Player not found")
 
-    # 2. Get only the fields the Exec wants to change
+    # 2. Only the fields the Exec actually sent
     changes = updates.model_dump(exclude_unset=True)
 
     old_values = {}
     new_values = {}
-    # 3. Validate the supplied values
+
     for field, value in changes.items():
-        if value is None:
+        value = clean(value)
+
+        # 3. Required fields can be changed but not emptied.
+        #    Optional fields can be emptied (blank -> None).
+        if value is None and field in REQUIRED_FIELDS:
             raise HTTPException(
                 status_code=422,
-                detail=f"{field} cannot be null"
+                detail=f"{REQUIRED_FIELDS[field]} cannot be empty"
             )
 
-        if field in ("name", "kica_id"):
-            value = value.strip()
+        if value is None and field == "joined_on":
+            raise HTTPException(status_code=422, detail="Joined on cannot be empty")
 
-            if not value:
-                raise HTTPException(
-                    status_code=422,
-                    detail=f"{field} cannot be empty"
-                )
+        if field == "date_of_birth":
+            check_date_of_birth(value)
 
         # 4. Remember what changed, then apply it
         if getattr(player, field) != value:
             old_values[field] = getattr(player, field)
             new_values[field] = value
-
-        setattr(player, field, value)
+            setattr(player, field, value)
 
     if new_values:
         record_audit(
@@ -167,6 +174,7 @@ def update_player(
             old_values=old_values,
             new_values=new_values
         )
+
     # 5. Save the changes
     try:
         db.commit()
@@ -192,10 +200,7 @@ def update_player_status(
     player = db.get(Player, player_id)
 
     if player is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Player not found"
-        )
+        raise HTTPException(status_code=404, detail="Player not found")
 
     if player.is_active != is_active:
         record_audit(

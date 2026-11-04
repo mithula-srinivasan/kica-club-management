@@ -1,4 +1,4 @@
-
+from datetime import date
 from pathlib import Path
 
 from openpyxl import load_workbook
@@ -92,7 +92,11 @@ def import_players():
                 kica_id=kica_id,
                 name=name,
                 joined_on=None,
-                is_active=True
+                is_active=True,
+                phone_1="+965 0000 0000",
+                email="update.me@example.com",
+                parent_name="To be updated",
+                date_of_birth=date(2000, 1, 1),
             )
 
             db.add(new_player)

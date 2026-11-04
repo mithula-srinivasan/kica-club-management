@@ -9,6 +9,7 @@ from models import Attendance, ClubSession, Exec, Player
 from schemas import (
     AttendanceUpdate,
     SessionCreate,
+    SessionDateChange,
     SessionDetailResponse,
     SessionResponse,
 )
@@ -193,6 +194,41 @@ def set_attendance(
     return session_detail(db, club_session)
 
 
+
+@router.patch("/{session_id}", response_model=SessionDetailResponse)
+def change_session_date(
+    session_id: int,
+    change: SessionDateChange,
+    current_exec: Exec = Depends(get_current_exec),
+    db: Session = Depends(get_db)
+):
+    club_session = get_session_or_404(db, session_id)
+    old_date = club_session.session_date
+
+    if change.session_date == old_date:
+        return session_detail(db, club_session)
+
+    # Attendance stays linked to the session, so everyone ticked moves with it
+    club_session.session_date = change.session_date
+
+    record_audit(
+        db, current_exec, "UPDATE", "club_sessions", session_id,
+        old_values={"session_date": old_date},
+        new_values={"session_date": change.session_date}
+    )
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A session already exists on this date"
+        )
+
+    return session_detail(db, club_session)
+
+
 @router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_session(
     session_id: int,
@@ -201,27 +237,25 @@ def delete_session(
 ):
     club_session = get_session_or_404(db, session_id)
 
-    present_count = db.scalar(
-        select(func.count())
-        .select_from(Attendance)
-        .where(
-            Attendance.session_id == session_id,
-            Attendance.is_present.is_(True)
+    present_ids = sorted(
+        db.scalars(
+            select(Attendance.player_id).where(
+                Attendance.session_id == session_id,
+                Attendance.is_present.is_(True)
+            )
         )
     )
 
-    if present_count > 0:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Remove all attendance before deleting this session"
-        )
-
+    # Keep the date and who attended in the log, so a deleted session can be recreated if needed
     record_audit(
         db, current_exec, "DELETE", "club_sessions", session_id,
-        old_values={"session_date": club_session.session_date}
+        old_values={
+            "session_date": club_session.session_date,
+            "present_player_ids": present_ids
+        }
     )
 
-    # Remove leftover "absent" rows first, because they point to this session
+    # Attendance rows point to the session, so they are removed first
     db.execute(delete(Attendance).where(Attendance.session_id == session_id))
     db.delete(club_session)
     db.commit()

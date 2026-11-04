@@ -81,7 +81,15 @@ def log_in(client):
 def make_player():
     def _make_player(name="Player One", kica_id="K001", is_active=True):
         with SessionLocal() as db:
-            player = Player(name=name, kica_id=kica_id, is_active=is_active)
+            player = Player(
+                name=name,
+                kica_id=kica_id,
+                is_active=is_active,
+                phone_1="+965 5000 0000",
+                email="parent@example.com",
+                parent_name="Lakshmi",
+                date_of_birth=date(2014, 5, 20),
+            )
             db.add(player)
             db.commit()
             db.refresh(player)

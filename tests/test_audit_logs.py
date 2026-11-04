@@ -1,9 +1,16 @@
 def create_player(client, kica_id="K001", name="Player One"):
     return client.post(
         "/players/",
-        json={"kica_id": kica_id, "name": name, "joined_on": "2026-01-10"}
+        json={
+            "kica_id": kica_id,
+            "name": name,
+            "joined_on": "2026-01-10",
+            "phone_1": "+965 5000 0000",
+            "email": "parent@example.com",
+            "date_of_birth": "2014-05-20",
+            "parent_name": "Lakshmi",
+        }
     ).json()["player_id"]
-
 
 def test_regular_exec_cannot_view_audit_log(client, make_exec, log_in):
     make_exec()

@@ -163,6 +163,24 @@ class Player(Base):
         nullable=False
     )
 
+    # Required for every player (current players were given demo values in the migration)
+    phone_1: Mapped[str] = mapped_column(String(30), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    parent_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    date_of_birth: Mapped[date] = mapped_column(Date, nullable=False)
+
+    # Optional
+    phone_2: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    fide_id: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    gender: Mapped[str | None] = mapped_column(String(10), nullable=True)
+
+    __table_args__ = (
+        CheckConstraint(
+            "gender IN ('male', 'female', 'other')",
+            name="ck_player_gender"
+        ),
+    )
+
 
 class ClubSession(Base):
     __tablename__ = "club_sessions"
