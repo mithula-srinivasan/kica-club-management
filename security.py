@@ -1,11 +1,13 @@
 import hashlib
-import os
 import secrets
 from datetime import timedelta
 
 from pwdlib import PasswordHash
 
+from config import IS_PRODUCTION, setting
+
 password_hash = PasswordHash.recommended()
+
 
 def hash_password(password: str) -> str:
     return password_hash.hash(password)
@@ -14,12 +16,14 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed_password: str) -> bool:
     return password_hash.verify(password, hashed_password)
 
+
 SESSION_COOKIE_NAME = "kica_session"
 SESSION_LENGTH = timedelta(hours=12)
 REMEMBER_ME_LENGTH = timedelta(days=30)
 
-# Browsers only send Secure cookies over HTTPS, so this must be "true" in production
-COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false") == "true"
+# Browsers only send Secure cookies over HTTPS. The live site always uses HTTPS;
+# your Mac uses plain http://localhost, so it's off there.
+COOKIE_SECURE = IS_PRODUCTION
 
 # Used so a login for an unknown email takes as long as one for a real account
 DUMMY_PASSWORD_HASH = password_hash.hash("timing-protection-dummy")
@@ -34,11 +38,8 @@ def hash_session_token(token: str) -> str:
 
 
 SETUP_LINK_LENGTH = timedelta(hours=24)
-
-# Where the React app runs; setup links point to its "set password" page
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
-
 RESET_LINK_LENGTH = timedelta(hours=1)
 
-# Where the React app runs; reset links point to its "reset password" page
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+# Where the React app runs. Setup and reset links point to its pages.
+# Required in production, e.g. https://kicachess.com
+FRONTEND_URL = setting("FRONTEND_URL", "http://localhost:5173").rstrip("/")

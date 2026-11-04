@@ -36,7 +36,8 @@ def empty_tables():
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    # Every test request goes to the API, e.g. "/players/" means "/api/players/"
+    return TestClient(app, base_url="http://testserver/api")
 
 
 @pytest.fixture

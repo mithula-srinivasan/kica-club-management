@@ -390,6 +390,7 @@ def reset_password(
 
     # A new password ends any login block, so the owner can log in straight away
     clear_hits(db, f"login-email:{exec_user.email}")
+    
     db.commit()
 
     return {

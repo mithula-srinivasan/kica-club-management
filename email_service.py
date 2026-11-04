@@ -1,9 +1,11 @@
-import os
 import smtplib
 from email.message import EmailMessage
 
-GMAIL_ADDRESS = os.getenv("GMAIL_ADDRESS")
-GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD")
+from config import setting
+
+# Required in production. On your Mac, if they're missing, emails are printed instead.
+GMAIL_ADDRESS = setting("GMAIL_ADDRESS")
+GMAIL_APP_PASSWORD = setting("GMAIL_APP_PASSWORD")
 
 
 def send_email(to: str, subject: str, text: str) -> None:

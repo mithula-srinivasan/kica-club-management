@@ -82,7 +82,7 @@ def test_deactivating_logs_exec_out_everywhere(client, make_exec, log_in):
     member = make_exec(email="member@example.com")
 
     # A second "browser" for the member, so both can be logged in at once
-    member_client = TestClient(app)
+    member_client = TestClient(app, base_url="http://testserver/api")
     member_client.post(
         "/auth/login",
         json={"email": "member@example.com", "password": "correct-password"}
