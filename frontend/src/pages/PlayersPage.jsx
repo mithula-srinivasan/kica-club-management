@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api'
-import { today } from '../format'
+import PlayerDetailsFields, {
+  formValues,
+  hasDemoDetails,
+  requestBody,
+} from '../components/PlayerDetailsFields'
 
 export default function PlayersPage() {
   const [players, setPlayers] = useState(null)
@@ -24,17 +28,25 @@ export default function PlayersPage() {
     return <p className="loading">Loading...</p>
   }
 
-  // Filter in the browser: the whole list is small, so this is instant as you type
-  const term = search.trim().toLowerCase()
-    // Ticked: only inactive players. Unticked: only active players.
+  // Filter in the browser: the whole list is small, so this is instant as you type.
+  // Spaces are ignored, so "50000000" finds "+965 5000 0000".
+  const term = search.toLowerCase().replace(/\s/g, '')
+
+  function matches(text) {
+    return (text ?? '').toLowerCase().replace(/\s/g, '').includes(term)
+  }
+
+  // Ticked: only inactive players. Unticked: only active players.
   const shown = players.filter((player) => {
     if (player.is_active === showInactive) {
       return false
     }
 
     return (
-      player.name.toLowerCase().includes(term) ||
-      (player.kica_id ?? '').toLowerCase().includes(term)
+      matches(player.name) ||
+      matches(player.kica_id) ||
+      matches(player.parent_name) ||
+      matches(player.phone_1)
     )
   })
 
@@ -51,7 +63,7 @@ export default function PlayersPage() {
         <div className="toolbar">
           <input
             type="search"
-            placeholder="Search by name or KICA ID"
+            placeholder="Search by name, KICA ID, parent or phone"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             aria-label="Search players"
@@ -69,26 +81,40 @@ export default function PlayersPage() {
         {shown.length === 0 ? (
           <p className="hint">No players match your search.</p>
         ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>KICA ID</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {shown.map((player) => (
-                <tr key={player.player_id}>
-                  <td>
-                    <Link to={`/players/${player.player_id}`}>{player.name}</Link>
-                  </td>
-                  <td>{player.kica_id}</td>
-                  <td>{player.is_active ? 'Active' : <span className="muted">Inactive</span>}</td>
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>KICA ID</th>
+                  <th>Parent</th>
+                  <th>Phone</th>
+                  <th>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {shown.map((player) => (
+                  <tr key={player.player_id}>
+                    <td>
+                      <Link to={`/players/${player.player_id}`}>{player.name}</Link>
+                      {hasDemoDetails(player) && (
+                        <>
+                          {' '}
+                          <span className="badge muted-badge">Update details</span>
+                        </>
+                      )}
+                    </td>
+                    <td>{player.kica_id}</td>
+                    <td>{player.parent_name}</td>
+                    <td>{player.phone_1}</td>
+                    <td>
+                      {player.is_active ? 'Active' : <span className="muted">Inactive</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
         <p className="hint">Showing {shown.length} of {players.length} players</p>
@@ -99,11 +125,14 @@ export default function PlayersPage() {
 
 function AddPlayerForm({ onCancel }) {
   const navigate = useNavigate()
-  const [name, setName] = useState('')
-  const [kicaId, setKicaId] = useState('')
-  const [joinedOn, setJoinedOn] = useState(today)
+  const [values, setValues] = useState(() => formValues())
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  // Change one field, keep the others
+  function setField(name, value) {
+    setValues((current) => ({ ...current, [name]: value }))
+  }
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -113,7 +142,7 @@ function AddPlayerForm({ onCancel }) {
     try {
       const player = await api('/players/', {
         method: 'POST',
-        body: { name, kica_id: kicaId, joined_on: joinedOn },
+        body: requestBody(values),
       })
       navigate(`/players/${player.player_id}`)
     } catch (err) {
@@ -128,25 +157,7 @@ function AddPlayerForm({ onCancel }) {
 
       {error && <p className="error">{error}</p>}
 
-      <label>
-        Full name
-        <input value={name} onChange={(event) => setName(event.target.value)} required />
-      </label>
-
-      <label>
-        KICA ID
-        <input value={kicaId} onChange={(event) => setKicaId(event.target.value)} required />
-      </label>
-
-      <label>
-        Joined on
-        <input
-          type="date"
-          value={joinedOn}
-          onChange={(event) => setJoinedOn(event.target.value)}
-          required
-        />
-      </label>
+      <PlayerDetailsFields values={values} onChange={setField} isNew />
 
       <div className="actions">
         <button type="submit" disabled={submitting}>

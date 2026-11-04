@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api'
+import PlayerDetailsFields, {
+  formValues,
+  genderLabel,
+  hasDemoDetails,
+  requestBody,
+} from '../components/PlayerDetailsFields'
 import { formatDate, kwd, methodLabel, monthLabel } from '../format'
 
 export default function PlayerPage() {
@@ -94,31 +100,11 @@ export default function PlayerPage() {
           onCancel={() => setEditing(false)}
         />
       ) : (
-        <section className="card">
-          <dl className="details">
-            <div>
-              <dt>KICA ID</dt>
-              <dd>{player.kica_id ?? '—'}</dd>
-            </div>
-            <div>
-              <dt>Status</dt>
-              <dd>{player.is_active ? 'Active' : 'Inactive'}</dd>
-            </div>
-            <div>
-              <dt>Joined</dt>
-              <dd>{player.joined_on ? formatDate(player.joined_on) : '—'}</dd>
-            </div>
-          </dl>
-
-          <div className="actions">
-            <button className="secondary" onClick={() => setEditing(true)}>
-              Edit details
-            </button>
-            <button className="secondary" onClick={toggleActive}>
-              {player.is_active ? 'Mark inactive' : 'Mark active'}
-            </button>
-          </div>
-        </section>
+        <PlayerDetails
+          player={player}
+          onEdit={() => setEditing(true)}
+          onToggleActive={toggleActive}
+        />
       )}
 
       <FeeHistory statement={statement} />
@@ -127,30 +113,108 @@ export default function PlayerPage() {
   )
 }
 
+/* ---------- Player details ---------- */
+
+function PlayerDetails({ player, onEdit, onToggleActive }) {
+  const notSet = <span className="muted">—</span>
+
+  return (
+    <>
+      {hasDemoDetails(player) && (
+        <p className="notice">
+          Some of these details are demo values. Click <strong>Edit details</strong> to add
+          the real ones.
+        </p>
+      )}
+
+      <section className="card">
+        <dl className="details">
+          <div>
+            <dt>KICA ID</dt>
+            <dd>{player.kica_id ?? notSet}</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>{player.is_active ? 'Active' : 'Inactive'}</dd>
+          </div>
+          <div>
+            <dt>Joined</dt>
+            <dd>{player.joined_on ? formatDate(player.joined_on) : notSet}</dd>
+          </div>
+          <div>
+            <dt>Parent name</dt>
+            <dd>{player.parent_name}</dd>
+          </div>
+          <div>
+            <dt>Phone 1</dt>
+            <dd>
+              <a href={`tel:${player.phone_1.replace(/\s/g, '')}`}>{player.phone_1}</a>
+            </dd>
+          </div>
+          <div>
+            <dt>Phone 2</dt>
+            <dd>
+              {player.phone_2 ? (
+                <a href={`tel:${player.phone_2.replace(/\s/g, '')}`}>{player.phone_2}</a>
+              ) : (
+                notSet
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt>Email</dt>
+            <dd>
+              <a href={`mailto:${player.email}`}>{player.email}</a>
+            </dd>
+          </div>
+          <div>
+            <dt>Date of birth</dt>
+            <dd>{formatDate(player.date_of_birth)}</dd>
+          </div>
+          <div>
+            <dt>Gender</dt>
+            <dd>{genderLabel(player.gender) ?? notSet}</dd>
+          </div>
+          <div>
+            <dt>FIDE ID</dt>
+            <dd>{player.fide_id ?? notSet}</dd>
+          </div>
+        </dl>
+
+        <div className="actions">
+          <button className="secondary" onClick={onEdit}>
+            Edit details
+          </button>
+          <button className="secondary" onClick={onToggleActive}>
+            {player.is_active ? 'Mark inactive' : 'Mark active'}
+          </button>
+        </div>
+      </section>
+    </>
+  )
+}
+
 /* ---------- Edit details ---------- */
 
 function EditPlayerForm({ player, onSaved, onCancel }) {
-  const [name, setName] = useState(player.name)
-  const [kicaId, setKicaId] = useState(player.kica_id ?? '')
-  const [joinedOn, setJoinedOn] = useState(player.joined_on ?? '')
+  const [values, setValues] = useState(() => formValues(player))
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  // Change one field, keep the others
+  function setField(name, value) {
+    setValues((current) => ({ ...current, [name]: value }))
+  }
 
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
     setSubmitting(true)
 
-    const changes = { name, kica_id: kicaId }
-
-    if (joinedOn) {
-      changes.joined_on = joinedOn
-    }
-
     try {
       const updated = await api(`/players/${player.player_id}`, {
         method: 'PATCH',
-        body: changes,
+        body: requestBody(values),
       })
       onSaved(updated)
     } catch (err) {
@@ -165,20 +229,7 @@ function EditPlayerForm({ player, onSaved, onCancel }) {
 
       {error && <p className="error">{error}</p>}
 
-      <label>
-        Full name
-        <input value={name} onChange={(event) => setName(event.target.value)} required />
-      </label>
-
-      <label>
-        KICA ID
-        <input value={kicaId} onChange={(event) => setKicaId(event.target.value)} required />
-      </label>
-
-      <label>
-        Joined on
-        <input type="date" value={joinedOn} onChange={(event) => setJoinedOn(event.target.value)} />
-      </label>
+      <PlayerDetailsFields values={values} onChange={setField} isNew={false} />
 
       <div className="actions">
         <button type="submit" disabled={submitting}>
