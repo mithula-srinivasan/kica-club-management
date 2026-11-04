@@ -1,9 +1,9 @@
-def create_player(client, kica_id="K001", name="Player One"):
+def create_player(client, kica_id="K001", name=None):
+    # Each player needs a different name now (name + date of birth must be unique)
     return client.post(
         "/players/",
         json={
-            "kica_id": kica_id,
-            "name": name,
+            "name": name or f"Player {kica_id}",
             "joined_on": "2026-01-10",
             "phone_1": "+965 5000 0000",
             "email": "parent@example.com",

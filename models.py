@@ -11,7 +11,8 @@ from sqlalchemy import (
     Text,
     DateTime,
     func,
-    JSON
+    JSON,
+    Index
 )
 
 from decimal import Decimal
@@ -179,6 +180,8 @@ class Player(Base):
             "gender IN ('male', 'female', 'other')",
             name="ck_player_gender"
         ),
+        # The same name (ignoring capitals) and date of birth can't belong to two players
+        Index("uq_players_name_dob", func.lower(name), date_of_birth, unique=True),
     )
 
 
@@ -749,4 +752,52 @@ class RateLimitHit(Base):
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False
+    )
+
+
+class PlayerRegistration(Base):
+    """A sign-up from the public "Join KICA" form, waiting for an Exec to approve it."""
+    __tablename__ = "player_registrations"
+
+    registration_id: Mapped[int] = mapped_column(primary_key=True)
+
+    # The same details a player has
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    parent_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    phone_1: Mapped[str] = mapped_column(String(30), nullable=False)
+    phone_2: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    date_of_birth: Mapped[date] = mapped_column(Date, nullable=False)
+    gender: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    fide_id: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
+    # "pending" until an Exec approves or rejects it
+    status: Mapped[str] = mapped_column(String(10), default="pending", nullable=False)
+
+    # When the consent box was ticked (it must be ticked to submit)
+    consented_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+    submitted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    # Filled in when an Exec approves or rejects it (Step 2)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reviewed_by_exec_id: Mapped[int | None] = mapped_column(ForeignKey("execs.exec_id"), nullable=True)
+    rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # The player created from this registration, once approved
+    player_id: Mapped[int | None] = mapped_column(ForeignKey("players.player_id"), nullable=True)
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('pending', 'approved', 'rejected')",
+            name="ck_registration_status"
+        ),
+        CheckConstraint(
+            "gender IN ('male', 'female', 'other')",
+            name="ck_registration_gender"
+        ),
     )

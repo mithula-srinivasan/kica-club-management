@@ -259,3 +259,49 @@ def test_next_kica_id_preview(client, make_exec, make_player, log_in):
     make_player(kica_id="KICA057")
 
     assert client.get("/players/next-kica-id").json() == {"kica_id": "KICA058"}
+
+
+
+def test_name_and_birthday_must_be_unique(client, make_exec, log_in):
+    make_exec()
+    log_in()
+    create_player(client, name="Arjun Kumar")
+
+    # Capitals and extra spaces don't make it a different player
+    response = create_player(client, name="  ARJUN   kumar ")
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "A player with this name and date of birth is already registered."
+
+    # Same name, different birthday is fine
+    assert create_player(client, name="Arjun Kumar", date_of_birth="2015-01-01").status_code == 201
+
+
+def test_cannot_edit_a_player_into_a_duplicate(client, make_exec, log_in):
+    make_exec()
+    log_in()
+    create_player(client, name="Arjun Kumar")
+    other_id = create_player(client, name="Ravi Kumar").json()["player_id"]
+
+    response = client.patch(f"/players/{other_id}", json={"name": "Arjun Kumar"})
+
+    assert response.status_code == 409
+    assert client.get(f"/players/{other_id}").json()["name"] == "Ravi Kumar"
+
+
+def test_cannot_add_a_player_who_is_waiting_in_registrations(client, make_exec, log_in):
+    make_exec()
+    log_in()
+    client.post(
+        "/registrations/",
+        json={
+            "name": "Arjun Kumar",
+            "parent_name": "Lakshmi Kumar",
+            "phone_1": "+965 5000 0000",
+            "email": "parent@example.com",
+            "date_of_birth": "2014-05-20",
+            "consent": True,
+        },
+    )
+
+    assert create_player(client, name="Arjun Kumar").status_code == 409

@@ -19,6 +19,10 @@ RESET_LIMIT_PER_EMAIL = 3
 RESET_LIMIT_PER_IP = 10
 RESET_MESSAGE = "Too many reset requests. Please try again in an hour."
 
+REGISTRATION_WINDOW = timedelta(hours=1)
+REGISTRATION_LIMIT_PER_IP = 5
+REGISTRATION_MESSAGE = "Too many registrations from this network. Please try again in an hour."
+
 SIGNUP_WINDOW = timedelta(hours=1)
 SIGNUP_LIMIT_PER_IP = 5
 SIGNUP_MESSAGE = "Too many sign-ups from this network. Please try again in an hour."

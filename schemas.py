@@ -7,10 +7,10 @@ from typing import Literal
 Gender = Literal["male", "female", "other"]
 
 
-class PlayerCreate(BaseModel):
-    # Required (the KICA ID is given automatically)
+class PlayerDetails(BaseModel):
+    """The details every player has. Shared by the exec "Add player" form and the public Join form."""
+    # Required
     name: str = Field(min_length=1, max_length=100)
-    joined_on: date
     phone_1: str = Field(min_length=1, max_length=30)
     email: EmailStr
     date_of_birth: date
@@ -21,6 +21,21 @@ class PlayerCreate(BaseModel):
     fide_id: str | None = Field(default=None, max_length=20)
     gender: Gender | None = None
 
+
+class PlayerCreate(PlayerDetails):
+    # Execs also choose the joined date (the KICA ID is given automatically)
+    joined_on: date
+
+
+class RegistrationCreate(PlayerDetails):
+    # The consent box on the Join form
+    consent: bool
+
+    # A hidden box people never see. Spam bots fill in every box, so if this
+    # has anything in it, the "registration" came from a bot.
+    website: str | None = None
+
+    
 
 class PlayerResponse(BaseModel):
     player_id: int

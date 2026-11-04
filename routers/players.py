@@ -1,14 +1,20 @@
-import re
-
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from audit import record_audit
-from club_time import kuwait_today
 from dependencies import get_current_exec, get_db
 from models import Exec, Player
+from player_rules import (
+    DUPLICATE_MESSAGE,
+    REQUIRED_FIELDS,
+    check_date_of_birth,
+    clean,
+    lock_player_tables,
+    name_and_dob_taken,
+    next_kica_id,
+)
 from schemas import PlayerCreate, PlayerResponse, PlayerUpdate
 
 
@@ -17,48 +23,6 @@ router = APIRouter(
     tags=["Players"],
     dependencies=[Depends(get_current_exec)]
 )
-
-# Fields every player must have, with the name shown in error messages.
-# (The KICA ID is not here: it is given automatically and cannot be changed.)
-REQUIRED_FIELDS = {
-    "name": "Name",
-    "phone_1": "Phone 1",
-    "email": "Email",
-    "date_of_birth": "Date of birth",
-    "parent_name": "Parent name",
-}
-
-# "KICA" followed by digits, e.g. KICA057
-KICA_ID_FORMAT = re.compile(r"KICA(\d+)")
-
-
-def clean(value):
-    """Trim spaces from text. Blank text becomes None. Other values are unchanged."""
-    if isinstance(value, str):
-        value = value.strip()
-        return value or None
-    return value
-
-
-def check_date_of_birth(date_of_birth):
-    if date_of_birth is not None and date_of_birth > kuwait_today():
-        raise HTTPException(
-            status_code=422,
-            detail="Date of birth cannot be in the future"
-        )
-
-
-def next_kica_id(db: Session) -> str:
-    """The next KICA ID: the highest number used so far + 1, e.g. KICA058."""
-    highest = 0
-
-    for kica_id in db.scalars(select(Player.kica_id)):
-        match = KICA_ID_FORMAT.fullmatch(kica_id)
-
-        if match:
-            highest = max(highest, int(match.group(1)))
-
-    return f"KICA{highest + 1:03d}"
 
 
 @router.get("/", response_model=list[PlayerResponse])
@@ -78,12 +42,10 @@ def get_players(
     return db.scalars(statement).all()
 
 
-
 @router.get("/next-kica-id")
 def get_next_kica_id(db: Session = Depends(get_db)):
     """The KICA ID the next new player will get, so the form can show it."""
     return {"kica_id": next_kica_id(db)}
-
 
 
 @router.get("/{player_id}", response_model=PlayerResponse)
@@ -115,13 +77,16 @@ def create_player(
 
     check_date_of_birth(details["date_of_birth"])
 
-    # 3. Stop two Execs adding a player at the same moment from getting the same ID.
-    #    Other Execs can still read players; anyone adding one waits until we save.
-    db.execute(text("LOCK TABLE players IN EXCLUSIVE MODE"))
+    # 3. Nobody else may add a player or registration until we've saved
+    lock_player_tables(db)
+
+    # 4. The same name and date of birth can't be used twice
+    if name_and_dob_taken(db, details["name"], details["date_of_birth"]):
+        raise HTTPException(status_code=409, detail=DUPLICATE_MESSAGE)
 
     details["kica_id"] = next_kica_id(db)
 
-    # 4. Create the player and log it
+    # 5. Create the player and log it
     new_player = Player(**details, is_active=True)
     db.add(new_player)
 
@@ -189,6 +154,17 @@ def update_player(
             new_values[field] = value
             setattr(player, field, value)
 
+    # 5. A new name or birthday must not match another player
+    if "name" in new_values or "date_of_birth" in new_values:
+        # no_autoflush: check without sending our unsaved changes to the database first
+        with db.no_autoflush:
+            taken = name_and_dob_taken(
+                db, player.name, player.date_of_birth, ignore_player_id=player.player_id
+            )
+
+        if taken:
+            raise HTTPException(status_code=409, detail=DUPLICATE_MESSAGE)
+
     if new_values:
         record_audit(
             db, current_exec, "UPDATE", "players", player.player_id,
@@ -196,15 +172,12 @@ def update_player(
             new_values=new_values
         )
 
-    # 5. Save the changes
+    # 6. Save the changes
     try:
         db.commit()
     except IntegrityError:
         db.rollback()
-        raise HTTPException(
-            status_code=409,
-            detail="Unable to update player: a database constraint was violated"
-        )
+        raise HTTPException(status_code=409, detail=DUPLICATE_MESSAGE)
 
     db.refresh(player)
 

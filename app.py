@@ -10,7 +10,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from config import IS_PRODUCTION
-from routers import players, auth, execs, club_sessions, fees, payments, expenses, transfers, dashboard, audit_logs, opening_balances, exports, income
+from routers import players, auth, execs, club_sessions, fees, payments, expenses, transfers, dashboard, audit_logs, opening_balances, exports, income, registrations
+
 
 # The /docs pages list every API route, so they're only available on your Mac
 app = FastAPI(
@@ -56,6 +57,7 @@ api.include_router(audit_logs.router)
 api.include_router(opening_balances.router)
 api.include_router(exports.router)
 api.include_router(income.router)
+api.include_router(registrations.router)
 
 app.include_router(api)
 
