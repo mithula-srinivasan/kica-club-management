@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { api } from '../api'
 import { useAuth } from '../auth'
+import HandledBySelect, { useExecList } from '../components/HandledBy'
 import ReverseForm from '../components/ReverseForm'
 import { formatDate, kwd, today } from '../format'
 
@@ -35,14 +36,13 @@ export default function ExpensesPage() {
   }
 
   if (!expenses) {
-    
     return error ? <p className="error">{error}</p> : <p className="loading">Loading...</p>
   }
 
   const reversedCount = expenses.filter((expense) => expense.status === 'reversed').length
   const shown = showReversed
-      ? expenses
-      : expenses.filter((expense) => expense.status !== 'reversed')
+    ? expenses
+    : expenses.filter((expense) => expense.status !== 'reversed')
 
   return (
     <div className="page">
@@ -68,7 +68,7 @@ export default function ExpensesPage() {
         </div>
 
         {shown.length === 0 ? (
-          <p className="hint">No expenses recorded yet.</p>
+          <p className="hint">No expenses to show.</p>
         ) : (
           <div className="table-scroll">
             <table>
@@ -96,7 +96,10 @@ export default function ExpensesPage() {
                         <td>{expense.description}</td>
                         <td className="money">{kwd(expense.amount)}</td>
                         <td>
-                          {expense.recorded_by_name}
+                          {expense.paid_by_name}
+                          {expense.recorded_by_exec_id !== expense.paid_by_exec_id && (
+                            <span className="muted"> · recorded by {expense.recorded_by_name}</span>
+                          )}
                           {reversed && ' (reversed)'}
                         </td>
                         <td className="row-actions">
@@ -139,10 +142,14 @@ export default function ExpensesPage() {
   )
 }
 
+/* ---------- Record an expense ---------- */
+
 function RecordExpenseForm({ onRecorded }) {
+  const execs = useExecList()
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
   const [expenseDate, setExpenseDate] = useState(today)
+  const [paidBy, setPaidBy] = useState('')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [saving, setSaving] = useState(false)
@@ -156,14 +163,24 @@ function RecordExpenseForm({ onRecorded }) {
     try {
       const expense = await api('/expenses/', {
         method: 'POST',
-        body: { description, amount, expense_date: expenseDate },
+        body: {
+          description,
+          amount,
+          expense_date: expenseDate,
+          paid_by_exec_id: paidBy ? Number(paidBy) : null,
+        },
       })
 
-      setMessage(`Recorded ${kwd(expense.amount)}: ${expense.description}.`)
+      setMessage(
+        expense.paid_by_exec_id === expense.recorded_by_exec_id
+          ? `Recorded ${kwd(expense.amount)}: ${expense.description}.`
+          : `Recorded ${kwd(expense.amount)}: ${expense.description}, paid by ${expense.paid_by_name}.`
+      )
       onRecorded()
 
       setDescription('')
       setAmount('')
+      setPaidBy('')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -174,7 +191,7 @@ function RecordExpenseForm({ onRecorded }) {
   return (
     <form className="card highlight-card" onSubmit={handleSubmit}>
       <h2>Record an expense</h2>
-      <p className="hint">Money you paid from the club funds you are holding.</p>
+      <p className="hint">Money paid from the club funds an Exec is holding.</p>
 
       {error && <p className="error">{error}</p>}
       {message && <p className="success">{message}</p>}
@@ -213,6 +230,9 @@ function RecordExpenseForm({ onRecorded }) {
             required
           />
         </label>
+
+        {/* Admins only: record an expense that another Exec paid */}
+        <HandledBySelect label="Paid by" execs={execs} value={paidBy} onChange={setPaidBy} />
       </div>
 
       <button type="submit" className="button-large" disabled={saving}>

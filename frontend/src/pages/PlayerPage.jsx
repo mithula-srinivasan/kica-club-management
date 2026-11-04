@@ -127,6 +127,8 @@ export default function PlayerPage() {
   )
 }
 
+/* ---------- Edit details ---------- */
+
 function EditPlayerForm({ player, onSaved, onCancel }) {
   const [name, setName] = useState(player.name)
   const [kicaId, setKicaId] = useState(player.kica_id ?? '')
@@ -190,6 +192,8 @@ function EditPlayerForm({ player, onSaved, onCancel }) {
   )
 }
 
+/* ---------- Fees, month by month ---------- */
+
 function FeeHistory({ statement }) {
   // Newest month first. Months with no fee (e.g. fully waived) are left out.
   const months = statement.months
@@ -244,6 +248,8 @@ function FeeHistory({ statement }) {
   )
 }
 
+/* ---------- Payments received ---------- */
+
 function PaymentHistory({ payments }) {
   const [showReversed, setShowReversed] = useState(false)
 
@@ -269,7 +275,7 @@ function PaymentHistory({ payments }) {
       </div>
 
       {shown.length === 0 ? (
-        <p className="hint">No payments recorded yet.</p>
+        <p className="hint">No payments to show.</p>
       ) : (
         <div className="table-scroll">
           <table>
@@ -291,7 +297,10 @@ function PaymentHistory({ payments }) {
                   <td className="money">{kwd(payment.amount)}</td>
                   <td>{methodLabel(payment.method)}</td>
                   <td>
-                    {payment.recorded_by_name}
+                    {payment.collected_by_name}
+                    {payment.recorded_by_exec_id !== payment.collected_by_exec_id && (
+                      <span className="muted"> · recorded by {payment.recorded_by_name}</span>
+                    )}
                     {payment.status === 'reversed' && ' (reversed)'}
                   </td>
                 </tr>

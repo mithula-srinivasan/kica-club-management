@@ -2,9 +2,10 @@ import { Fragment, useEffect, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
+import HandledBySelect, { useExecList } from '../components/HandledBy'
 import PlayerPicker from '../components/PlayerPicker'
-import { currentMonth, formatDate, kwd, methodLabel, monthLabel, today } from '../format'
 import ReverseForm from '../components/ReverseForm'
+import { currentMonth, formatDate, kwd, methodLabel, monthLabel, today } from '../format'
 
 const USUAL_FEE = '5.000'
 const RECENT_LIMIT = 50
@@ -86,12 +87,16 @@ export default function FeeCollectionPage() {
   )
 }
 
+/* ---------- Record a payment ---------- */
+
 function RecordPaymentForm({ players, initialPlayerId, onRecorded }) {
+  const execs = useExecList()
   const [playerId, setPlayerId] = useState(initialPlayerId)
   const [statement, setStatement] = useState(null)
   const [amount, setAmount] = useState(USUAL_FEE)
   const [paidOn, setPaidOn] = useState(today)
   const [method, setMethod] = useState('cash')
+  const [collectedBy, setCollectedBy] = useState('')
   const [note, setNote] = useState('')
   const [formKey, setFormKey] = useState(newFormKey)
   const [error, setError] = useState('')
@@ -139,16 +144,22 @@ function RecordPaymentForm({ players, initialPlayerId, onRecorded }) {
           method,
           note: note.trim() || null,
           idempotency_key: formKey,
+          collected_by_exec_id: collectedBy ? Number(collectedBy) : null,
         },
       })
 
-      setMessage(`Recorded ${kwd(payment.amount)} from ${payment.player_name}.`)
+      setMessage(
+        payment.collected_by_exec_id === payment.recorded_by_exec_id
+          ? `Recorded ${kwd(payment.amount)} from ${payment.player_name}.`
+          : `Recorded ${kwd(payment.amount)} from ${payment.player_name}, collected by ${payment.collected_by_name}.`
+      )
       onRecorded()
 
-      // A fresh form, with a new key, for the next payment
+      // A fresh form, with a new key, for the next payment (date and method are kept)
       setPlayerId(null)
       setAmount(USUAL_FEE)
       setNote('')
+      setCollectedBy('')
       setFormKey(newFormKey())
     } catch (err) {
       setError(err.message)
@@ -216,6 +227,14 @@ function RecordPaymentForm({ players, initialPlayerId, onRecorded }) {
             <option value="bank_transfer">Bank transfer</option>
           </select>
         </label>
+
+        {/* Admins only: record a payment that another Exec collected */}
+        <HandledBySelect
+          label="Collected by"
+          execs={execs}
+          value={collectedBy}
+          onChange={setCollectedBy}
+        />
       </div>
 
       <label>
@@ -228,121 +247,14 @@ function RecordPaymentForm({ players, initialPlayerId, onRecorded }) {
         />
       </label>
 
-      <button type="submit" className="button-large" disabled={saving}>
+      <button type="submit" className="button-large green" disabled={saving}>
         {saving ? 'Saving...' : 'Record payment'}
       </button>
     </form>
   )
 }
 
-function RecentPayments({ payments, user, onReverse }) {
-  const [reversingId, setReversingId] = useState(null)
-  const [showReversed, setShowReversed] = useState(false)
-
-  const reversedCount = payments.filter((payment) => payment.status === 'reversed').length
-  const visible = showReversed
-    ? payments
-    : payments.filter((payment) => payment.status !== 'reversed')
-  const recent = visible.slice(0, RECENT_LIMIT)
-
-  return (
-    <section className="card">
-      <div className="section-header">
-        <h2>Recent payments</h2>
-        {reversedCount > 0 && (
-          <label className="checkbox">
-            <input
-              type="checkbox"
-              checked={showReversed}
-              onChange={(event) => setShowReversed(event.target.checked)}
-            />
-            Show reversed ({reversedCount})
-          </label>
-        )}
-      </div>
-
-      {recent.length === 0 ? (
-        <p className="hint">No payments recorded yet.</p>
-      ) : (
-        <div className="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Player</th>
-                <th>Amount</th>
-                <th>Method</th>
-                <th>Collected by</th>
-                <th aria-label="Actions" />
-              </tr>
-            </thead>
-            <tbody>
-              {recent.map((payment) => {
-                const reversed = payment.status === 'reversed'
-                const canReverse =
-                  !reversed &&
-                  (user.role === 'admin' || payment.recorded_by_exec_id === user.exec_id)
-                const isReversing = reversingId === payment.payment_id
-
-                return (
-                  <Fragment key={payment.payment_id}>
-                    <tr className={reversed ? 'reversed' : undefined}>
-                      <td>{formatDate(payment.paid_on)}</td>
-                      <td>
-                        <Link to={`/players/${payment.player_id}`}>{payment.player_name}</Link>
-                      </td>
-                      <td className="money">{kwd(payment.amount)}</td>
-                      <td>{methodLabel(payment.method)}</td>
-                      <td>
-                        {payment.recorded_by_name}
-                        {reversed && ' (reversed)'}
-                      </td>
-                      <td className="row-actions">
-                        {canReverse && !isReversing && (
-                          <button
-                            className="secondary danger-text small"
-                            onClick={() => setReversingId(payment.payment_id)}
-                          >
-                            Reverse
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-
-                    {isReversing && (
-                      <tr className="reverse-row">
-                        <td colSpan={6}>
-                          <ReverseForm
-                            label={`Reason for reversing ${kwd(payment.amount)} from ${payment.player_name}`}
-                            confirmMessage={
-                              `Reverse ${kwd(payment.amount)} from ${payment.player_name}?\n\n` +
-                              'It will stay in the history, marked as reversed, and the player will owe this amount again.'
-                            }
-                            buttonText="Reverse payment"
-                            onCancel={() => setReversingId(null)}
-                            onReverse={async (reason) => {
-                              await onReverse(payment, reason)
-                              setReversingId(null)
-                            }}
-                          />
-                        </td>
-                      </tr>
-                    )}
-                  </Fragment>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {visible.length > RECENT_LIMIT && (
-        <p className="hint">Showing the {RECENT_LIMIT} most recent payments.</p>
-      )}
-    </section>
-  )
-}
-
+/* ---------- Who owes, and Unpaid for a month ---------- */
 
 function WhoOwes({ refreshCount }) {
   const [owing, setOwing] = useState(null)
@@ -441,7 +353,7 @@ function OwingTable({ rows }) {
             </td>
             <td className="money">{kwd(row.outstanding)}</td>
             <td className="row-actions">
-              <Link className="button small-button" to={`/fees?player=${row.player_id}`}>
+              <Link className="button small-button green" to={`/fees?player=${row.player_id}`}>
                 Record payment
               </Link>
             </td>
@@ -449,5 +361,118 @@ function OwingTable({ rows }) {
         ))}
       </tbody>
     </table>
+  )
+}
+
+/* ---------- Recent payments ---------- */
+
+function RecentPayments({ payments, user, onReverse }) {
+  const [reversingId, setReversingId] = useState(null)
+  const [showReversed, setShowReversed] = useState(false)
+
+  const reversedCount = payments.filter((payment) => payment.status === 'reversed').length
+  const visible = showReversed
+    ? payments
+    : payments.filter((payment) => payment.status !== 'reversed')
+  const recent = visible.slice(0, RECENT_LIMIT)
+
+  return (
+    <section className="card">
+      <div className="section-header">
+        <h2>Recent payments</h2>
+        {reversedCount > 0 && (
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={showReversed}
+              onChange={(event) => setShowReversed(event.target.checked)}
+            />
+            Show reversed ({reversedCount})
+          </label>
+        )}
+      </div>
+
+      {recent.length === 0 ? (
+        <p className="hint">No payments to show.</p>
+      ) : (
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Player</th>
+                <th>Amount</th>
+                <th>Method</th>
+                <th>Collected by</th>
+                <th aria-label="Actions" />
+              </tr>
+            </thead>
+            <tbody>
+              {recent.map((payment) => {
+                const reversed = payment.status === 'reversed'
+                const canReverse =
+                  !reversed &&
+                  (user.role === 'admin' || payment.recorded_by_exec_id === user.exec_id)
+                const isReversing = reversingId === payment.payment_id
+
+                return (
+                  <Fragment key={payment.payment_id}>
+                    <tr className={reversed ? 'reversed' : undefined}>
+                      <td>{formatDate(payment.paid_on)}</td>
+                      <td>
+                        <Link to={`/players/${payment.player_id}`}>{payment.player_name}</Link>
+                      </td>
+                      <td className="money">{kwd(payment.amount)}</td>
+                      <td>{methodLabel(payment.method)}</td>
+                      <td>
+                        {payment.collected_by_name}
+                        {payment.recorded_by_exec_id !== payment.collected_by_exec_id && (
+                          <span className="muted"> · recorded by {payment.recorded_by_name}</span>
+                        )}
+                        {reversed && ' (reversed)'}
+                      </td>
+                      <td className="row-actions">
+                        {canReverse && !isReversing && (
+                          <button
+                            className="secondary danger-text small"
+                            onClick={() => setReversingId(payment.payment_id)}
+                          >
+                            Reverse
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+
+                    {isReversing && (
+                      <tr className="reverse-row">
+                        <td colSpan={6}>
+                          <ReverseForm
+                            label={`Reason for reversing ${kwd(payment.amount)} from ${payment.player_name}`}
+                            confirmMessage={
+                              `Reverse ${kwd(payment.amount)} from ${payment.player_name}?\n\n` +
+                              'It will stay in the history, marked as reversed, and the player will owe this amount again.'
+                            }
+                            buttonText="Reverse payment"
+                            onCancel={() => setReversingId(null)}
+                            onReverse={async (reason) => {
+                              await onReverse(payment, reason)
+                              setReversingId(null)
+                            }}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {visible.length > RECENT_LIMIT && (
+        <p className="hint">Showing the {RECENT_LIMIT} most recent payments.</p>
+      )}
+    </section>
   )
 }
