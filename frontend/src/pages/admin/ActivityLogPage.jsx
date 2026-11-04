@@ -20,6 +20,8 @@ const TABLES = {
   execs: 'Exec account',
   exec_opening_balances: 'Exec opening cash',
   player_opening_balances: 'Member opening balance',
+  incomes: 'Income',
+  fee_rates: 'Fee rate',
 }
 
 // "collected_by_exec_id" -> "Collected by exec", "kica_id" -> "Kica"

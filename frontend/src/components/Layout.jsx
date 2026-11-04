@@ -9,6 +9,7 @@ const LINKS = [
   { to: '/players', label: 'Players' },
   { to: '/fees', label: 'Fee Collection' },
   { to: '/expenses', label: 'Expenses' },
+  { to: '/income', label: 'Income' },
   { to: '/transfers', label: 'Money Transfers' },
 ]
 

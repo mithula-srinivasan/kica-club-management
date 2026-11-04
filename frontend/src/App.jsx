@@ -23,6 +23,7 @@ import OpeningBalancesPage from './pages/admin/OpeningBalancesPage'
 import ActivityLogPage from './pages/admin/ActivityLogPage'
 import BackupPage from './pages/admin/BackupPage'
 import FeeRatePage from './pages/admin/FeeRatePage'
+import IncomePage from './pages/IncomePage'
 
 
 export default function App() {
@@ -48,6 +49,7 @@ export default function App() {
             <Route path="/attendance/:sessionId" element={<SessionPage />} />
             <Route path="/fees" element={<FeeCollectionPage />} />
             <Route path="/expenses" element={<ExpensesPage />} />
+            <Route path="/income" element={<IncomePage />} />
             <Route path="/transfers" element={<TransfersPage />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Navigate to="signups" replace />} />
