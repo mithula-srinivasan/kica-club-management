@@ -24,6 +24,24 @@ from security import (
     RESET_LINK_LENGTH
 )
 
+from rate_limit import (
+    LOGIN_LIMIT_PER_EMAIL,
+    LOGIN_LIMIT_PER_IP,
+    LOGIN_MESSAGE,
+    LOGIN_WINDOW,
+    RESET_LIMIT_PER_EMAIL,
+    RESET_LIMIT_PER_IP,
+    RESET_MESSAGE,
+    RESET_WINDOW,
+    SIGNUP_LIMIT_PER_IP,
+    SIGNUP_MESSAGE,
+    SIGNUP_WINDOW,
+    check_rate_limit,
+    clear_hits,
+    client_ip,
+    record_hit,
+)
+
 
 router = APIRouter(
     prefix="/auth",
@@ -34,8 +52,15 @@ router = APIRouter(
 @router.post("/signup", status_code=status.HTTP_201_CREATED)
 def signup(
     signup_data: SignupRequest,
+    request: Request,
     db: Session = Depends(get_db)
 ):
+    # At most a few sign-ups per hour from the same network
+    ip_key = f"signup-ip:{client_ip(request)}"
+    check_rate_limit(db, ip_key, SIGNUP_LIMIT_PER_IP, SIGNUP_WINDOW, SIGNUP_MESSAGE)
+    record_hit(db, ip_key)
+    db.commit()
+
     new_exec = Exec(
         name=signup_data.name.strip(),
         email=signup_data.email.strip().lower(),
@@ -61,18 +86,25 @@ def signup(
     }
 
 
+
 @router.post("/login")
 def login(
     credentials: LoginRequest,
+    request: Request,
     response: Response,
     db: Session = Depends(get_db)
 ):
-    # Find the Exec using their email address
-    statement = select(Exec).where(
-        Exec.email == credentials.email.strip().lower()
-    )
+    email = credentials.email.strip().lower()
+    email_key = f"login-email:{email}"
+    ip_key = f"login-ip:{client_ip(request)}"
 
-    exec_user = db.scalar(statement)
+    # Too many wrong passwords recently? Refuse before checking this one,
+    # even if it is correct - otherwise someone could keep guessing.
+    check_rate_limit(db, email_key, LOGIN_LIMIT_PER_EMAIL, LOGIN_WINDOW, LOGIN_MESSAGE)
+    check_rate_limit(db, ip_key, LOGIN_LIMIT_PER_IP, LOGIN_WINDOW, LOGIN_MESSAGE)
+
+    # Find the Exec using their email address
+    exec_user = db.scalar(select(Exec).where(Exec.email == email))
 
     # Always run one password check, so every failed login takes the same time
     if exec_user is None or exec_user.password_hash is None:
@@ -86,6 +118,11 @@ def login(
 
     # Reject wrong passwords, unknown or passwordless accounts, and inactive accounts
     if not password_ok or not exec_user.is_active:
+        # Count this failed attempt for the email and for the IP
+        record_hit(db, email_key)
+        record_hit(db, ip_key)
+        db.commit()
+
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
@@ -97,6 +134,9 @@ def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Your account is awaiting admin approval"
         )
+
+    # Logged in successfully: forget this email's earlier wrong attempts
+    clear_hits(db, email_key)
 
     # Tidy up: remove everyone's expired sessions, which can never be used again
     db.execute(
@@ -137,7 +177,6 @@ def login(
         "name": exec_user.name,
         "role": exec_user.role
     }
-
 
 @router.post("/logout")
 def logout(
@@ -226,6 +265,7 @@ def create_password_setup_link(
 @router.post("/forgot-password")
 def forgot_password(
     request_data: ForgotPasswordRequest,
+    request: Request,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
@@ -233,6 +273,22 @@ def forgot_password(
     generic_reply = {
         "message": "If an account exists for this email, a reset link has been sent."
     }
+
+    email = request_data.email.strip().lower()
+
+    # Limit reset emails per email address and per network.
+    # Every request counts, whether or not the account exists.
+    email_key = f"reset-email:{email}"
+    ip_key = f"reset-ip:{client_ip(request)}"
+    check_rate_limit(db, email_key, RESET_LIMIT_PER_EMAIL, RESET_WINDOW, RESET_MESSAGE)
+    check_rate_limit(db, ip_key, RESET_LIMIT_PER_IP, RESET_WINDOW, RESET_MESSAGE)
+    record_hit(db, email_key)
+    record_hit(db, ip_key)
+    db.commit()
+
+    exec_user = db.scalar(
+        select(Exec).where(Exec.email == email)
+    )
 
     exec_user = db.scalar(
         select(Exec).where(Exec.email == request_data.email.strip().lower())
@@ -331,6 +387,9 @@ def reset_password(
         delete(ExecSession).where(ExecSession.exec_id == exec_user.exec_id)
     )
 
+
+    # A new password ends any login block, so the owner can log in straight away
+    clear_hits(db, f"login-email:{exec_user.email}")
     db.commit()
 
     return {

@@ -729,3 +729,24 @@ class Income(Base):
             name="ck_income_status"
         ),
     )
+
+
+
+class RateLimitHit(Base):
+    __tablename__ = "rate_limit_hits"
+
+    hit_id: Mapped[int] = mapped_column(primary_key=True)
+
+    # What is being limited and for whom, e.g. "login-email:exec@example.com"
+    # or "login-ip:203.0.113.5"
+    key: Mapped[str] = mapped_column(
+        String(320),
+        index=True,
+        nullable=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
