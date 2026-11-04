@@ -25,6 +25,7 @@ from models import (
     ClubSession,
     Exec,
     ExecOpeningBalance,
+    Income,
     Expense,
     Payment,
     Player,
@@ -196,6 +197,27 @@ def export_club_data(db: Session = Depends(get_db)):
                 e.created_at,
             ]
             for e in expenses
+        ],
+    )
+
+        # Income
+    entries = db.scalars(select(Income).order_by(Income.income_date, Income.income_id)).all()
+
+    add_sheet(
+        workbook,
+        "Income",
+        ["Income ID", "Date", "Description", "Amount (KWD)", "Received by", "Status", "Recorded at"],
+        [
+            [
+                i.income_id,
+                i.income_date,
+                i.description,
+                i.amount,
+                exec_names[i.received_by_exec_id],
+                i.status,
+                i.created_at,
+            ]
+            for i in entries
         ],
     )
 

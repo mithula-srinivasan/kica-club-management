@@ -655,3 +655,59 @@ class PlayerOpeningBalance(Base):
         onupdate=func.now(),
         nullable=False
     )
+
+
+
+class Income(Base):
+    __tablename__ = "incomes"
+
+    income_id: Mapped[int] = mapped_column(primary_key=True)
+
+    description: Mapped[str] = mapped_column(
+        Text,
+        nullable=False
+    )
+
+    amount: Mapped[Decimal] = mapped_column(
+        Numeric(10, 3),
+        nullable=False
+    )
+
+    income_date: Mapped[date] = mapped_column(
+        Date,
+        nullable=False
+    )
+
+    # The Exec who received the money, and now holds it
+    received_by_exec_id: Mapped[int] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        nullable=False
+    )
+
+    recorded_by_exec_id: Mapped[int] = mapped_column(
+        ForeignKey("execs.exec_id"),
+        nullable=False
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(20),
+        default="active",
+        nullable=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "amount > 0",
+            name="ck_income_positive"
+        ),
+        CheckConstraint(
+            "status IN ('active', 'reversed')",
+            name="ck_income_status"
+        ),
+    )

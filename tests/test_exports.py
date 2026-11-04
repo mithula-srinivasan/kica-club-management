@@ -35,7 +35,7 @@ def test_admin_downloads_excel_workbook(client, make_exec, log_in, make_player):
 
     assert workbook.sheetnames == [
         "Summary", "Players", "Monthly fees", "Payments",
-        "Expenses", "Transfers", "Attendance", "Opening balances"
+        "Expenses", "Income", "Transfers", "Attendance", "Opening balances"
     ]
 
 

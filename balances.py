@@ -11,6 +11,7 @@ from models import (
     Exec,
     ExecOpeningBalance,
     Expense,
+    Income,
     Payment,
     Player,
     PlayerOpeningBalance,
@@ -126,10 +127,19 @@ def cash_held_by_exec(db: Session) -> list[dict]:
         held[exec_id] += amount
 
     # Money in: payments each Exec collected
+    
     for exec_id, total in db.execute(
         select(Payment.collected_by_exec_id, func.sum(Payment.amount))
         .where(Payment.status == "active")
         .group_by(Payment.collected_by_exec_id)
+    ):
+        held[exec_id] += total
+
+    # Money in: other income each Exec received (tournaments, equipment rental, ...)
+    for exec_id, total in db.execute(
+        select(Income.received_by_exec_id, func.sum(Income.amount))
+        .where(Income.status == "active")
+        .group_by(Income.received_by_exec_id)
     ):
         held[exec_id] += total
 
@@ -234,6 +244,15 @@ def month_summary(db: Session, fee_month: date) -> dict:
         )
     )
 
+    income_received = db.scalar(
+        select(func.sum(Income.amount))
+        .where(
+            Income.status == "active",
+            Income.income_date >= fee_month,
+            Income.income_date < next_month
+        )
+    )
+
     expenses_paid = db.scalar(
         select(func.sum(Expense.amount))
         .where(
@@ -249,6 +268,7 @@ def month_summary(db: Session, fee_month: date) -> dict:
         "players_attended": sum(1 for fee in fees if fee["base_fee"] > 0),
         "fees_assessed": sum((fee["amount_due"] for fee in fees), ZERO),
         "payments_received": payments_received or ZERO,
+        "income_received": income_received or ZERO,
         "expenses_paid": expenses_paid or ZERO
     }
 

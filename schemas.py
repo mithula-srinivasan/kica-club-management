@@ -236,6 +236,7 @@ class MonthSummary(BaseModel):
     fees_assessed: Decimal
     payments_received: Decimal
     expenses_paid: Decimal
+    income_received: Decimal
 
 
 class DashboardResponse(BaseModel):
@@ -318,3 +319,27 @@ class FeeRateResponse(BaseModel):
     monthly_amount: Decimal
     effective_from: date
     changed_by_name: str | None
+
+
+class IncomeCreate(BaseModel):
+    description: str = Field(min_length=1, max_length=500)
+    amount: Decimal = Field(gt=0, max_digits=10, decimal_places=3)
+    income_date: date
+    received_by_exec_id: int | None = None
+
+
+class IncomeResponse(BaseModel):
+    income_id: int
+    description: str
+    amount: Decimal
+    income_date: date
+    status: str
+    received_by_exec_id: int
+    received_by_name: str
+    recorded_by_exec_id: int
+    recorded_by_name: str
+    created_at: datetime
+
+
+class IncomeReverse(BaseModel):
+    reason: str = Field(min_length=1, max_length=500)

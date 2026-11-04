@@ -171,6 +171,7 @@ def test_month_summary_counts_only_that_month(client, make_exec, log_in, make_pl
         "players_attended": 2,
         "fees_assessed": "10.000",
         "payments_received": "5.000",
+        "income_received": "0.000",
         "expenses_paid": "25.000"
     }
 
