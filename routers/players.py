@@ -78,6 +78,14 @@ def get_players(
     return db.scalars(statement).all()
 
 
+
+@router.get("/next-kica-id")
+def get_next_kica_id(db: Session = Depends(get_db)):
+    """The KICA ID the next new player will get, so the form can show it."""
+    return {"kica_id": next_kica_id(db)}
+
+
+
 @router.get("/{player_id}", response_model=PlayerResponse)
 def get_player(
     player_id: int,

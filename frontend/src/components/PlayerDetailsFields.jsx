@@ -50,7 +50,7 @@ export function requestBody(values) {
 const PHONE_PATTERN = '\\+?[0-9 \\-]{7,30}'
 const PHONE_HINT = 'Numbers with the country code, e.g. +965 5000 0000'
 
-export default function PlayerDetailsFields({ values, onChange, isNew }) {
+export default function PlayerDetailsFields({ values, onChange, isNew, kicaId }) {
   // Gives an input its value and what to do when it changes
   function field(name) {
     return {
@@ -62,6 +62,11 @@ export default function PlayerDetailsFields({ values, onChange, isNew }) {
   return (
     <>
       <div className="form-row">
+        <label>
+          KICA ID (automatic)
+          <input value={kicaId ?? 'Loading...'} readOnly tabIndex={-1} />
+        </label>
+
         <label>
           Full name
           <input {...field('name')} maxLength={100} required />

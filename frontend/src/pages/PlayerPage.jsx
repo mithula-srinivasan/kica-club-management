@@ -230,7 +230,12 @@ function EditPlayerForm({ player, onSaved, onCancel }) {
 
       {error && <p className="error">{error}</p>}
 
-      <PlayerDetailsFields values={values} onChange={setField} isNew={false} />
+      <PlayerDetailsFields
+        values={values}
+        onChange={setField}
+        isNew={false}
+        kicaId={player.kica_id}
+      />
 
       <div className="actions">
         <button type="submit" disabled={submitting}>

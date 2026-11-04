@@ -248,3 +248,14 @@ def test_date_of_birth_cannot_be_in_the_future(client, make_exec, log_in):
     player_id = create_player(client).json()["player_id"]
     response = client.patch(f"/players/{player_id}", json={"date_of_birth": tomorrow})
     assert response.status_code == 422
+
+
+def test_next_kica_id_preview(client, make_exec, make_player, log_in):
+    make_exec()
+    log_in()
+
+    assert client.get("/players/next-kica-id").json() == {"kica_id": "KICA001"}
+
+    make_player(kica_id="KICA057")
+
+    assert client.get("/players/next-kica-id").json() == {"kica_id": "KICA058"}

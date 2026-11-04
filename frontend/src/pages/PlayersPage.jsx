@@ -125,8 +125,16 @@ export default function PlayersPage() {
 function AddPlayerForm({ onCancel }) {
   const navigate = useNavigate()
   const [values, setValues] = useState(() => formValues())
+  const [nextKicaId, setNextKicaId] = useState(null)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  // Ask the backend which KICA ID this player will get
+  useEffect(() => {
+    api('/players/next-kica-id')
+      .then((data) => setNextKicaId(data.kica_id))
+      .catch((err) => setError(err.message))
+  }, [])
 
   // Change one field, keep the others
   function setField(name, value) {
@@ -153,11 +161,15 @@ function AddPlayerForm({ onCancel }) {
   return (
     <form className="card" onSubmit={handleSubmit}>
       <h2>Add a player</h2>
-      <p className="hint">The KICA ID is given automatically when you add the player.</p>
 
       {error && <p className="error">{error}</p>}
 
-      <PlayerDetailsFields values={values} onChange={setField} isNew />
+      <PlayerDetailsFields
+        values={values}
+        onChange={setField}
+        isNew
+        kicaId={nextKicaId}
+      />
 
       <div className="actions">
         <button type="submit" disabled={submitting}>

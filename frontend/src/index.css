@@ -1053,3 +1053,12 @@ tfoot td {
 .auth-page h1 {
   text-align: center;
 }
+
+
+
+/* Boxes that show a value but can't be typed in (e.g. KICA ID) */
+input[readonly] {
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: default;
+}
