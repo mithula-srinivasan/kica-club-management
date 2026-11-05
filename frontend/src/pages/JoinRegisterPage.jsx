@@ -102,9 +102,11 @@ export default function JoinRegisterPage() {
           <div>
             <p className="join-eyebrow">Kuwait Indian Chess Association</p>
             <h1>New Player Registration</h1>
-            <p className="join-intro">
-              Fill in the form below. Our team will review it and contact you soon.
-            </p>
+              {!registered && (
+              <p className="join-intro">
+                Fill in the form below. Our team will review it and contact you soon.
+              </p>
+            )}
           </div>
         </header>
       </div>
