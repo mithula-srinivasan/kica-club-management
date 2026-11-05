@@ -9,6 +9,8 @@ def create_player(client, kica_id="K001", name=None):
             "email": "parent@example.com",
             "date_of_birth": "2014-05-20",
             "parent_name": "Lakshmi",
+            "country": "India",
+            "gender": "male",
         }
     ).json()["player_id"]
 

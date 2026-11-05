@@ -19,6 +19,7 @@ from player_rules import (
     lock_player_tables,
     name_and_dob_taken,
     next_kica_id,
+    check_country
 )
 from rate_limit import (
     REGISTRATION_LIMIT_PER_IP,
@@ -79,6 +80,7 @@ def describe_registrations(db: Session, registrations: list[PlayerRegistration])
             "phone_2": r.phone_2,
             "email": r.email,
             "date_of_birth": r.date_of_birth,
+            "country": r.country,
             "gender": r.gender,
             "fide_id": r.fide_id,
             "status": r.status,
@@ -148,6 +150,7 @@ def submit_registration(
             raise HTTPException(status_code=422, detail=f"{label} is required")
 
     check_date_of_birth(details["date_of_birth"])
+    check_country(details["country"])
 
     # 5. Refuse a player (or waiting registration) with the same name and date of birth
     lock_player_tables(db)

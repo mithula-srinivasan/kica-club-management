@@ -30,6 +30,8 @@ def registration_details(**changes):
         "email": "parent@example.com",
         "date_of_birth": "2014-05-20",
         "consent": True,
+        "country": "India",
+        "gender": "male",
     }
     details.update(changes)
     return details
@@ -83,7 +85,12 @@ def test_required_details_are_needed(client, sent_emails):
 
     assert client.post("/registrations/", json=details).status_code == 422
     assert register(client, name="   ").status_code == 422
+    for field in ["country", "gender"]:
+        missing = registration_details()
+        del missing[field]
+        assert client.post("/registrations/", json=missing).status_code == 422, field
     assert saved_registrations() == []
+    
 
 
 def test_birthday_cannot_be_in_the_future(client, sent_emails):
@@ -176,6 +183,8 @@ def test_approving_creates_the_player(client, make_exec, log_in, sent_emails):
     assert player["name"] == "Arjun Kumar"
     assert player["parent_name"] == "Lakshmi Kumar"
     assert player["joined_on"] == kuwait_today().isoformat()
+    assert player["country"] == "India"
+    assert player["gender"] == "male"
 
     [registration] = client.get("/registrations/", params={"show": "approved"}).json()
     assert registration["kica_id"] == "KICA001"
@@ -284,3 +293,19 @@ def test_unknown_registration(client, make_exec, log_in):
     log_in()
 
     assert client.post("/registrations/999/approve").status_code == 404
+
+
+
+
+def test_country_list_is_public_with_india_and_kuwait_first(client):
+    countries = client.get("/countries/").json()
+
+    assert countries[:2] == ["India", "Kuwait"]
+    assert "Israel" not in countries
+    assert "Hong Kong" in countries
+    assert len(countries) == len(set(countries)) == 198
+
+
+def test_registration_country_must_be_from_the_list(client, sent_emails):
+    assert register(client, country="Israel").status_code == 422
+    assert saved_registrations() == []

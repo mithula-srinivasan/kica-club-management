@@ -169,6 +169,7 @@ class Player(Base):
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     parent_name: Mapped[str] = mapped_column(String(100), nullable=False)
     date_of_birth: Mapped[date] = mapped_column(Date, nullable=False)
+    country: Mapped[str] = mapped_column(String(100), nullable=False)
 
     # Optional
     phone_2: Mapped[str | None] = mapped_column(String(30), nullable=True)
@@ -768,6 +769,7 @@ class PlayerRegistration(Base):
     phone_2: Mapped[str | None] = mapped_column(String(30), nullable=True)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     date_of_birth: Mapped[date] = mapped_column(Date, nullable=False)
+    country: Mapped[str] = mapped_column(String(100), nullable=False)
     gender: Mapped[str | None] = mapped_column(String(10), nullable=True)
     fide_id: Mapped[str | None] = mapped_column(String(20), nullable=True)
 

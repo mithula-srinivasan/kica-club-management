@@ -97,6 +97,7 @@ def import_players():
                 email="update.me@example.com",
                 parent_name="To be updated",
                 date_of_birth=date(2000, 1, 1),
+                country="To be updated",
             )
 
             db.add(new_player)

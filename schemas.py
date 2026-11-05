@@ -15,11 +15,14 @@ class PlayerDetails(BaseModel):
     email: EmailStr
     date_of_birth: date
     parent_name: str = Field(min_length=1, max_length=100)
+    country: str = Field(min_length=1, max_length=100)
+    gender: Gender
 
     # Optional
     phone_2: str | None = Field(default=None, max_length=30)
     fide_id: str | None = Field(default=None, max_length=20)
-    gender: Gender | None = None
+
+
 
 
 class PlayerCreate(PlayerDetails):
@@ -45,6 +48,7 @@ class RegistrationResponse(BaseModel):
     phone_2: str | None
     email: str
     date_of_birth: date
+    country: str
     gender: str | None
     fide_id: str | None
     status: str
@@ -76,6 +80,7 @@ class PlayerResponse(BaseModel):
     fide_id: str | None
     gender: str | None
     date_of_birth: date
+    country: str
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -90,6 +95,7 @@ class PlayerUpdate(BaseModel):
     fide_id: str | None = Field(default=None, max_length=20)
     gender: Gender | None = None
     date_of_birth: date | None = None
+    country: str | None = Field(default=None, max_length=100)
 
 
     

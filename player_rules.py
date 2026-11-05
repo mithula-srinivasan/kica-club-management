@@ -6,8 +6,11 @@ from sqlalchemy.orm import Session
 
 from club_time import kuwait_today
 from models import Player, PlayerRegistration
+from countries import ALLOWED_COUNTRIES
 
 
+# Fields every player must have, with the name shown in error messages.
+# (The KICA ID is not here: it is given automatically and cannot be changed.)
 # Fields every player must have, with the name shown in error messages.
 # (The KICA ID is not here: it is given automatically and cannot be changed.)
 REQUIRED_FIELDS = {
@@ -16,6 +19,8 @@ REQUIRED_FIELDS = {
     "email": "Email",
     "date_of_birth": "Date of birth",
     "parent_name": "Parent name",
+    "country": "Country",
+    "gender": "Gender",
 }
 
 DUPLICATE_MESSAGE = "A player with this name and date of birth is already registered."
@@ -38,6 +43,15 @@ def check_date_of_birth(date_of_birth):
         raise HTTPException(
             status_code=422,
             detail="Date of birth cannot be in the future"
+        )
+
+
+
+def check_country(country):
+    if country not in ALLOWED_COUNTRIES:
+        raise HTTPException(
+            status_code=422,
+            detail="Please choose a country from the list"
         )
 
 

@@ -14,6 +14,7 @@ from player_rules import (
     lock_player_tables,
     name_and_dob_taken,
     next_kica_id,
+    check_country
 )
 from schemas import PlayerCreate, PlayerResponse, PlayerUpdate
 
@@ -76,6 +77,7 @@ def create_player(
             raise HTTPException(status_code=422, detail=f"{label} is required")
 
     check_date_of_birth(details["date_of_birth"])
+    check_country(details["country"])
 
     # 3. Nobody else may add a player or registration until we've saved
     lock_player_tables(db)
@@ -147,6 +149,11 @@ def update_player(
 
         if field == "date_of_birth":
             check_date_of_birth(value)
+
+        # Only check a country that's being changed, so existing players with the
+        # demo value "To be updated" can still have other details edited
+        if field == "country" and value != player.country:
+            check_country(value)
 
         # 4. Remember what changed, then apply it
         if getattr(player, field) != value:

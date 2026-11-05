@@ -90,6 +90,7 @@ def make_player():
                 email="parent@example.com",
                 parent_name="Lakshmi",
                 date_of_birth=date(2014, 5, 20),
+                country="To be updated",
             )
             db.add(player)
             db.commit()

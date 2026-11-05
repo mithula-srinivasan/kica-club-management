@@ -1,10 +1,10 @@
 from datetime import timedelta
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from club_time import kuwait_today
 from database import SessionLocal
-from models import AuditLog
+from models import AuditLog, Player
 
 
 def audit_entries():
@@ -21,6 +21,8 @@ def player_details(**changes):
         "email": "parent@example.com",
         "date_of_birth": "2014-05-20",
         "parent_name": "Lakshmi",
+        "country": "India",
+        "gender": "male",
     }
     details.update(changes)
     return details
@@ -133,7 +135,7 @@ def test_new_player_needs_every_required_field(client, make_exec, log_in):
     make_exec()
     log_in()
 
-    for field in ["name", "phone_1", "email", "date_of_birth", "parent_name"]:
+    for field in ["name", "phone_1", "email", "date_of_birth", "parent_name", "country", "gender"]:
         details = player_details()
         del details[field]
 
@@ -165,6 +167,7 @@ def test_stores_all_details_and_trims_spaces(client, make_exec, log_in):
         phone_2="+965 6000 0000",
         fide_id="12345678",
         gender="male",
+        country="Kuwait"
     )
 
     assert response.status_code == 201
@@ -177,25 +180,25 @@ def test_stores_all_details_and_trims_spaces(client, make_exec, log_in):
     assert player["fide_id"] == "12345678"
     assert player["gender"] == "male"
     assert player["date_of_birth"] == "2014-05-20"
+    assert player["country"] == "Kuwait"
 
 
 def test_optional_details_can_be_cleared(client, make_exec, log_in):
     make_exec()
     log_in()
     player_id = create_player(
-        client, phone_2="+965 6000 0000", fide_id="12345678", gender="female"
+        client, phone_2="+965 6000 0000", fide_id="12345678"
     ).json()["player_id"]
 
     response = client.patch(
         f"/players/{player_id}",
-        json={"phone_2": "", "fide_id": "  ", "gender": None},
+        json={"phone_2": "", "fide_id": "  "},
     )
 
     assert response.status_code == 200
     player = response.json()
     assert player["phone_2"] is None
     assert player["fide_id"] is None
-    assert player["gender"] is None
 
 
 def test_required_details_cannot_be_cleared(client, make_exec, log_in):
@@ -203,7 +206,7 @@ def test_required_details_cannot_be_cleared(client, make_exec, log_in):
     log_in()
     player_id = create_player(client).json()["player_id"]
 
-    for field in ["name", "phone_1", "parent_name", "email", "date_of_birth"]:
+    for field in ["name", "phone_1", "parent_name", "email", "date_of_birth", "country", "gender"]:
         response = client.patch(f"/players/{player_id}", json={field: None})
         assert response.status_code == 422, field
 
@@ -301,7 +304,36 @@ def test_cannot_add_a_player_who_is_waiting_in_registrations(client, make_exec, 
             "email": "parent@example.com",
             "date_of_birth": "2014-05-20",
             "consent": True,
+            "country": "India",
+            "gender": "male",
         },
     )
 
     assert create_player(client, name="Arjun Kumar").status_code == 409
+
+
+def test_country_must_be_from_the_list(client, make_exec, make_player, log_in):
+    make_exec()
+    log_in()
+
+    assert create_player(client, country="Israel").status_code == 422
+    assert create_player(client, country="Narnia").status_code == 422
+
+    player_id = create_player(client).json()["player_id"]
+    assert client.patch(f"/players/{player_id}", json={"country": "Israel"}).status_code == 422
+    assert client.patch(f"/players/{player_id}", json={"country": "Sri Lanka"}).status_code == 200
+
+    # An existing player still on the demo country can have other details edited
+    old_player = make_player(name="Old Player", kica_id="KICA050")
+    with SessionLocal() as db:
+        db.execute(
+            update(Player)
+            .where(Player.player_id == old_player.player_id)
+            .values(country="To be updated")
+        )
+        db.commit()
+
+    response = client.patch(
+        f"/players/{old_player.player_id}", json={"phone_1": "+965 5222 2222"}
+    )
+    assert response.status_code == 200
