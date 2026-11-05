@@ -24,6 +24,9 @@ import ActivityLogPage from './pages/admin/ActivityLogPage'
 import BackupPage from './pages/admin/BackupPage'
 import FeeRatePage from './pages/admin/FeeRatePage'
 import IncomePage from './pages/IncomePage'
+import JoinRegisterPage from './pages/JoinRegisterPage'
+import RegistrationsPage from './pages/RegistrationsPage'
+
 
 
 export default function App() {
@@ -33,6 +36,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/join" element={<Navigate to="/join/register" replace />} />
+          <Route path="/join/register" element={<JoinRegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
@@ -45,6 +50,7 @@ export default function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/players" element={<PlayersPage />} />
             <Route path="/players/:playerId" element={<PlayerPage />} />
+            <Route path="/registrations" element={<RegistrationsPage />} />
             <Route path="/attendance" element={<AttendancePage />} />
             <Route path="/attendance/:sessionId" element={<SessionPage />} />
             <Route path="/fees" element={<FeeCollectionPage />} />

@@ -1,6 +1,14 @@
 import { useState } from 'react'
 
-export default function ReverseForm({ label, confirmMessage, buttonText, onReverse, onCancel }) {
+export default function ReverseForm({
+  label,
+  confirmMessage,
+  buttonText,
+  onReverse,
+  onCancel,
+  placeholder = 'e.g. entered the wrong amount',
+  savingText = 'Reversing...',
+}) {
   const [reason, setReason] = useState('')
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -36,7 +44,7 @@ export default function ReverseForm({ label, confirmMessage, buttonText, onRever
           value={reason}
           onChange={(event) => setReason(event.target.value)}
           maxLength={500}
-          placeholder="e.g. entered the wrong amount"
+          placeholder={placeholder}
           autoFocus
         />
       </label>
@@ -45,7 +53,7 @@ export default function ReverseForm({ label, confirmMessage, buttonText, onRever
 
       <div className="actions">
         <button type="submit" className="danger" disabled={saving}>
-          {saving ? 'Reversing...' : buttonText}
+          {saving ? savingText : buttonText}
         </button>
         <button type="button" className="secondary" onClick={onCancel}>
           Cancel

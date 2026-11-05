@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { api } from '../api'
 import { useAuth } from '../auth'
 import GlobalSearch from './GlobalSearch'
 
@@ -7,6 +8,7 @@ const LINKS = [
   { to: '/', label: 'Dashboard', end: true },
   { to: '/attendance', label: 'Attendance' },
   { to: '/players', label: 'Players' },
+  { to: '/registrations', label: 'Registrations', showsPendingCount: true },
   { to: '/fees', label: 'Fee Collection' },
   { to: '/expenses', label: 'Expenses' },
   { to: '/income', label: 'Income' },
@@ -17,9 +19,42 @@ function hideIfMissing(event) {
   event.currentTarget.style.display = 'none'
 }
 
+// How many player registrations are waiting. Checked when you move between pages,
+// every minute, and straight away when the Registrations page says something changed.
+function usePendingRegistrations() {
+  const location = useLocation()
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    let ignore = false
+
+    function load() {
+      api('/registrations/pending-count')
+        .then((data) => {
+          if (!ignore) setCount(data.count)
+        })
+        .catch(() => {})
+    }
+
+    load()
+    const timer = setInterval(load, 60 * 1000)
+    window.addEventListener('registrations-changed', load)
+
+    // Clean up when leaving, so we don't keep checking twice
+    return () => {
+      ignore = true
+      clearInterval(timer)
+      window.removeEventListener('registrations-changed', load)
+    }
+  }, [location.pathname])
+
+  return count
+}
+
 export default function Layout() {
   const { user, logOut } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const pendingCount = usePendingRegistrations()
 
   const links = user.role === 'admin' ? [...LINKS, { to: '/admin', label: 'Admin' }] : LINKS
 
@@ -33,12 +68,13 @@ export default function Layout() {
 
         <nav className="side-nav" onClick={() => setMenuOpen(false)}>
           {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              end={link.end}
-            >
+            <NavLink key={link.to} to={link.to} end={link.end}>
               {link.label}
+              {link.showsPendingCount && pendingCount > 0 && (
+                <span className="nav-count" aria-label={`${pendingCount} waiting`}>
+                  {pendingCount}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -59,10 +95,11 @@ export default function Layout() {
           <button
             className="secondary menu-button"
             onClick={() => setMenuOpen((open) => !open)}
-            aria-label="Open menu"
+            aria-label={pendingCount > 0 ? `Open menu (${pendingCount} registrations waiting)` : 'Open menu'}
             aria-expanded={menuOpen}
           >
             ☰
+            {pendingCount > 0 && <span className="nav-count">{pendingCount}</span>}
           </button>
           <span className="top-brand">KICA</span>
           <GlobalSearch />

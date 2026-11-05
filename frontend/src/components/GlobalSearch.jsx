@@ -11,6 +11,7 @@ const FEATURES = [
   { label: 'Recent payments', to: '/fees', keywords: 'payments history reverse mistake' },
   { label: 'Attendance', to: '/attendance', keywords: 'attendance session sessions mark present create' },
   { label: 'Players', to: '/players', keywords: 'players members list add new player' },
+  { label: 'Player registrations', to: '/registrations', keywords: 'registrations join new players sign up signups approve reject public form waiting' },
   { label: 'Expenses', to: '/expenses', keywords: 'expenses expense spend spent hall rental costs club' },
   { label: 'Income', to: '/income', keywords: 'income earned tournament tournaments rental equipment money received' },
   { label: 'Money Transfers', to: '/transfers', keywords: 'transfers transfer handover cash received money' },

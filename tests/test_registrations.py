@@ -5,7 +5,7 @@ from sqlalchemy import select
 
 from club_time import kuwait_today
 from database import SessionLocal
-from models import PlayerRegistration
+from models import AuditLog, PlayerRegistration
 
 
 @pytest.fixture
@@ -65,7 +65,7 @@ def test_thank_you_email_is_sent_to_the_parent(client, sent_emails):
     assert email["subject"] == "Thank you for registering with KICA"
     assert "Dear Lakshmi Kumar" in email["text"]
     assert "Arjun Kumar" in email["text"]
-    assert "WhatsApp" in email["text"]
+    assert "please contact us at" in email["text"]
 
 
 def test_consent_box_must_be_ticked(client, sent_emails):
@@ -134,3 +134,153 @@ def test_registrations_are_limited_per_network(client, sent_emails):
         assert register(client, name=f"Player {number}").status_code == 201
 
     assert register(client, name="One Too Many").status_code == 429
+
+
+
+# ---------- Execs reviewing registrations ----------
+
+def first_registration_id():
+    return saved_registrations()[0].registration_id
+
+
+def test_execs_must_log_in_to_see_registrations(client, sent_emails):
+    register(client)
+
+    assert client.get("/registrations/").status_code == 401
+    assert client.get("/registrations/pending-count").status_code == 401
+    assert client.post(f"/registrations/{first_registration_id()}/approve").status_code == 401
+
+
+def test_execs_see_pending_registrations(client, make_exec, log_in, sent_emails):
+    register(client)
+    make_exec()
+    log_in()
+
+    [registration] = client.get("/registrations/").json()
+
+    assert registration["name"] == "Arjun Kumar"
+    assert registration["status"] == "pending"
+    assert client.get("/registrations/pending-count").json() == {"count": 1}
+
+
+def test_approving_creates_the_player(client, make_exec, log_in, sent_emails):
+    register(client)
+    exec_user = make_exec()
+    log_in()
+
+    response = client.post(f"/registrations/{first_registration_id()}/approve")
+
+    assert response.status_code == 200
+    player = response.json()
+    assert player["kica_id"] == "KICA001"
+    assert player["name"] == "Arjun Kumar"
+    assert player["parent_name"] == "Lakshmi Kumar"
+    assert player["joined_on"] == kuwait_today().isoformat()
+
+    [registration] = client.get("/registrations/", params={"show": "approved"}).json()
+    assert registration["kica_id"] == "KICA001"
+    assert registration["reviewed_by_name"] == exec_user.name
+    assert client.get("/registrations/pending-count").json() == {"count": 0}
+
+
+def test_approving_is_logged(client, make_exec, log_in, sent_emails):
+    register(client)
+    make_exec()
+    log_in()
+
+    client.post(f"/registrations/{first_registration_id()}/approve")
+
+    with SessionLocal() as db:
+        actions = [
+            (entry.action, entry.table_name)
+            for entry in db.scalars(select(AuditLog).order_by(AuditLog.audit_id))
+        ]
+
+    assert actions == [("CREATE", "players"), ("UPDATE", "player_registrations")]
+
+
+def test_approved_player_gets_the_next_kica_id(client, make_exec, make_player, log_in, sent_emails):
+    make_player(name="Yokshith", kica_id="KICA057")
+    register(client)
+    make_exec()
+    log_in()
+
+    response = client.post(f"/registrations/{first_registration_id()}/approve")
+
+    assert response.json()["kica_id"] == "KICA058"
+
+
+def test_cannot_approve_twice(client, make_exec, log_in, sent_emails):
+    register(client)
+    make_exec()
+    log_in()
+    registration_id = first_registration_id()
+
+    client.post(f"/registrations/{registration_id}/approve")
+    response = client.post(f"/registrations/{registration_id}/approve")
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "This registration was already approved"
+
+
+def test_approving_is_refused_if_the_player_was_added_meanwhile(
+    client, make_exec, make_player, log_in, sent_emails
+):
+    register(client)
+    make_player(name="Arjun Kumar")   # same name and birthday, added directly
+    make_exec()
+    log_in()
+
+    response = client.post(f"/registrations/{first_registration_id()}/approve")
+
+    assert response.status_code == 409
+
+
+def test_rejecting_needs_a_reason(client, make_exec, log_in, sent_emails):
+    register(client)
+    make_exec()
+    log_in()
+    registration_id = first_registration_id()
+
+    blank = client.post(f"/registrations/{registration_id}/reject", json={"reason": "   "})
+    assert blank.status_code == 422
+
+    response = client.post(
+        f"/registrations/{registration_id}/reject",
+        json={"reason": "Already a member under a different name"}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "rejected"
+    assert response.json()["rejection_reason"] == "Already a member under a different name"
+    assert client.get("/registrations/").json() == []
+    assert len(client.get("/registrations/", params={"show": "rejected"}).json()) == 1
+
+
+def test_rejected_registration_cannot_be_approved(client, make_exec, log_in, sent_emails):
+    register(client)
+    make_exec()
+    log_in()
+    registration_id = first_registration_id()
+
+    client.post(f"/registrations/{registration_id}/reject", json={"reason": "Duplicate"})
+    response = client.post(f"/registrations/{registration_id}/approve")
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "This registration was already rejected"
+
+
+def test_family_can_register_again_after_a_rejection(client, make_exec, log_in, sent_emails):
+    register(client)
+    make_exec()
+    log_in()
+    client.post(f"/registrations/{first_registration_id()}/reject", json={"reason": "Wrong details"})
+
+    assert register(client).status_code == 201
+
+
+def test_unknown_registration(client, make_exec, log_in):
+    make_exec()
+    log_in()
+
+    assert client.post("/registrations/999/approve").status_code == 404

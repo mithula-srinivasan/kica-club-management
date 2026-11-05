@@ -61,7 +61,13 @@ def lock_player_tables(db: Session):
     db.execute(text("LOCK TABLE players, player_registrations IN EXCLUSIVE MODE"))
 
 
-def name_and_dob_taken(db: Session, name, date_of_birth, ignore_player_id=None) -> bool:
+def name_and_dob_taken(
+    db: Session,
+    name,
+    date_of_birth,
+    ignore_player_id=None,
+    ignore_registration_id=None
+) -> bool:
     """True if a player, or a registration waiting for approval, already has
     this name (ignoring capitals) and date of birth."""
     player_query = select(Player.player_id).where(
@@ -81,5 +87,11 @@ def name_and_dob_taken(db: Session, name, date_of_birth, ignore_player_id=None) 
         PlayerRegistration.date_of_birth == date_of_birth,
         PlayerRegistration.status == "pending"
     )
+
+    # When approving a registration, it shouldn't count as its own duplicate
+    if ignore_registration_id is not None:
+        pending_query = pending_query.where(
+            PlayerRegistration.registration_id != ignore_registration_id
+        )
 
     return db.scalar(pending_query.limit(1)) is not None

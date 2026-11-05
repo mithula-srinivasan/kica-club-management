@@ -47,8 +47,9 @@ export function requestBody(values) {
   return body
 }
 
-const PHONE_PATTERN = '\\+?[0-9 \\-]{7,30}'
-const PHONE_HINT = 'Numbers with the country code, e.g. +965 5000 0000'
+export const PHONE_PATTERN = '\\+?[0-9 \\-]{7,30}'
+
+export const PHONE_HINT = 'Numbers with the country code, e.g. +965 5000 0000'
 
 export default function PlayerDetailsFields({ values, onChange, isNew, kicaId }) {
   // Gives an input its value and what to do when it changes

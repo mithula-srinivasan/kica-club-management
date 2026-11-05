@@ -35,6 +35,32 @@ class RegistrationCreate(PlayerDetails):
     # has anything in it, the "registration" came from a bot.
     website: str | None = None
 
+
+
+class RegistrationResponse(BaseModel):
+    registration_id: int
+    name: str
+    parent_name: str
+    phone_1: str
+    phone_2: str | None
+    email: str
+    date_of_birth: date
+    gender: str | None
+    fide_id: str | None
+    status: str
+    submitted_at: datetime
+    consented_at: datetime
+    reviewed_at: datetime | None
+    reviewed_by_name: str | None
+    rejection_reason: str | None
+    # Once approved: the player it became
+    player_id: int | None
+    kica_id: str | None
+
+
+class RegistrationReject(BaseModel):
+    reason: str = Field(min_length=1, max_length=500)
+
     
 
 class PlayerResponse(BaseModel):
@@ -384,3 +410,6 @@ class IncomeResponse(BaseModel):
 
 class IncomeReverse(BaseModel):
     reason: str = Field(min_length=1, max_length=500)
+
+
+
