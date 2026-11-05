@@ -88,7 +88,7 @@ export default function PlayersPage() {
                   <th>Name</th>
                   <th>KICA ID</th>
                   <th>Parent</th>
-                  <th>Phone</th>
+                  <th>WhatsApp</th>
                   <th>Status</th>
                 </tr>
               </thead>

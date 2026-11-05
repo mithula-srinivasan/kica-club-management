@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { api } from '../api'
 import { genderLabel } from '../components/PlayerDetailsFields'
 import ReverseForm from '../components/ReverseForm'
-import { formatDate, formatTimestamp } from '../format'
+import { formatDate, formatTimestamp, whatAppLink } from '../format'
+
 
 // [value for the backend, tab name]
 const VIEWS = [
@@ -195,6 +196,12 @@ function PendingRegistration({
             {formatDate(r.date_of_birth)} (age {ageToday(r.date_of_birth)})
           </dd>
         </div>
+
+                <div>
+          <dt>Country</dt>
+          <dd>{r.country}</dd>
+        </div>
+
         <div>
           <dt>Gender</dt>
           <dd>{genderLabel(r.gender) ?? notSet}</dd>
@@ -208,9 +215,11 @@ function PendingRegistration({
           <dd>{r.parent_name}</dd>
         </div>
         <div>
-          <dt>Phone</dt>
+          <dt>WhatsApp number</dt>
           <dd>
-            <a href={`tel:${r.phone_1.replace(/\s/g, '')}`}>{r.phone_1}</a>
+            <a href={whatsAppLink(r.phone_1)} target="_blank" rel="noopener noreferrer">
+              {r.phone_1}
+            </a>
           </dd>
         </div>
         <div>

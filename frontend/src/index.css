@@ -1281,13 +1281,17 @@ input[readonly] {
   font-weight: 400;
 }
 
+
 /* A hint next to the question: a little smaller than the question itself */
 .join-label .join-hint {
   font-size: 0.9rem;
 }
 
-/* Big, comfortable text boxes, with one thin border */
-.join-card input:not([type='checkbox']):not([type='radio']) {
+
+
+/* Big, comfortable text boxes and dropdowns, with one thin border */
+.join-card input:not([type='checkbox']):not([type='radio']),
+.join-card select {
   min-height: 56px;
   padding: 12px 16px;
   border: 1.5px solid var(--border);
@@ -1296,7 +1300,8 @@ input[readonly] {
 }
 
 /* Clicked into a box: just the border turns maroon (no extra outline) */
-.join-card input:not([type='checkbox']):not([type='radio']):focus {
+.join-card input:not([type='checkbox']):not([type='radio']):focus,
+.join-card select:focus {
   outline: none;
   border-color: var(--accent);
 }
@@ -1316,8 +1321,8 @@ input[readonly] {
 
 .join-radios {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 10px 28px;
 }
 
 .join-radio {
@@ -1433,6 +1438,44 @@ input[readonly] {
 
 .join-thanks .join-button {
   margin-top: 12px;
+}
+
+
+
+
+/* ---- WhatsApp group (thank-you screen) ---- */
+
+.join-whatsapp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+  margin-top: 8px;
+  padding: 24px 20px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+}
+
+/* WhatsApp's own green, so people recognise it straight away */
+.join-whatsapp-button {
+  width: 100%;
+  border-color: #25d366;
+  background: #25d366;
+  color: #000000;
+}
+
+.join-whatsapp-button:hover {
+  background: #3ee07a;
+}
+
+/* QR codes need a plain white border around them to scan reliably */
+.join-qr {
+  padding: 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  line-height: 0;
 }
 
 /* ---- Phones and narrow windows: one card per row ---- */

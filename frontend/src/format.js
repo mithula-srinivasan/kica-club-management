@@ -62,3 +62,10 @@ export function formatTimestamp(isoDateTime) {
     minute: '2-digit',
   })
 }
+
+
+// A WhatsApp chat link for a phone number, e.g. "+965 5000 0000" -> "https://wa.me/96550000000"
+// (WhatsApp wants only the digits, including the country code)
+export function whatsAppLink(phone) {
+  return `https://wa.me/${phone.replace(/\D/g, '')}`
+}

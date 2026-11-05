@@ -1,16 +1,25 @@
 import { useEffect, useRef, useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { api } from '../api'
-import { PHONE_HINT, PHONE_PATTERN } from '../components/PlayerDetailsFields'
+import {
+  CountryOptions,
+  PHONE_HINT,
+  PHONE_PATTERN,
+  useCountries,
+} from '../components/PlayerDetailsFields'
 import { today } from '../format'
 
 const CLUB_EMAIL = 'kica.chesskwt@gmail.com'
+
+// The "KICA Members" WhatsApp group. If the link is ever reset in WhatsApp,
+// change it here: the button and the QR code both update.
+const WHATSAPP_GROUP_LINK = 'https://chat.whatsapp.com/HsnonjfDkqE17FhdfmvqNv'
 
 // [value sent to the backend, text shown next to the bullet]
 const GENDERS = [
   ['male', 'Male'],
   ['female', 'Female'],
   ['other', 'Other'],
-  ['', 'Prefer not to say'],
 ]
 
 function emptyForm() {
@@ -18,6 +27,7 @@ function emptyForm() {
     name: '',
     date_of_birth: '',
     gender: '',
+    country: '',
     parent_name: '',
     email: '',
     phone_1: '+965 ',
@@ -30,6 +40,7 @@ function emptyForm() {
 }
 
 export default function JoinRegisterPage() {
+  const countries = useCountries()
   const [values, setValues] = useState(emptyForm)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -69,10 +80,7 @@ export default function JoinRegisterPage() {
     setSubmitting(true)
 
     try {
-      await api('/registrations/', {
-        method: 'POST',
-        body: { ...values, gender: values.gender || null },
-      })
+      await api('/registrations/', { method: 'POST', body: values })
 
       setRegistered({ name: values.name.trim(), email: values.email.trim() })
       window.scrollTo({ top: 0 })
@@ -101,8 +109,8 @@ export default function JoinRegisterPage() {
           />
           <div>
             <p className="join-eyebrow">Kuwait Indian Chess Association</p>
-            <h1>New Player Registration</h1>
-              {!registered && (
+            <h1>Register a new player</h1>
+            {!registered && (
               <p className="join-intro">
                 Fill in the form below. Our team will review it and contact you soon.
               </p>
@@ -124,42 +132,47 @@ export default function JoinRegisterPage() {
             <form className="join-form" onSubmit={handleSubmit}>
               {/* Top left */}
               <section className="join-card">
-                <h2>Player Details</h2>
+                <h2>Player details</h2>
 
-                <Field label="Player's Full Name">
+                <Field label="Player's full name">
                   <input {...field('name')} maxLength={100} autoComplete="off" required />
                 </Field>
 
-                <Field label="Date of Birth">
+                <Field label="Date of birth">
                   <input type="date" {...field('date_of_birth')} max={today()} required />
                 </Field>
 
                 <fieldset className="join-fieldset">
-                  <legend className="join-label">
-                    Gender <span className="join-optional">Optional</span>
-                  </legend>
+                  <legend className="join-label">Gender</legend>
                   <div className="join-radios">
                     {GENDERS.map(([value, text]) => (
-                      <label key={text} className="join-radio">
+                      <label key={value} className="join-radio">
                         <input
                           type="radio"
                           name="gender"
                           value={value}
                           checked={values.gender === value}
                           onChange={() => setField('gender', value)}
+                          required
                         />
                         {text}
                       </label>
                     ))}
                   </div>
                 </fieldset>
+
+                <Field label="Country">
+                  <select {...field('country')} required>
+                    <CountryOptions countries={countries} />
+                  </select>
+                </Field>
               </section>
 
               {/* Top right */}
               <section className="join-card">
-                <h2>Parent Details</h2>
+                <h2>Parent details</h2>
 
-                <Field label="Parent's Full Name">
+                <Field label="Parent's full name">
                   <input {...field('parent_name')} maxLength={100} autoComplete="name" required />
                 </Field>
 
@@ -173,7 +186,7 @@ export default function JoinRegisterPage() {
                   />
                 </Field>
 
-                <Field label="Phone Number" hint="With the country code, e.g. +965 5000 0000">
+                <Field label="Whatsapp Number" hint="With the country code, e.g. +965 5000 0000">
                   <input
                     type="tel"
                     {...field('phone_1')}
@@ -184,7 +197,7 @@ export default function JoinRegisterPage() {
                   />
                 </Field>
 
-                <Field label="Second Phone Number" optional>
+                <Field label="Second phone number" optional>
                   <input
                     type="tel"
                     {...field('phone_2')}
@@ -197,16 +210,18 @@ export default function JoinRegisterPage() {
 
               {/* Bottom left */}
               <section className="join-card">
-                <h2>Chess Details</h2>
+                <h2>Chess details</h2>
 
                 <Field label="FIDE ID" optional hint="Only if the player already has one.">
                   <input {...field('fide_id')} maxLength={20} inputMode="numeric" />
                 </Field>
+
+                
               </section>
 
               {/* Bottom right */}
               <section className="join-card">
-                <h2>Confirm and Register</h2>
+                <h2>Confirm and register</h2>
 
                 <label className="join-consent">
                   <input
@@ -251,6 +266,7 @@ export default function JoinRegisterPage() {
   )
 }
 
+// A question: its label (with an "Optional" tag if needed), the box, and a hint underneath
 // A question: its label, an "Optional" tag and a short hint on the same line, then the box
 function Field({ label, optional = false, hint, children }) {
   return (
@@ -278,6 +294,29 @@ function ThankYou({ name, email, onRegisterAnother }) {
         folder if you don&apos;t see it). Our team will review the registration and contact you
         soon.
       </p>
+
+      <div className="join-whatsapp">
+        <p>
+          <strong>Join the KICA Members WhatsApp group</strong> for club news and updates. A
+          group admin will approve your request.
+        </p>
+
+        <a
+          className="button join-button join-whatsapp-button"
+          href={WHATSAPP_GROUP_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Join our WhatsApp group
+        </a>
+
+        <p className="join-hint">Or scan this code with your phone&apos;s camera:</p>
+
+        <div className="join-qr">
+          <QRCodeSVG value={WHATSAPP_GROUP_LINK} size={200} />
+        </div>
+      </div>
+
       <button type="button" className="secondary join-button" onClick={onRegisterAnother}>
         Register another player
       </button>

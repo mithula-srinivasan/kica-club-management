@@ -7,7 +7,8 @@ import PlayerDetailsFields, {
   hasDemoDetails,
   requestBody,
 } from '../components/PlayerDetailsFields'
-import { formatDate, kwd, methodLabel, monthLabel } from '../format'
+import { formatDate, kwd, methodLabel, monthLabel, whatsappLink } from '../format'
+
 
 export default function PlayerPage() {
   const { playerId } = useParams()
@@ -122,8 +123,8 @@ function PlayerDetails({ player, onEdit, onToggleActive }) {
     <>
       {hasDemoDetails(player) && (
         <p className="notice">
-          Some of these details are demo values. Click <strong>Edit details</strong> to add
-          the real ones.
+          Some of these details are demo values or missing. Click <strong>Edit details</strong>{' '}
+          to add the real ones.
         </p>
       )}
 
@@ -146,9 +147,11 @@ function PlayerDetails({ player, onEdit, onToggleActive }) {
             <dd>{player.parent_name}</dd>
           </div>
           <div>
-            <dt>Phone 1</dt>
+            <dt>Whatsapp Number</dt>
             <dd>
-              <a href={`tel:${player.phone_1.replace(/\s/g, '')}`}>{player.phone_1}</a>
+              <a href={whatsappLink(player.phone_1)} target="_blank" rel="noopener noreferrer">
+                {player.phone_1}
+              </a>
             </dd>
           </div>
           <div>
@@ -166,6 +169,11 @@ function PlayerDetails({ player, onEdit, onToggleActive }) {
             <dt>Date of birth</dt>
             <dd>{formatDate(player.date_of_birth)}</dd>
           </div>
+          <div>
+            <dt>Country</dt>
+            <dd>{player.country}</dd>
+          </div>
+
           <div>
             <dt>Gender</dt>
             <dd>{genderLabel(player.gender) ?? notSet}</dd>

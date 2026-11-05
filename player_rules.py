@@ -15,7 +15,7 @@ from countries import ALLOWED_COUNTRIES
 # (The KICA ID is not here: it is given automatically and cannot be changed.)
 REQUIRED_FIELDS = {
     "name": "Name",
-    "phone_1": "Phone 1",
+    "phone_1": "WhatsApp number",
     "email": "Email",
     "date_of_birth": "Date of birth",
     "parent_name": "Parent name",
