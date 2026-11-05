@@ -45,7 +45,7 @@ export default function AttendancePage() {
         method: 'POST',
         body: { session_date: sessionDate },
       })
-      navigate(`/attendance/${created.session_id}`)
+      navigate(`/exec/attendance/${created.session_id}`)
     } catch (err) {
       setError(err.message)
       setCreating(false)
@@ -101,7 +101,7 @@ export default function AttendancePage() {
         {existing && (
           <p className="notice">
             A session already exists on {formatDay(existing.session_date)}.{' '}
-            <Link to={`/attendance/${existing.session_id}`}>Open it</Link>
+            <Link to={`/exec/attendance/${existing.session_id}`}>Open it</Link>
           </p>
         )}
       </form>
@@ -124,7 +124,7 @@ export default function AttendancePage() {
               {sessions.map((session) => (
                 <tr key={session.session_id}>
                   <td>
-                    <Link to={`/attendance/${session.session_id}`}>
+                    <Link to={`/exec/attendance/${session.session_id}`}>
                       {formatDay(session.session_date)}
                     </Link>
                   </td>

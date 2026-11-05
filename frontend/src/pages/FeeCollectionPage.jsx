@@ -349,11 +349,11 @@ function OwingTable({ rows }) {
         {rows.map((row) => (
           <tr key={row.player_id}>
             <td>
-              <Link to={`/players/${row.player_id}`}>{row.player_name}</Link>
+              <Link to={`/exec/players/${row.player_id}`}>{row.player_name}</Link>
             </td>
             <td className="money">{kwd(row.outstanding)}</td>
             <td className="row-actions">
-              <Link className="button small-button green" to={`/fees?player=${row.player_id}`}>
+              <Link className="button small-button green" to={`/exec/fees?player=${row.player_id}`}>
                 Record payment
               </Link>
             </td>
@@ -420,7 +420,7 @@ function RecentPayments({ payments, user, onReverse }) {
                     <tr className={reversed ? 'reversed' : undefined}>
                       <td>{formatDate(payment.paid_on)}</td>
                       <td>
-                        <Link to={`/players/${payment.player_id}`}>{payment.player_name}</Link>
+                        <Link to={`/exec/players/${payment.player_id}`}>{payment.player_name}</Link>
                       </td>
                       <td className="money">{kwd(payment.amount)}</td>
                       <td>{methodLabel(payment.method)}</td>

@@ -7,7 +7,7 @@ import PlayerDetailsFields, {
   hasDemoDetails,
   requestBody,
 } from '../components/PlayerDetailsFields'
-import { formatDate, kwd, methodLabel, monthLabel, whatsappLink } from '../format'
+import { formatDate, kwd, methodLabel, monthLabel, whatsAppLink } from '../format'
 
 
 export default function PlayerPage() {
@@ -69,7 +69,7 @@ export default function PlayerPage() {
 
   return (
     <div className="page">
-      <Link to="/players" className="back-link">← All players</Link>
+      <Link to="/exec/players" className="back-link">← All players</Link>
 
       <h1>
         {player.name}
@@ -86,7 +86,7 @@ export default function PlayerPage() {
             <span className="hint">Paid in advance: {kwd(statement.credit)}</span>
           )}
         </div>
-        <Link className="button button-large green" to={`/fees?player=${player.player_id}`}>
+        <Link className="button button-large green" to={`/exec/fees?player=${player.player_id}`}>
           Record payment
         </Link>
       </section>

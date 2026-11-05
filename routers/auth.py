@@ -257,7 +257,7 @@ def create_password_setup_link(
 
     return {
         "exec_name": target_exec.name,
-        "setup_link": f"{FRONTEND_URL}/set-password#token={token}",
+        "setup_link": f"{FRONTEND_URL}/exec/set-password#token={token}",
         "expires_at": expires_at
     }
 
@@ -333,7 +333,7 @@ def forgot_password(
     )
     db.commit()
 
-    reset_link = f"{FRONTEND_URL}/reset-password#token={token}"
+    reset_link = f"{FRONTEND_URL}/exec/reset-password#token={token}"
 
     # Send after the reply, so the response time doesn't reveal that the account exists
     background_tasks.add_task(

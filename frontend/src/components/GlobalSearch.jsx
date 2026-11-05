@@ -5,23 +5,23 @@ import { useAuth } from '../auth'
 
 // Every page or feature an Exec might search for, with words people are likely to type
 const FEATURES = [
-  { label: 'Dashboard', to: '/', keywords: 'home overview club balance cash held summary month' },
-  { label: 'Record a payment', to: '/fees', keywords: 'fee collection pay payment collect money record' },
-  { label: 'Who owes', to: '/fees', keywords: 'owes owing outstanding unpaid pending debt fees' },
-  { label: 'Recent payments', to: '/fees', keywords: 'payments history reverse mistake' },
-  { label: 'Attendance', to: '/attendance', keywords: 'attendance session sessions mark present create' },
-  { label: 'Players', to: '/players', keywords: 'players members list add new player' },
-  { label: 'Player registrations', to: '/registrations', keywords: 'registrations join new players sign up signups approve reject public form waiting' },
-  { label: 'Expenses', to: '/expenses', keywords: 'expenses expense spend spent hall rental costs club' },
-  { label: 'Income', to: '/income', keywords: 'income earned tournament tournaments rental equipment money received' },
-  { label: 'Money Transfers', to: '/transfers', keywords: 'transfers transfer handover cash received money' },
-  { label: 'Approve sign-ups', to: '/admin/signups', keywords: 'admin approve sign-ups signups pending reject', admin: true },
-  { label: 'Manage Execs', to: '/admin/execs', keywords: 'admin execs exec deactivate reactivate make admin', admin: true },
-  { label: 'Fee adjustments', to: '/admin/fees', keywords: 'admin waive waiver discount adjust adjustment fee', admin: true },
-  { label: 'Fee rate', to: '/admin/fee-rate', keywords: 'admin fee rate monthly fee price change amount 5 kwd', admin: true },
-  { label: 'Opening balances', to: '/admin/opening-balances', keywords: 'admin opening balances starting figures excel', admin: true },
-  { label: 'Activity log', to: '/admin/activity', keywords: 'admin activity audit log history changes', admin: true },
-  { label: 'Download club data', to: '/admin/backup', keywords: 'admin backup download export excel data', admin: true },
+  { label: 'Dashboard', to: '/exec', keywords: 'home overview club balance cash held summary month' },
+  { label: 'Record a payment', to: '/exec/fees', keywords: 'fee collection pay payment collect money record' },
+  { label: 'Who owes', to: '/exec/fees', keywords: 'owes owing outstanding unpaid pending debt fees' },
+  { label: 'Recent payments', to: '/exec/fees', keywords: 'payments history reverse mistake' },
+  { label: 'Attendance', to: '/exec/attendance', keywords: 'attendance session sessions mark present create' },
+  { label: 'Players', to: '/exec/players', keywords: 'players members list add new player' },
+  { label: 'Player registrations', to: '/exec/registrations', keywords: 'registrations join new players sign up signups approve reject public form waiting' },
+  { label: 'Expenses', to: '/exec/expenses', keywords: 'expenses expense spend spent hall rental costs club' },
+  { label: 'Income', to: '/exec/income', keywords: 'income earned tournament tournaments rental equipment money received' },
+  { label: 'Money Transfers', to: '/exec/transfers', keywords: 'transfers transfer handover cash received money' },
+  { label: 'Approve sign-ups', to: '/exec/admin/signups', keywords: 'admin approve sign-ups signups pending reject', admin: true },
+  { label: 'Manage Execs', to: '/exec/admin/execs', keywords: 'admin execs exec deactivate reactivate make admin', admin: true },
+  { label: 'Fee adjustments', to: '/exec/admin/fees', keywords: 'admin waive waiver discount adjust adjustment fee', admin: true },
+  { label: 'Fee rate', to: '/exec/admin/fee-rate', keywords: 'admin fee rate monthly fee price change amount 5 kwd', admin: true },
+  { label: 'Opening balances', to: '/exec/admin/opening-balances', keywords: 'admin opening balances starting figures excel', admin: true },
+  { label: 'Activity log', to: '/exec/admin/activity', keywords: 'admin activity audit log history changes', admin: true },
+  { label: 'Download club data', to: '/exec/admin/backup', keywords: 'admin backup download export excel data', admin: true },
 ]
 
 export default function GlobalSearch() {
@@ -59,7 +59,7 @@ export default function GlobalSearch() {
           key: `player-${player.player_id}`,
           label: player.name,
           detail: `${player.kica_id ?? ''}${player.is_active ? '' : ' · inactive'}`,
-          to: `/players/${player.player_id}`,
+          to: `/exec/players/${player.player_id}`,
         }))
     : []
 

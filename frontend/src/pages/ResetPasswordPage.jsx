@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
         <div className="card">
           <h1>Link incomplete</h1>
           <p>This reset link is missing its code. Please request a new one.</p>
-          <Link to="/forgot-password">Request a new link</Link>
+          <Link to="/exec/forgot-password">Request a new link</Link>
         </div>
       </div>
     )
@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
             Your new password is set. For safety, you've been logged out on all
             your devices.
           </p>
-          <Link to="/login">Log in</Link>
+          <Link to="/exec/login">Log in</Link>
         </div>
       </div>
     )

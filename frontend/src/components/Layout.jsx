@@ -5,14 +5,14 @@ import { useAuth } from '../auth'
 import GlobalSearch from './GlobalSearch'
 
 const LINKS = [
-  { to: '/', label: 'Dashboard', end: true },
-  { to: '/attendance', label: 'Attendance' },
-  { to: '/players', label: 'Players' },
-  { to: '/registrations', label: 'Registrations', showsPendingCount: true },
-  { to: '/fees', label: 'Fee Collection' },
-  { to: '/expenses', label: 'Expenses' },
-  { to: '/income', label: 'Income' },
-  { to: '/transfers', label: 'Money Transfers' },
+  { to: '/exec', label: 'Dashboard', end: true },
+  { to: '/exec/attendance', label: 'Attendance' },
+  { to: '/exec/players', label: 'Players' },
+  { to: '/exec/registrations', label: 'Registrations', showsPendingCount: true },
+  { to: '/exec/fees', label: 'Fee Collection' },
+  { to: '/exec/expenses', label: 'Expenses' },
+  { to: '/exec/income', label: 'Income' },
+  { to: '/exec/transfers', label: 'Money Transfers' },
 ]
 
 function hideIfMissing(event) {
@@ -56,7 +56,7 @@ export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false)
   const pendingCount = usePendingRegistrations()
 
-  const links = user.role === 'admin' ? [...LINKS, { to: '/admin', label: 'Admin' }] : LINKS
+  const links = user.role === 'admin' ? [...LINKS, { to: '/exec/admin', label: 'Admin' }] : LINKS
 
   return (
     <div className="shell">

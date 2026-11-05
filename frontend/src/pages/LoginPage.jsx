@@ -14,7 +14,7 @@ export default function LoginPage() {
 
   // Already logged in: go straight to the dashboard
   if (user) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/exec" replace />
   }
 
   async function handleSubmit(event) {
@@ -24,7 +24,7 @@ export default function LoginPage() {
 
     try {
       await logIn(email, password, rememberMe)
-      navigate('/')
+      navigate('/exec')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -83,8 +83,8 @@ export default function LoginPage() {
         </button>
 
         <div className="auth-links">
-          <Link to="/forgot-password">Forgot password?</Link>
-          <Link to="/signup">Create an account</Link>
+          <Link to="/exec/forgot-password">Forgot password?</Link>
+          <Link to="/exec/signup">Create an account</Link>
         </div>
       </form>
     </div>

@@ -89,7 +89,7 @@ export default function SessionPage() {
 
     try {
       await api(`/sessions/${sessionId}`, { method: 'DELETE' })
-      navigate('/attendance')
+      navigate('/exec/attendance')
     } catch (err) {
       setError(err.message)
     }
@@ -116,7 +116,7 @@ export default function SessionPage() {
 
   return (
     <div className="page">
-      <Link to="/attendance" className="back-link">← All sessions</Link>
+      <Link to="/exec/attendance" className="back-link">← All sessions</Link>
 
         <div className="header-actions">
           <span className="badge">{selected.size} present</span>

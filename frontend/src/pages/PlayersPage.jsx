@@ -96,7 +96,7 @@ export default function PlayersPage() {
                 {shown.map((player) => (
                   <tr key={player.player_id}>
                     <td>
-                      <Link to={`/players/${player.player_id}`}>{player.name}</Link>
+                      <Link to={`/exec/players/${player.player_id}`}>{player.name}</Link>
                       {hasDemoDetails(player) && (
                         <>
                           {' '}
@@ -151,7 +151,7 @@ function AddPlayerForm({ onCancel }) {
         method: 'POST',
         body: requestBody(values),
       })
-      navigate(`/players/${player.player_id}`)
+      navigate(`/exec/players/${player.player_id}`)
     } catch (err) {
       setError(err.message)
       setSubmitting(false)

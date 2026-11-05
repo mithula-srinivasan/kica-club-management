@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../api'
 import { genderLabel } from '../components/PlayerDetailsFields'
 import ReverseForm from '../components/ReverseForm'
-import { formatDate, formatTimestamp, whatAppLink } from '../format'
+import { formatDate, formatTimestamp, whatsAppLink } from '../format'
 
 
 // [value for the backend, tab name]
@@ -139,7 +139,7 @@ export default function RegistrationsPage() {
           {message.playerId && (
             <>
               {' '}
-              <Link to={`/players/${message.playerId}`}>Open player</Link>
+              <Link to={`/exec/players/${message.playerId}`}>Open player</Link>
             </>
           )}
         </p>
@@ -288,7 +288,7 @@ function ReviewedTable({ registrations, show }) {
               <tr key={r.registration_id}>
                 <td>
                   {approved && r.player_id ? (
-                    <Link to={`/players/${r.player_id}`}>{r.name}</Link>
+                    <Link to={`/exec/players/${r.player_id}`}>{r.name}</Link>
                   ) : (
                     r.name
                   )}

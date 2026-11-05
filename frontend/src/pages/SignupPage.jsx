@@ -50,7 +50,7 @@ export default function SignupPage() {
             An admin needs to approve your account before you can log in.
             You'll be able to log in once they have.
           </p>
-          <Link to="/login">Back to login</Link>
+          <Link to="/exec/login">Back to login</Link>
         </div>
       </div>
     )
@@ -120,7 +120,7 @@ export default function SignupPage() {
         </button>
 
         <div className="auth-links">
-          <Link to="/login">Already have an account? Log in</Link>
+          <Link to="/exec/login">Already have an account? Log in</Link>
         </div>
       </form>
     </div>

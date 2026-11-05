@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
             reset your password. It works for 1 hour. Check your spam folder if you
             can't see it.
           </p>
-          <Link to="/login">Back to login</Link>
+          <Link to="/exec/login">Back to login</Link>
         </div>
       </div>
     )
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
         </button>
 
         <div className="auth-links">
-          <Link to="/login">Back to login</Link>
+          <Link to="/exec/login">Back to login</Link>
         </div>
       </form>
     </div>

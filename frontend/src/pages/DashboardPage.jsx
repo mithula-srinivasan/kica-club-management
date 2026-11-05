@@ -48,7 +48,7 @@ export default function DashboardPage() {
           label="Owed by members"
           value={kwd(dashboard.total_outstanding)}
           note={`${dashboard.players_owing} players owing · See who →`}
-          to="/fees"
+          to="/exec/fees"
         />
         <Stat label="Paid in advance" value={kwd(dashboard.total_credit)} />
         <Stat label="Active players" value={dashboard.active_players} />
@@ -101,7 +101,7 @@ export default function DashboardPage() {
         </div>
 
         <p className="section-link">
-          <Link to="/fees">See who hasn't paid →</Link>
+          <Link to="/exec/fees">See who hasn't paid →</Link>
         </p>
       </section>
     </div>
