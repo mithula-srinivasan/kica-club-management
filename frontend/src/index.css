@@ -1097,6 +1097,20 @@ input[readonly] {
   gap: 16px;
 }
 
+
+/* Even space between the parts of a registration card */
+.registration-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.registration-card .section-header h2,
+.registration-card .details,
+.registration-card > .hint {
+  margin: 0;
+}
+
 /* ========== Public "Join KICA" pages: dark page, off-white cards, maroon headings ========== */
 
 .join-page {

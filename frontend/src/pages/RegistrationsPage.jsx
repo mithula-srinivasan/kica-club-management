@@ -182,7 +182,7 @@ function PendingRegistration({
   const notSet = <span className="muted">—</span>
 
   return (
-    <section className="card">
+    <section className="card registration-card">
       <div className="section-header">
         <h2>{r.name}</h2>
         <span className="hint">Sent {formatTimestamp(r.submitted_at)}</span>
