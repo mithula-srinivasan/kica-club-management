@@ -12,7 +12,6 @@ import {
   ChessRook,
   FileText,
   MessageCircle,
-  Wallet,
 } from 'lucide-react'
 import { CLUB } from './club'
 import JoinBand from './JoinBand'
@@ -165,22 +164,13 @@ function Benefits() {
 }
 
 /* ---------- The fee and the club timings, side by side ---------- */
+/* ---------- The club timings ---------- */
 
 function FeeAndTimings() {
   return (
     <section className="page-section">
-      <div className="site-container info-cards">
+      <div className="site-container">
         <Reveal className="info-card">
-          <span className="feature-card-icon">
-            <Wallet size={24} aria-hidden="true" />
-          </span>
-          <p className="site-eyebrow">Membership Fee</p>
-          <p className="info-card-big">
-            5 KWD <span>per month</span>
-          </p>
-        </Reveal>
-
-        <Reveal className="info-card" delay={0.1}>
           <span className="feature-card-icon">
             <CalendarDays size={24} aria-hidden="true" />
           </span>

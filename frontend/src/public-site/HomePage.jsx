@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { animate, motion, useInView, useReducedMotion } from 'motion/react'
-import { ArrowRight } from 'lucide-react'
-import { CLUB } from './club'
+import { ArrowRight, Clock, ExternalLink, MapPin } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
+import { CLUB, INSTAGRAM_LINK } from './club'
+import InstagramIcon from './InstagramIcon'
+import Reveal from './Reveal'
 import heroPhoto from '../assets/photos/hero/home-hero.webp'
 import aboutPhoto from '../assets/photos/sections/about.webp'
 import activitiesPhoto from '../assets/photos/sections/activities.webp'
@@ -65,7 +68,7 @@ const SECTIONS = [
     title: 'Join the KICA Family',
     text:
       'Your next move starts here. A welcoming club for children, adults and families, ' +
-      'from beginners to tournament players, for just 5 KWD a month.',
+      'from beginners to tournament players.',
     button: 'Join the Club',
     to: '/membership',
   },
@@ -132,29 +135,70 @@ function Hero() {
 }
 
 /* ---------- 2. Welcome text and the highlight figures ---------- */
-
 function Welcome() {
   return (
     <section className="home-welcome">
       <div className="site-container">
-        <motion.div
-          className="home-welcome-text"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.7, ease: SMOOTH }}
-        >
-          <p>
-            Welcome to the Kuwait Indian Chess Association (KICA), a non-commercial,
-            community-driven chess club dedicated to promoting chess and connecting players
-            across Kuwait.
-          </p>
-          <p>
-            Whether you are discovering chess for the first time, developing your competitive
-            skills, or simply enjoying the game, KICA offers a friendly and inclusive environment
-            for players of all nationalities, ages, and skill levels.
-          </p>
-        </motion.div>
+        <div className="home-welcome-inner">
+          <Reveal className="home-welcome-text">
+            <p>
+              Welcome to the Kuwait Indian Chess Association (KICA), a community-driven sports
+              association dedicated to promoting chess and connecting players across Kuwait.
+            </p>
+            <p>
+              Whether you are discovering chess for the first time, developing your competitive
+              skills, or simply enjoying the game, KICA offers a friendly and inclusive environment
+              for players of all nationalities, ages, and skill levels.
+            </p>
+          </Reveal>
+
+          <Reveal className="home-location" delay={0.15}>
+            <div className="home-location-details">
+              <p className="site-eyebrow">Visit Us</p>
+              <p className="home-location-line">
+                <MapPin size={20} aria-hidden="true" />
+                <span>
+                  <strong>{CLUB.address}</strong>
+                  <span className="home-location-landmark">{CLUB.landmark}</span>
+                </span>
+              </p>
+              {CLUB.timings.map((timing) => (
+                <p key={timing.label} className="home-location-line">
+                  <Clock size={20} aria-hidden="true" />
+                  <span>
+                    <strong>{timing.label}:</strong> {timing.time}
+                  </span>
+                </p>
+              ))}
+              <p className="home-location-line">
+                <InstagramIcon size={20} />
+                <a href={INSTAGRAM_LINK} target="_blank" rel="noopener noreferrer">
+                  @{CLUB.instagram}
+                </a>
+              </p>
+              <a
+                href={CLUB.mapsLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="site-button home-location-button"
+              >
+                Open in Google Maps
+                <ExternalLink size={18} aria-hidden="true" />
+              </a>
+            </div>
+
+            <div className="home-location-qrs">
+              <div className="home-location-qr">
+                <QRCodeSVG value={CLUB.mapsLink} size={112} />
+                <span>Scan for directions</span>
+              </div>
+              <div className="home-location-qr">
+                <QRCodeSVG value={INSTAGRAM_LINK} size={112} />
+                <span>Follow us on Instagram</span>
+              </div>
+            </div>
+          </Reveal>
+        </div>
 
         <div className="home-highlights">
           {HIGHLIGHTS.map((highlight, index) => (

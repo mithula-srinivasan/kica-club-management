@@ -480,13 +480,18 @@
   padding: clamp(40px, 6vw, 80px) 0;
 }
 
+/* The welcome text on the left, the location card on the right */
+.home-welcome-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 72px);
+}
+
 .home-welcome-text {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  max-width: 820px;
-  margin: 0 auto;
-  text-align: center;
 }
 
 .home-welcome-text p {
@@ -498,6 +503,87 @@
 
 .home-welcome-text p:first-child {
   color: var(--site-text);
+}
+
+/* ---------- The location card: address, timings, map button and QR code ---------- */
+
+.home-location {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: clamp(22px, 3vw, 32px);
+  border: 1px solid var(--site-line);
+  border-radius: 20px;
+  background: linear-gradient(160deg, #2b0e0e, #101010 60%);
+}
+
+.home-location-details {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.home-location-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  color: var(--site-text);
+  line-height: 1.5;
+}
+
+.home-location-line svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--rose);
+}
+
+.home-location-landmark {
+  display: block;
+  color: var(--site-muted);
+  font-size: 0.9rem;
+}
+
+.home-location-button {
+  margin-top: 6px;
+  min-height: 46px;
+  padding: 10px 20px;
+  font-size: 0.95rem;
+}
+
+
+/* The two QR codes (map and Instagram), stacked */
+.home-location-qrs {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.home-location-line a {
+  color: var(--site-text);
+  font-weight: 600;
+}
+
+
+/* The QR code on a white tile (QR codes scan best dark-on-white) */
+.home-location-qr {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--site-muted);
+  font-size: 0.8rem;
+}
+
+.home-location-qr svg {
+  display: block;
+  padding: 10px;
+  border-radius: 12px;
+  background: #ffffff;
 }
 
 .home-highlights {
@@ -877,6 +963,23 @@
   letter-spacing: -0.01em;
 }
 
+
+/* ---------- The executives ---------- */
+/* ---------- The executives: a plain list, in columns ---------- */
+
+.executives-list {
+  margin: 0;
+  padding-left: 1.2em;
+  columns: 3;
+  column-gap: clamp(24px, 5vw, 64px);
+  color: var(--site-text);
+  font-size: 1.1rem;
+  line-height: 2;
+}
+
+.executives-list li::marker {
+  color: var(--maroon-bright);
+}
 /* ---------- Our facilities ---------- */
 
 .about-facilities {
@@ -1552,6 +1655,10 @@
   .join-steps {
     grid-template-columns: 1fr;
   }
+
+    .home-welcome-inner {
+    grid-template-columns: 1fr;
+  }
 }
 
 
@@ -1588,5 +1695,21 @@
 
     .feature-cards {
     grid-template-columns: 1fr;
+  }
+
+    /* Phones: the QR code goes under the address (people tap the map button instead) */
+  .home-location {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+
+    .home-location-qrs {
+    flex-direction: row;
+  }
+
+
+    .executives-list {
+    columns: 1;
   }
 }

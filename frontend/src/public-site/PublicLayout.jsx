@@ -4,6 +4,7 @@ import { AnimatePresence, MotionConfig, motion } from 'motion/react'
 import { Clock, LogIn, Mail, MapPin, Menu, X } from 'lucide-react'
 import { CLUB, INSTAGRAM_LINK } from './club'
 import './public-site.css'
+import InstagramIcon from './InstagramIcon'
 
 // The pages in the top menu, in order
 const PAGES = [

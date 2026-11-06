@@ -39,7 +39,7 @@ const SERVICES = [
   {
     icon: Scale,
     title: 'Qualified Chess Arbiters',
-    text: 'Experienced senior national arbiters, including FIDE-certified arbiters, to officiate and administer tournaments.',
+    text: 'Experienced, licensed, senior national arbiters, including FIDE-certified arbiters, to officiate and administer tournaments.',
   },
   {
     icon: Award,
@@ -67,6 +67,11 @@ const PARTNERS = [
   'Tamil Nadu Engineering Forum (TEF)',
   'Institute of Chartered Accountants of India (ICAI) – Kuwait Chapter',
   'The Indian Community School (TKS)',
+  'KMSA (Kuwait Mind Sports Association)',
+  'Chess House Academy',
+  'Indians In Kuwait',
+  'Al-Mulla',
+  'Best Al-Yousifi',
 ]
 
 // Opens an email to the club with the subject already filled in
@@ -208,7 +213,7 @@ const JOURNEY = [
   { icon: ChessPawn, title: 'Beginner', text: 'Beginner-level instruction to build strong foundations.' },
   {
     icon: ChessKnight,
-    title: 'Developing Player',
+    title: 'Intermediate',
     text: 'Building skills, confidence and experience for competitive play.',
   },
   {

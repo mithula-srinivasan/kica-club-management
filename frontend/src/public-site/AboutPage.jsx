@@ -30,6 +30,7 @@ export default function AboutPage() {
       </PageIntro>
 
       <OurStory />
+      <Executives />
       <BigQuote />
       <Facilities />
       <JoinBand />
@@ -45,9 +46,9 @@ function OurStory() {
       <div className="site-container about-story-inner">
         <Reveal className="about-story-text">
           <p>
-            KICA is a non-commercial association run by dedicated volunteers, including
-            experienced chess enthusiasts, professionals, and qualified chess arbiters who
-            generously contribute their personal time to support the chess community.
+            KICA is a sports association run by dedicated volunteers, including experienced chess
+            enthusiasts, professionals, and qualified chess arbiters who generously contribute
+            their personal time to support the chess community.
           </p>
           <p>
             Rooted in its Indian chess community heritage, KICA welcomes chess enthusiasts of all
@@ -75,6 +76,44 @@ function OurStory() {
         >
           <img src={teamPhoto} alt="The KICA team standing beside the club banner" loading="lazy" />
         </motion.div>
+      </div>
+    </section>
+  )
+}
+
+
+
+/* ---------- The executives ---------- */
+
+const EXECUTIVES = [
+  'Soni Francis',
+  'Srinivasan',
+  'Sivanand',
+  'Gowri Shankar',
+  'Muthukumar',
+  'Vidhyasagar',
+  'Srinadh',
+  'Anandakannan',
+  'Yogeesha',
+]
+
+
+function Executives() {
+  return (
+    <section className="page-section">
+      <div className="site-container">
+        <Reveal className="section-heading">
+          <p className="site-eyebrow">Our Team</p>
+          <h2>Executives</h2>
+        </Reveal>
+
+        <Reveal>
+          <ul className="executives-list">
+            {EXECUTIVES.map((name) => (
+              <li key={name}>{name}</li>
+            ))}
+          </ul>
+        </Reveal>
       </div>
     </section>
   )
