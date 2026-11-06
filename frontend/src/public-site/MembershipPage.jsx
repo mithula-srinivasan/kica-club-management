@@ -64,7 +64,7 @@ export default function MembershipPage() {
     <>
       <PageIntro
         eyebrow="Membership"
-        title="Join the KICA Family"
+        title="Join the KICA Family!"
         actions={
           <Link to={REGISTER_LINK} className="site-button">
             Register a New Player
