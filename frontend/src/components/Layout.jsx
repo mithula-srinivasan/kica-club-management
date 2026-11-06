@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
+import { Globe } from 'lucide-react'
+
 import GlobalSearch from './GlobalSearch'
 
 const LINKS = [
@@ -13,6 +15,7 @@ const LINKS = [
   { to: '/exec/expenses', label: 'Expenses' },
   { to: '/exec/income', label: 'Income' },
   { to: '/exec/transfers', label: 'Money Transfers' },
+  
 ]
 
 function hideIfMissing(event) {
@@ -103,6 +106,10 @@ export default function Layout() {
           </button>
           <span className="top-brand">KICA</span>
           <GlobalSearch />
+          <Link to="/" className="top-site-link" aria-label="View public website">
+            <Globe size={18} aria-hidden="true" />
+            <span className="top-site-link-text">View public website</span>
+          </Link>
         </header>
 
         <main>

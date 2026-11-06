@@ -29,6 +29,7 @@ import RegistrationsPage from './pages/RegistrationsPage'
 import PublicLayout from './public-site/PublicLayout'
 import PublicPlaceholder from './public-site/PublicPlaceholder'
 import HomePage from './public-site/HomePage'
+import AuthLayout from './components/AuthLayout'
 
 
 
@@ -68,11 +69,12 @@ export default function App() {
 
           {/* The link shared with parents */}
           <Route path="/join" element={<Navigate to="/membership" replace />} />
-          <Route path="/exec/login" element={<LoginPage />} />
-          <Route path="/exec/signup" element={<SignupPage />} />
-          <Route path="/exec/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/exec/reset-password" element={<ResetPasswordPage />} />
-
+            <Route element={<AuthLayout />}>
+            <Route path="/exec/login" element={<LoginPage />} />
+            <Route path="/exec/signup" element={<SignupPage />} />
+            <Route path="/exec/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/exec/reset-password" element={<ResetPasswordPage />} />
+          </Route>
           <Route
             element={
               <RequireAuth>

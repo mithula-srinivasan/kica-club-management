@@ -622,6 +622,67 @@ button.green:hover,
   font-size: 0.95rem;
 }
 
+
+/* "← Back to KICA website" on the login, sign-up and password pages */
+.auth-layout {
+  position: relative;
+}
+
+.back-to-site {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.back-to-site:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* Leave room above the login card for the link, so they never overlap on phones */
+.auth-layout .auth-page {
+  padding-top: 72px;
+}
+
+
+/* "View public website" at the right end of the top bar */
+.top-site-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.top-site-link:hover {
+  border-color: var(--text);
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* Phones: just the globe icon, so the search box keeps its space */
+@media (max-width: 640px) {
+  .top-site-link {
+    padding: 8px;
+  }
+
+  .top-site-link-text {
+    display: none;
+  }
+}
+
 /* ========== Page layout ========== */
 .page {
   display: flex;
