@@ -1184,22 +1184,6 @@ input[readonly] {
   padding: 32px 16px 64px;
 }
 
-/* The squares are drawn on a layer behind the cards,
-   so they can fade in at the top without fading the cards too */
-.join-board::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: conic-gradient(
-    rgba(242, 239, 233, 0.15) 25%,
-    transparent 0 50%,
-    rgba(242, 239, 233, 0.15) 0 75%,
-    transparent 0
-  );
-  background-size: 112px 112px;
-  mask-image: linear-gradient(to bottom, transparent, #000000 140px);
-  pointer-events: none;
-}
 
 /* Keep the cards above the squares */
 .join-board > .join-container {

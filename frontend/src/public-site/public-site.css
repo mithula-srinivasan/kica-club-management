@@ -3,7 +3,7 @@
 .site {
   /* Fonts: change --font-heading to try another heading font */
   --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-heading: 'Source Serif 4 Variable', Georgia, serif;
+  --font-heading: 'Manrope Variable', 'Inter Variable', system-ui, sans-serif;
 
   /* Colours */
   --site-bg: #000000;
@@ -27,15 +27,15 @@
 .site h2,
 .site h3 {
   font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
+/* Content spreads across the whole screen, with padding at the edges
+   that grows a little on bigger screens */
 .site-container {
   width: 100%;
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 clamp(20px, 5vw, 80px);
 }
 
 /* Visible focus ring for keyboard users, on every link and button */
@@ -104,12 +104,6 @@
   font-family: var(--font-heading);
   font-size: 1.35rem;
   letter-spacing: 0.04em;
-}
-
-.site-brand-full {
-  color: var(--site-muted);
-  font-size: 0.78rem;
-  font-weight: 500;
 }
 
 .site-nav {
@@ -253,8 +247,36 @@
 
 /* ---------- Page content ---------- */
 
+/* The page area, between the top bar and the footer */
 .site-main {
+  position: relative;
   flex: 1;
+  /* Undo the exec app's "main" rule (1100px wide, centred), so pages use the full width */
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* The faint chessboard behind every page. It fades in just under the top bar. */
+.site-main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: conic-gradient(
+    rgba(242, 239, 233, 0.06) 25%,
+    transparent 0 50%,
+    rgba(242, 239, 233, 0.06) 0 75%,
+    transparent 0
+  );
+  background-size: 112px 112px;
+  mask-image: linear-gradient(to bottom, transparent, #000000 140px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000000 140px);
+  pointer-events: none;
+}
+
+/* Keep the page itself in front of the squares */
+.site-main > * {
+  position: relative;
 }
 
 .site-eyebrow {
@@ -298,29 +320,12 @@
   text-decoration: none;
 }
 
-/* Placeholder pages: a title over the faint chessboard */
+/* Placeholder pages: just a title and a line of text */
 .site-placeholder {
-  position: relative;
   padding: 96px 0 120px;
 }
 
-.site-placeholder::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: conic-gradient(
-    rgba(242, 239, 233, 0.06) 25%,
-    transparent 0 50%,
-    rgba(242, 239, 233, 0.06) 0 75%,
-    transparent 0
-  );
-  background-size: 112px 112px;
-  mask-image: linear-gradient(to bottom, transparent, #000000 160px, #000000 70%, transparent);
-  pointer-events: none;
-}
-
 .site-placeholder .site-container {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -333,6 +338,54 @@
   line-height: 1.1;
 }
 
+/* ---------- Home page: the hero (big logo and title) ---------- */
+
+.home-hero {
+  padding: clamp(56px, 9vw, 120px) 0;
+}
+
+.home-hero-inner {
+  display: flex;
+  align-items: center;
+  gap: clamp(32px, 5vw, 72px);
+}
+
+/* The big logo on its off-white tile, with a soft maroon glow */
+.home-hero-logo {
+  flex-shrink: 0;
+  width: clamp(150px, 17vw, 220px);
+  height: auto;
+  padding: 14px;
+  border-radius: 28px;
+  background: #f2efe9;
+  box-shadow: 0 24px 70px rgba(179, 38, 43, 0.28);
+}
+
+.home-hero-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.home-hero-text h1 {
+  max-width: 16ch;
+  margin: 0;
+  font-size: clamp(2.3rem, 5vw, 4rem);
+  line-height: 1.08;
+}
+
+.home-hero-tagline {
+  margin: 0;
+  color: var(--rose);
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  font-weight: 600;
+}
+
+.home-hero-text .site-button {
+  margin-top: 8px;
+}
+
 /* ---------- Footer ---------- */
 
 .site-footer {
@@ -341,51 +394,52 @@
   color: var(--site-muted);
 }
 
+/* Three columns, spread across the full width */
 .site-footer-grid {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr 0.9fr;
-  gap: 40px;
-  padding-top: 56px;
-  padding-bottom: 40px;
+  grid-template-columns: repeat(3, auto);
+  justify-content: space-between;
+  gap: 24px 64px;
+  padding-top: 28px;
+  padding-bottom: 24px;
 }
 
 .site-footer-brand {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 
-.site-footer-brand .site-brand-logo {
-  width: 64px;
-  height: 64px;
-}
-
+/* The club name and the tagline, in the same style */
 .site-footer-name {
-  margin: 4px 0 0;
+  margin: 0;
   color: var(--site-text);
   font-family: var(--font-heading);
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.site-footer-tagline {
+
+/* Small grey text: the © line and the Exec login link */
+.site-footer-small {
   margin: 0;
-  font-style: italic;
+  color: var(--site-muted);
+  font-size: 0.85rem;
 }
+
+
 
 .site-footer-title {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   color: var(--site-text);
   font-size: 1rem;
   letter-spacing: 0.04em;
 }
 
-.site-footer-list,
-.site-footer-links {
+.site-footer-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -416,16 +470,6 @@
   text-decoration: none;
 }
 
-.site-footer-bottom {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 20px;
-  padding-bottom: 28px;
-  border-top: 1px solid var(--site-line);
-  font-size: 0.9rem;
-}
 
 /* ---------- Smaller screens ---------- */
 
@@ -442,6 +486,19 @@
 
   .site-footer-grid {
     grid-template-columns: 1fr 1fr;
+    justify-content: stretch;
+  }
+}
+
+/* Phones and narrow windows: the big logo sits above the title, centred */
+@media (max-width: 760px) {
+  .home-hero-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .home-hero-text {
+    align-items: center;
   }
 }
 
@@ -450,9 +507,6 @@
     min-height: 66px;
   }
 
-  .site-brand-full {
-    display: none;
-  }
 
   .site-placeholder {
     padding: 64px 0 88px;
@@ -460,6 +514,6 @@
 
   .site-footer-grid {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 28px;
   }
 }

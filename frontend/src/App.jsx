@@ -28,6 +28,7 @@ import JoinRegisterPage from './pages/JoinRegisterPage'
 import RegistrationsPage from './pages/RegistrationsPage'
 import PublicLayout from './public-site/PublicLayout'
 import PublicPlaceholder from './public-site/PublicPlaceholder'
+import HomePage from './public-site/HomePage'
 
 
 
@@ -39,7 +40,7 @@ export default function App() {
             <Route element={<PublicLayout />}>
             <Route
               path="/"
-              element={<PublicPlaceholder title="Welcome to KICA" text="Our new home page is coming soon." />}
+              element={<HomePage />}
             />
             <Route
               path="/about"

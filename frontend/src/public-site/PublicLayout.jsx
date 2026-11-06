@@ -64,7 +64,6 @@ export default function PublicLayout() {
               <img src="/kica-logo.png" alt="" className="site-brand-logo" />
               <span className="site-brand-text">
                 <strong>{CLUB.shortName}</strong>
-                <span className="site-brand-full">{CLUB.name}</span>
               </span>
             </Link>
 
@@ -167,14 +166,18 @@ export default function PublicLayout() {
   )
 }
 
+
+
+
 function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-container site-footer-grid">
         <div className="site-footer-brand">
-          <img src="/kica-logo.png" alt="" className="site-brand-logo" />
-          <p className="site-footer-name">{CLUB.name}</p>
-          <p className="site-footer-tagline">{CLUB.tagline}</p>
+          <p className="site-footer-name">{CLUB.tagline}</p>
+          <p className="site-footer-small">
+            © {new Date().getFullYear()} {CLUB.name}
+          </p>
         </div>
 
         <div>
@@ -215,28 +218,8 @@ function SiteFooter() {
               </a>
             </li>
           </ul>
+          
         </div>
-
-        <div>
-          <h2 className="site-footer-title">Explore</h2>
-          <ul className="site-footer-links">
-            {PAGES.map((page) => (
-              <li key={page.to}>
-                <Link to={page.to}>{page.label}</Link>
-              </li>
-            ))}
-            <li>
-              <Link to="/join/register">Register a new player</Link>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="site-container site-footer-bottom">
-        <span>
-          © {new Date().getFullYear()} {CLUB.name}
-        </span>
-        <Link to="/exec/login">Exec login</Link>
       </div>
     </footer>
   )
