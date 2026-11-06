@@ -967,24 +967,34 @@
   line-height: 1.4;
   letter-spacing: -0.01em;
 }
-
-
-/* ---------- The executives ---------- */
-/* ---------- The executives: a plain list, in columns ---------- */
+/* ---------- The executives: a vertical list with pawns as bullet points ---------- */
 
 .executives-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin: 0;
-  padding-left: 1.2em;
-  columns: 3;
-  column-gap: clamp(24px, 5vw, 64px);
-  color: var(--site-text);
-  font-size: 1.1rem;
-  line-height: 2;
+  padding: 0;
+  list-style: none;
 }
 
-.executives-list li::marker {
+/* Each name with its pawn in front */
+.executives-list li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--site-text);
+  font-family: var(--font-heading);
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  font-weight: 600;
+}
+
+.executives-pawn {
+  flex-shrink: 0;
   color: var(--maroon-bright);
 }
+
+
 /* ---------- Our facilities ---------- */
 
 .about-facilities {

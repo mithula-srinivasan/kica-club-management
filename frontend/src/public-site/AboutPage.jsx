@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { Armchair, BookOpen, Monitor, MapPin, Presentation, Quote, Scale, Timer } from 'lucide-react'
+import { Armchair, ChessPawn, BookOpen, Monitor, MapPin, Presentation, Quote, Scale, Timer } from 'lucide-react'
 import { CLUB } from './club'
 import JoinBand from './JoinBand'
 import PageIntro from './PageIntro'
@@ -97,7 +97,6 @@ const EXECUTIVES = [
   'Yogeesha',
 ]
 
-
 function Executives() {
   return (
     <section className="page-section">
@@ -107,10 +106,14 @@ function Executives() {
           <h2>Executives</h2>
         </Reveal>
 
+        {/* The names in one flowing line, with a small maroon pawn between each */}
         <Reveal>
           <ul className="executives-list">
             {EXECUTIVES.map((name) => (
-              <li key={name}>{name}</li>
+              <li key={name}>
+                <ChessPawn size={18} aria-hidden="true" className="executives-pawn" />
+                {name}
+              </li>
             ))}
           </ul>
         </Reveal>
