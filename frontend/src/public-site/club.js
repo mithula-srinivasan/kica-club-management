@@ -10,9 +10,9 @@ export const CLUB = {
   // To do: the club's Google Maps link (Google Maps → the club → Share → Copy link)
   mapsLink: null,
   // \u00a0 is a space that never breaks, so "10 am" always stays on one line
+    // \u00a0 is a space that never breaks, so "10:30 am" always stays on one line
   timings: [
-    { label: 'Training', time: 'Friday & Saturday, 9–10\u00a0am' },
-    { label: 'Club time', time: 'Friday & Saturday, 10\u00a0am – 2\u00a0pm' },
+    { label: 'Club Timings', time: 'Friday & Saturday, 10:30\u00a0am – 1:30\u00a0pm' },
   ],
 }
 
