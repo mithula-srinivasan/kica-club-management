@@ -1,6 +1,9 @@
 import { motion } from 'motion/react'
 import {
   Award,
+  ChessKing,
+  ChessKnight,
+  ChessPawn,
   ClipboardList,
   Cpu,
   Crown,
@@ -196,12 +199,30 @@ function CardsSection({ eyebrow, title, intro, cards }) {
   )
 }
 
-/* ---------- Chess training & coaching: a calm, centred text section ---------- */
+
+
+/* ---------- Chess training & coaching: the text, and "the chess journey" path ---------- */
+
+// The three steps of the path. Each piece is "stronger" than the one before.
+const JOURNEY = [
+  { icon: ChessPawn, title: 'Beginner', text: 'Beginner-level instruction to build strong foundations.' },
+  {
+    icon: ChessKnight,
+    title: 'Developing Player',
+    text: 'Building skills, confidence and experience for competitive play.',
+  },
+  {
+    icon: ChessKing,
+    title: 'Advanced',
+    text: 'Advanced coaching with internationally titled professionals.',
+    titles: ['GM', 'IM', 'WIM'],
+  },
+]
 
 function Training() {
   return (
     <section className="page-section">
-      <div className="site-container">
+      <div className="site-container training-inner">
         <Reveal className="page-text">
           <p className="site-eyebrow">Chess Training &amp; Coaching</p>
           <h2>Supporting Every Player&apos;s Chess Journey.</h2>
@@ -222,6 +243,49 @@ function Training() {
             promote chess as an enjoyable and rewarding activity.
           </p>
         </Reveal>
+
+        <div className="journey">
+          <ol className="journey-steps">
+            {JOURNEY.map((step, index) => (
+              <motion.li
+                key={step.title}
+                className="journey-step"
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.6 }}
+                transition={{ duration: 0.6, delay: 0.3 + index * 0.35, ease: SMOOTH }}
+              >
+                <span className="journey-icon">
+                  <step.icon size={28} aria-hidden="true" />
+                </span>
+
+                {/* The maroon line down to the next step. It draws itself after this step appears. */}
+                {index < JOURNEY.length - 1 && (
+                  <motion.span
+                    className="journey-line"
+                    initial={{ scaleY: 0 }}
+                    whileInView={{ scaleY: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.6 + index * 0.35, ease: SMOOTH }}
+                  />
+                )}
+
+                <div className="journey-card">
+                  <p className="journey-number">Step {index + 1}</p>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                  {step.titles && (
+                    <div className="journey-titles">
+                      {step.titles.map((title) => (
+                        <span key={title}>{title}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.li>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   )

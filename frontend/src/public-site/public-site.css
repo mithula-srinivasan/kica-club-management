@@ -282,7 +282,7 @@
 .site-eyebrow {
   margin: 0;
   color: var(--rose);
-  font-size: 0.85rem;
+  font-size: 0.93rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1084,6 +1084,113 @@
   line-height: 1.7;
 }
 
+
+
+/* ---------- "The chess journey" path (Chess Training & Coaching) ---------- */
+
+/* Text on the left, the path on the right */
+.training-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: clamp(32px, 6vw, 96px);
+}
+
+.journey-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journey-step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* The line from this step's icon down to the next step's icon
+   (60px icon, 24px gap between steps) */
+.journey-line {
+  position: absolute;
+  top: 60px;
+  bottom: -24px;
+  left: 29px;
+  width: 2px;
+  background: var(--maroon-bright);
+  transform-origin: top;
+}
+
+/* The chess piece in a maroon circle; the black ring hides the line behind it */
+.journey-icon {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--maroon), var(--maroon-bright));
+  color: #ffffff;
+  box-shadow: 0 0 0 6px var(--site-bg), 0 10px 30px rgba(179, 38, 43, 0.35);
+}
+
+.journey-card {
+  flex: 1;
+  padding: 18px 22px;
+  border: 1px solid var(--site-line);
+  border-radius: 16px;
+  background: linear-gradient(160deg, #2b0e0e, #101010 60%);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.journey-card:hover {
+  border-color: rgba(230, 163, 163, 0.5);
+  transform: translateX(4px);
+}
+
+.journey-number {
+  margin: 0 0 4px;
+  color: var(--rose);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.journey-card h3 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+}
+
+.journey-card p:not(.journey-number) {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.6;
+}
+
+/* GM · IM · WIM as small badges */
+.journey-titles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.journey-titles span {
+  padding: 4px 12px;
+  border: 1px solid rgba(230, 163, 163, 0.45);
+  border-radius: 999px;
+  color: var(--rose);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
 
 
 
