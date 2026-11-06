@@ -651,30 +651,46 @@
 
 
 /* ========== Shared pieces for the inner pages (About, Activities, Membership) ========== */
-
 /* ---------- The title block at the top of a page ---------- */
 
 .page-intro {
   padding: clamp(48px, 7vw, 104px) 0 clamp(24px, 4vw, 48px);
 }
 
-.page-intro-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 18px;
+/* The small label sits above both columns */
+.page-intro-eyebrow {
+  margin-bottom: 18px;
 }
 
-.page-intro h1 {
-  max-width: 20ch;
+/* Heading on the left, intro text on the right, both starting at the top */
+.page-intro-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(32px, 6vw, 96px);
+}
+
+.page-intro-inner h1 {
   margin: 0;
-  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  font-size: clamp(2.1rem, 4.4vw, 3.4rem);
   line-height: 1.06;
 }
 
-.page-intro .site-lead {
-  max-width: 760px;
+/* The intro text: light red, like the small label above the heading */
+.page-intro-lead {
+  margin: 0;
+  color: var(--rose);
+  font-size: clamp(0.98rem, 1.2vw, 1.1rem);
+  line-height: 1.7;
 }
+
+.page-intro-line {
+  height: 1px;
+  margin-top: clamp(32px, 5vw, 56px);
+  background: linear-gradient(to right, rgba(230, 163, 163, 0.5), var(--site-line));
+  transform-origin: left;
+}
+
 
 /* ---------- A section's heading: small label, title and intro ---------- */
 
@@ -815,7 +831,7 @@
 
 .about-story-text p {
   margin: 0;
-  color: var(--site-muted);
+  color: var(--site-text);
   font-size: 1.08rem;
   line-height: 1.75;
 }
@@ -1020,9 +1036,11 @@
   .feature-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .page-intro-inner {
+    grid-template-columns: 1fr;
+  }
 }
-
-
 
 
 
