@@ -1010,14 +1010,35 @@
   background: var(--maroon-bright);
 }
 
+
+/* "A Welcoming Space to Play and Learn" on the left, the address on the right */
+.facilities-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: stretch;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 48px;
+}
+
+.facilities-title-row h2 {
+  margin: 0;
+}
+
 /* The club address under "A Welcoming Space to Play and Learn" */
+/* The club address, in a small solid card to the right of the heading */
 .about-address {
   display: flex;
+  flex-shrink: 0;
   align-items: flex-start;
   gap: 10px;
-  margin: 6px 0 0;
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px solid var(--site-line);
+  border-radius: 14px;
+  background: #1f0c0c;
   color: var(--site-text);
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.5;
 }
 

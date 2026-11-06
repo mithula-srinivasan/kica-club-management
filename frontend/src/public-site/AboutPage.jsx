@@ -107,17 +107,22 @@ function Facilities() {
       <div className="site-container">
         <Reveal className="section-heading">
           <p className="site-eyebrow">Our Facilities</p>
-          <h2>A Welcoming Space to Play and Learn</h2>
+
+          {/* The heading on the left, the address on the right */}
+          <div className="facilities-title-row">
+            <h2>A Welcoming Space to Play and Learn</h2>
+            <p className="about-address">
+              <MapPin size={20} aria-hidden="true" />
+              <span>
+                <strong>{CLUB.address}</strong>
+                <span className="about-address-landmark">{CLUB.landmark}</span>
+              </span>
+            </p>
+          </div>
+
           <p className="site-lead">
             KICA provides a comfortable environment and useful resources to support regular chess
             activities and competitive practice.
-          </p>
-          <p className="about-address">
-            <MapPin size={20} aria-hidden="true" />
-            <span>
-              <strong>{CLUB.address}</strong>
-              <span className="about-address-landmark">{CLUB.landmark}</span>
-            </span>
           </p>
         </Reveal>
 
