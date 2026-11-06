@@ -239,7 +239,7 @@ function PhotoBelt() {
     >
       <div
         className="home-belt-track"
-        style={{ '--belt-duration': `${BELT_PHOTOS.length * 7}s` }}
+        style={{ '--belt-duration': `${BELT_PHOTOS.length * 4.3}s` }}
       >
         {Array.from({ length: BELT_COPIES }, (_, copy) =>
           BELT_PHOTOS.map((photo) => (

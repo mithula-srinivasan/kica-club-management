@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
-import { Armchair, BookOpen, Monitor, Presentation, Quote, Scale, Timer } from 'lucide-react'
+import { Armchair, BookOpen, Monitor, MapPin, Presentation, Quote, Scale, Timer } from 'lucide-react'
+import { CLUB } from './club'
 import JoinBand from './JoinBand'
 import PageIntro from './PageIntro'
 import Reveal, { SMOOTH } from './Reveal'
@@ -66,7 +67,7 @@ function OurStory() {
         </Reveal>
 
         <motion.div
-          className="about-story-photo site-photo"
+          className="about-story-photo"
           initial={{ opacity: 0, x: 60 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.25 }}
@@ -110,6 +111,13 @@ function Facilities() {
           <p className="site-lead">
             KICA provides a comfortable environment and useful resources to support regular chess
             activities and competitive practice.
+          </p>
+          <p className="about-address">
+            <MapPin size={20} aria-hidden="true" />
+            <span>
+              <strong>{CLUB.address}</strong>
+              <span className="about-address-landmark">{CLUB.landmark}</span>
+            </span>
           </p>
         </Reveal>
 

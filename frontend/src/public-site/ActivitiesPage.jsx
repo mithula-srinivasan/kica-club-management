@@ -72,7 +72,7 @@ const PARTNER_EMAIL = `mailto:${CLUB.email}?subject=${encodeURIComponent('Tourna
 export default function ActivitiesPage() {
   return (
     <>
-      <PageIntro eyebrow="Activities & Tournaments" title="Learn. Play. Compete. Grow.">
+      <PageIntro eyebrow="Activities & Tournaments" title="More Than a Club: A Home for Competitive Chess">
         From friendly weekend games to major tournaments with hundreds of players, there&apos;s
         always something happening at KICA.
       </PageIntro>
@@ -149,7 +149,7 @@ function PhotoSection({ photo, alt, eyebrow, title, photoOnRight = false, childr
     <section className={photoOnRight ? 'page-split photo-right' : 'page-split'}>
       <div className="site-container page-split-inner">
         <motion.div
-          className="page-split-photo site-photo"
+          className="page-split-photo"
           initial={{ opacity: 0, x: photoOnRight ? 60 : -60 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.25 }}
@@ -202,7 +202,7 @@ function Training() {
   return (
     <section className="page-section">
       <div className="site-container">
-        <Reveal className="text-panel">
+        <Reveal className="page-text">
           <p className="site-eyebrow">Chess Training &amp; Coaching</p>
           <h2>Supporting Every Player&apos;s Chess Journey.</h2>
           <p>KICA recognises that players have different learning needs and aspirations.</p>
@@ -239,22 +239,24 @@ function TournamentServices() {
         title="Professional Expertise. Experienced Arbiters. Seamless Tournament Management."
         photoOnRight
       >
-        <p>
-          KICA brings together a team of experienced senior chess arbiters, including FIDE
-          (International Chess Federation)-certified arbiters, with the expertise and capabilities
-          to organise and conduct professionally managed chess tournaments.
-        </p>
-        <p>
-          With extensive hands-on experience in tournament organisation and administration, KICA
-          supports institutions, community organisations, and corporate groups looking to host
-          chess competitions for their members, students, employees, and wider communities.
-        </p>
-        <p>
-          Over the past five years, KICA has successfully conducted and supported large-scale chess
-          tournaments in Kuwait, including events with <strong>200+ participants</strong>,
-          demonstrating its ability to manage competitive events involving significant numbers of
-          players.
-        </p>
+                <ul className="page-split-list">
+          <li>
+            KICA brings together a team of experienced senior chess arbiters, including FIDE
+            (International Chess Federation)-certified arbiters, with the expertise and
+            capabilities to organise and conduct professionally managed chess tournaments.
+          </li>
+          <li>
+            With extensive hands-on experience in tournament organisation and administration, KICA
+            supports institutions, community organisations, and corporate groups looking to host
+            chess competitions for their members, students, employees, and wider communities.
+          </li>
+          <li>
+            Over the past five years, KICA has successfully conducted and supported large-scale
+            chess tournaments in Kuwait, including events with <strong>200+ participants</strong>,
+            demonstrating its ability to manage competitive events involving significant numbers of
+            players.
+          </li>
+        </ul>
       </PhotoSection>
 
       <section className="page-section page-section-tight" id="tournament-services">
