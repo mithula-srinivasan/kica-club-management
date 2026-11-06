@@ -31,7 +31,6 @@ export default function AboutPage() {
 
       <OurStory />
       <Executives />
-      <BigQuote />
       <Facilities />
       <JoinBand />
     </>
@@ -100,35 +99,28 @@ const EXECUTIVES = [
 function Executives() {
   return (
     <section className="page-section">
-      <div className="site-container">
-        <Reveal className="section-heading">
-          <p className="site-eyebrow">Our Team</p>
-          <h2>Executives</h2>
-        </Reveal>
+      <div className="site-container team-and-quote">
+        {/* Left: the executives */}
+        <div>
+          <Reveal className="section-heading">
+            <p className="site-eyebrow">Our Team</p>
+            <h2>Executives</h2>
+          </Reveal>
 
-        {/* The names in one flowing line, with a small maroon pawn between each */}
-        <Reveal>
-          <ul className="executives-list">
-            {EXECUTIVES.map((name) => (
-              <li key={name}>
-                <ChessPawn size={18} aria-hidden="true" className="executives-pawn" />
-                {name}
-              </li>
-            ))}
-          </ul>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
+          <Reveal>
+            <ul className="executives-list">
+              {EXECUTIVES.map((name) => (
+                <li key={name}>
+                  <ChessPawn size={18} aria-hidden="true" className="executives-pawn" />
+                  {name}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
 
-/* ---------- The big quote ---------- */
-
-function BigQuote() {
-  return (
-    <section className="about-quote">
-      <div className="site-container">
-        <Reveal className="about-quote-inner">
+        {/* Right: the big quote */}
+        <Reveal className="team-quote" delay={0.15}>
           <Quote size={40} aria-hidden="true" className="about-quote-icon" />
           <blockquote>
             We believe chess is more than a game. It develops critical thinking, concentration,
@@ -140,6 +132,8 @@ function BigQuote() {
     </section>
   )
 }
+
+
 
 /* ---------- Our facilities, as cards ---------- */
 

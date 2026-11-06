@@ -968,6 +968,14 @@
   letter-spacing: -0.01em;
 }
 /* ---------- The executives: a vertical list with pawns as bullet points ---------- */
+/* ---------- The executives (left) and the big quote (right) ---------- */
+
+.team-and-quote {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: clamp(32px, 6vw, 96px);
+}
 
 .executives-list {
   display: flex;
@@ -994,6 +1002,23 @@
   color: var(--maroon-bright);
 }
 
+/* The quote, with a maroon line down its left side */
+.team-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-left: clamp(20px, 3vw, 40px);
+  border-left: 2px solid var(--maroon-bright);
+}
+
+.team-quote blockquote {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
 
 /* ---------- Our facilities ---------- */
 
@@ -1672,6 +1697,14 @@
   }
 
     .home-welcome-inner {
+    grid-template-columns: 1fr;
+  }
+
+    .team-and-quote,
+  .training-inner,
+  .benefits-list,
+  .info-cards,
+  .join-steps {
     grid-template-columns: 1fr;
   }
 }
