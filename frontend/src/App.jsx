@@ -31,6 +31,7 @@ import PublicPlaceholder from './public-site/PublicPlaceholder'
 import HomePage from './public-site/HomePage'
 import AuthLayout from './components/AuthLayout'
 import AboutPage from './public-site/AboutPage'
+import ActivitiesPage from './public-site/ActivitiesPage'
 
 
 
@@ -45,10 +46,7 @@ export default function App() {
               element={<HomePage />}
             />
             <Route path="/about" element={<AboutPage />} />
-            <Route
-              path="/activities"
-              element={<PublicPlaceholder title="Activities & Tournaments" text="Our tournaments, lectures and club activities. Coming soon." />}
-            />
+            <Route path="/activities" element={<ActivitiesPage />} />
             <Route
               path="/membership"
               element={

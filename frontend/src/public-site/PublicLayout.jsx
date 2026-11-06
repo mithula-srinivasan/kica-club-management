@@ -194,13 +194,15 @@ function SiteFooter() {
           <li>
               <MapPin size={18} aria-hidden="true" />
               <span>
-                {CLUB.mapsLink ? (
-                  <a href={CLUB.mapsLink} target="_blank" rel="noopener noreferrer">
-                    {CLUB.address}
-                  </a>
-                ) : (
-                  CLUB.address
-                )}
+                  <strong className="site-footer-address">
+                  {CLUB.mapsLink ? (
+                    <a href={CLUB.mapsLink} target="_blank" rel="noopener noreferrer">
+                      {CLUB.address}
+                    </a>
+                  ) : (
+                    CLUB.address
+                  )}
+                </strong>
                 <span className="site-footer-landmark">{CLUB.landmark}</span>
               </span>
             </li>
