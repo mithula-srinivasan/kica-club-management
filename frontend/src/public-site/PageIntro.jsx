@@ -3,8 +3,9 @@ import { SMOOTH } from './Reveal'
 
 // The title block at the top of each page:
 // a small label, then the big heading on the left and a short intro on the right
-// (both starting at the same height), then a faint line that leads into the page
-export default function PageIntro({ eyebrow, title, children }) {
+// (both starting at the same height), then a faint line that leads into the page.
+// "actions" (optional) are buttons shown under the intro, e.g. "Register a New Player".
+export default function PageIntro({ eyebrow, title, children, actions }) {
   return (
     <section className="page-intro">
       <motion.div
@@ -17,7 +18,13 @@ export default function PageIntro({ eyebrow, title, children }) {
 
         <div className="page-intro-inner">
           <h1>{title}</h1>
-          {children && <p className="page-intro-lead">{children}</p>}
+
+          {(children || actions) && (
+            <div className="page-intro-side">
+              {children && <p className="page-intro-lead">{children}</p>}
+              {actions}
+            </div>
+          )}
         </div>
       </motion.div>
 

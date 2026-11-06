@@ -282,7 +282,7 @@
 .site-eyebrow {
   margin: 0;
   color: var(--rose);
-  font-size: 0.93rem;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1216,6 +1216,172 @@
 
 
 
+/* ========== Membership page ========== */
+
+/* The intro text and the "Register a New Player" button, on the right of the heading */
+.page-intro-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+/* ---------- What members enjoy: a two-column checklist ---------- */
+
+.benefits-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.benefits-list li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--site-line);
+  border-radius: 14px;
+  background: #140909;
+  color: var(--site-text);
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+/* Each benefit's chess piece, in a small maroon circle */
+.benefits-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--maroon), var(--maroon-bright));
+  color: #ffffff;
+}
+
+.benefits-note {
+  margin-top: clamp(28px, 4vw, 44px);
+}
+
+/* ---------- The fee and the club timings ---------- */
+
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: clamp(28px, 4vw, 40px);
+  border: 1px solid var(--site-line);
+  border-radius: 20px;
+  background: linear-gradient(160deg, #2b0e0e, #101010 60%);
+}
+
+/* The big figure: "5 KWD", or the club times */
+.info-card-big {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.info-card-big span {
+  color: var(--site-muted);
+  font-size: 0.5em;
+  font-weight: 600;
+}
+
+.info-card-text {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.6;
+}
+
+/* ---------- How to join: three steps ---------- */
+
+.join-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.join-step {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 28px 26px;
+  border: 1px solid var(--site-line);
+  border-radius: 18px;
+  background: linear-gradient(160deg, #2b0e0e, #101010 60%);
+}
+
+.join-step-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  margin-bottom: 6px;
+}
+
+/* The big step number in a maroon circle */
+.join-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--maroon), var(--maroon-bright));
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.join-step-icon {
+  color: var(--rose);
+}
+
+.join-step h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.join-step p {
+  margin: 0;
+  color: var(--site-muted);
+  line-height: 1.6;
+}
+
+.join-step-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--rose);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.join-step-link:hover {
+  color: var(--site-text);
+  text-decoration: none;
+}
+
+
+
+
 /* ---------- Footer ---------- */
 
 .site-footer {
@@ -1367,6 +1533,13 @@
   }
 
   .page-intro-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .training-inner,
+  .benefits-list,
+  .info-cards,
+  .join-steps {
     grid-template-columns: 1fr;
   }
 }

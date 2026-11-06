@@ -108,7 +108,8 @@ export default function JoinRegisterPage() {
             <h1>Register a new player</h1>
             {!registered && (
               <p className="join-intro">
-                Fill in the form below. Our team will review it and contact you soon.
+                Fill in the form below. Once your registration is approved, you&apos;ll be let into
+                our members&apos; WhatsApp group.
               </p>
             )}
           </div>
@@ -287,14 +288,13 @@ function ThankYou({ name, email, onRegisterAnother }) {
       </p>
       <p>
         A confirmation email is on its way to <strong>{email}</strong> (please check your spam
-        folder if you don&apos;t see it). Our team will review the registration and contact you
-        soon.
+        folder if you don&apos;t see it).
       </p>
 
       <div className="join-whatsapp">
         <p>
-          <strong>Join the KICA Members WhatsApp group</strong> for club news and updates. A
-          group admin will approve your request.
+          <strong>Request to join the KICA Members WhatsApp group</strong>, where we share club
+          timings, events, and updates. You&apos;ll be let in once your registration is approved.
         </p>
 
         <a

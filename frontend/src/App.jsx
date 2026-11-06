@@ -27,11 +27,11 @@ import IncomePage from './pages/IncomePage'
 import JoinRegisterPage from './pages/JoinRegisterPage'
 import RegistrationsPage from './pages/RegistrationsPage'
 import PublicLayout from './public-site/PublicLayout'
-import PublicPlaceholder from './public-site/PublicPlaceholder'
 import HomePage from './public-site/HomePage'
 import AuthLayout from './components/AuthLayout'
 import AboutPage from './public-site/AboutPage'
 import ActivitiesPage from './public-site/ActivitiesPage'
+import MembershipPage from './public-site/MembershipPage'
 
 
 
@@ -47,19 +47,7 @@ export default function App() {
             />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/activities" element={<ActivitiesPage />} />
-            <Route
-              path="/membership"
-              element={
-                <PublicPlaceholder
-                  title="Membership"
-                  text="Join the Kuwait Indian Chess Association. Membership is 5 KWD per month."
-                >
-                  <Link to="/join/register" className="site-button">
-                    Register a new player
-                  </Link>
-                </PublicPlaceholder>
-              }
-            />
+            <Route path="/membership" element={<MembershipPage />} />
             <Route path="/join/register" element={<JoinRegisterPage />} />
           </Route>
 

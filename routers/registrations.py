@@ -40,6 +40,8 @@ from schemas import (
 
 # How parents can reach the club, e.g. kica.chesskwt@gmail.com. Required in production.
 CLUB_CONTACT = setting("CLUB_CONTACT", "kica.chesskwt@gmail.com")
+# The "KICA Members" WhatsApp group (the same link as on the thank-you screen)
+WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/HsnonjfDkqE17FhdfmvqNv"
 
 # Submitting is public (no login). Every other route below asks for an Exec login itself.
 router = APIRouter(
@@ -54,12 +56,16 @@ THANK_YOU = {"message": "Thank you! We have received your registration."}
 PLAYER_DETAIL_FIELDS = list(PlayerDetails.model_fields)
 
 
+
+
 def thank_you_email(parent_name: str, player_name: str) -> str:
     return (
         f"Dear {parent_name},\n\n"
         f"Thank you for registering {player_name} with the Kuwait Indian Chess Association (KICA)!\n\n"
-        "We have received your registration. "
-        "A member of our team will review it and contact you soon.\n\n"
+        "We have received your registration, and our team will review it.\n\n"
+        "To receive club timings, events and updates, please request to join the "
+        f"KICA Members WhatsApp group: {WHATSAPP_GROUP_LINK}\n"
+        "You will be let into the group once your registration is approved.\n\n"
         f"If you have any questions, please contact us at {CLUB_CONTACT}.\n\n"
         "Warm regards,\n"
         "Kuwait Indian Chess Association"
