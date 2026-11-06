@@ -149,7 +149,7 @@ function PlayerDetails({ player, onEdit, onToggleActive }) {
           <div>
             <dt>Whatsapp Number</dt>
             <dd>
-              <a href={whatsappLink(player.phone_1)} target="_blank" rel="noopener noreferrer">
+              <a href={whatsAppLink(player.phone_1)} target="_blank" rel="noopener noreferrer">
                 {player.phone_1}
               </a>
             </dd>

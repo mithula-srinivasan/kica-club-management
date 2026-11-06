@@ -226,7 +226,6 @@ function Welcome() {
     </section>
   )
 }
-
 // A number that counts up from 0 the first time it scrolls into view
 function CountUp({ to, suffix = '' }) {
   const ref = useRef(null)
@@ -235,13 +234,8 @@ function CountUp({ to, suffix = '' }) {
   const [shown, setShown] = useState(0)
 
   useEffect(() => {
-    if (!inView) {
-      return
-    }
-
-    // "Reduce motion" on: just show the final number
-    if (reduceMotion) {
-      setShown(to)
+    // Only count when it's on screen, and not for people with "reduce motion" on
+    if (!inView || reduceMotion) {
       return
     }
 
@@ -254,9 +248,12 @@ function CountUp({ to, suffix = '' }) {
     return () => counting.stop()
   }, [inView, reduceMotion, to])
 
+  // "Reduce motion" on: just show the final number, without counting
+  const value = reduceMotion ? to : shown
+
   return (
     <span ref={ref}>
-      {shown}
+      {value}
       {suffix}
     </span>
   )

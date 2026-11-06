@@ -17,5 +17,10 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // Files that share helpers as well as a component only lose instant updates
+      // while coding (the page reloads instead). Harmless, so a warning is enough.
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ])

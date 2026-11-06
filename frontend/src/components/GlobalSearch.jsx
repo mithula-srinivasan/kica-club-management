@@ -82,31 +82,7 @@ export default function GlobalSearch() {
     }
   }
 
-  function ResultGroup({ title, results }) {
-    if (results.length === 0) {
-      return null
-    }
 
-    return (
-      <>
-        <li className="search-group">{title}</li>
-        {results.map((result) => (
-          <li key={result.key}>
-            <button
-              type="button"
-              className="picker-option"
-              // Stops the box losing focus before the click registers
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => choose(result)}
-            >
-              <span>{result.label}</span>
-              {result.detail && <span className="muted">{result.detail}</span>}
-            </button>
-          </li>
-        ))}
-      </>
-    )
-  }
 
   return (
     <div className="global-search">
@@ -133,12 +109,41 @@ export default function GlobalSearch() {
             <li className="search-empty">No results</li>
           ) : (
             <>
-              <ResultGroup title="Pages" results={featureResults} />
-              <ResultGroup title="Players" results={playerResults} />
+              <ResultGroup title="Pages" results={featureResults} onChoose={choose} />
+              <ResultGroup title="Players" results={playerResults} onChoose={choose} />
             </>
           )}
         </ul>
       )}
     </div>
+  )
+}
+
+
+// One group of search results ("Pages" or "Players").
+// It lives outside GlobalSearch, so React doesn't rebuild it on every keystroke.
+function ResultGroup({ title, results, onChoose }) {
+  if (results.length === 0) {
+    return null
+  }
+
+  return (
+    <>
+      <li className="search-group">{title}</li>
+      {results.map((result) => (
+        <li key={result.key}>
+          <button
+            type="button"
+            className="picker-option"
+            // Stops the box losing focus before the click registers
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => onChoose(result)}
+          >
+            <span>{result.label}</span>
+            {result.detail && <span className="muted">{result.detail}</span>}
+          </button>
+        </li>
+      ))}
+    </>
   )
 }
