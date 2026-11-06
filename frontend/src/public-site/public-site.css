@@ -546,6 +546,11 @@
   font-size: 0.9rem;
 }
 
+/* The club times on their own line, under "Club Timings:" */
+.home-location-time {
+  display: block;
+}
+
 .home-location-button {
   margin-top: 6px;
   min-height: 46px;

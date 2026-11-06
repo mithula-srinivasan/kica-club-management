@@ -166,7 +166,8 @@ function Welcome() {
                 <p key={timing.label} className="home-location-line">
                   <Clock size={20} aria-hidden="true" />
                   <span>
-                    <strong>{timing.label}:</strong> {timing.time}
+                    <strong>{timing.label}:</strong>
+                    <span className="home-location-time">{timing.time}</span>
                   </span>
                 </p>
               ))}
