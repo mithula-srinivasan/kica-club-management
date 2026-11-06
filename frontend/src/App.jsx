@@ -1,4 +1,4 @@
-import { Navigate, BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Navigate, BrowserRouter, Route, Routes, Link } from 'react-router-dom'
 import { AuthProvider } from './auth'
 import Layout from './components/Layout'
 import RequireAuth from './components/RequireAuth'
@@ -26,6 +26,8 @@ import FeeRatePage from './pages/admin/FeeRatePage'
 import IncomePage from './pages/IncomePage'
 import JoinRegisterPage from './pages/JoinRegisterPage'
 import RegistrationsPage from './pages/RegistrationsPage'
+import PublicLayout from './public-site/PublicLayout'
+import PublicPlaceholder from './public-site/PublicPlaceholder'
 
 
 
@@ -34,15 +36,37 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* ---------- Public website ---------- */}
+            <Route element={<PublicLayout />}>
+            <Route
+              path="/"
+              element={<PublicPlaceholder title="Welcome to KICA" text="Our new home page is coming soon." />}
+            />
+            <Route
+              path="/about"
+              element={<PublicPlaceholder title="About KICA" text="Who we are, our facilities and our training programs. Coming soon." />}
+            />
+            <Route
+              path="/activities"
+              element={<PublicPlaceholder title="Activities & Tournaments" text="Our tournaments, lectures and club activities. Coming soon." />}
+            />
+            <Route
+              path="/membership"
+              element={
+                <PublicPlaceholder
+                  title="Membership"
+                  text="Join the Kuwait Indian Chess Association. Membership is 5 KWD per month."
+                >
+                  <Link to="/join/register" className="site-button">
+                    Register a new player
+                  </Link>
+                </PublicPlaceholder>
+              }
+            />
+            <Route path="/join/register" element={<JoinRegisterPage />} />
+          </Route>
 
-          {/* Until the Home page is built, the main address goes to the exec login */}
-          <Route path="/" element={<Navigate to="/exec" replace />} />
-          <Route path="/join" element={<Navigate to="/join/register" replace />} />
-          <Route path="/join/register" element={<JoinRegisterPage />} />
-
-          {/* ---------- Exec app: everything under /exec ---------- */}
-
+          {/* The link shared with parents */}
+          <Route path="/join" element={<Navigate to="/membership" replace />} />
           <Route path="/exec/login" element={<LoginPage />} />
           <Route path="/exec/signup" element={<SignupPage />} />
           <Route path="/exec/forgot-password" element={<ForgotPasswordPage />} />

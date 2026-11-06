@@ -102,11 +102,7 @@ export default function JoinRegisterPage() {
       {/* Top: plain black, so the title is easy to read */}
       <div className="join-container">
         <header className="join-header">
-          <img
-            src="/kica-logo.png"
-            alt="Kuwait Indian Chess Association logo"
-            className="join-logo"
-          />
+          
           <div>
             <p className="join-eyebrow">Kuwait Indian Chess Association</p>
             <h1>Register a new player</h1>

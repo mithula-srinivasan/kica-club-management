@@ -1,0 +1,465 @@
+/* ========== The public website: black, off-white and maroon ========== */
+
+.site {
+  /* Fonts: change --font-heading to try another heading font */
+  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Source Serif 4 Variable', Georgia, serif;
+
+  /* Colours */
+  --site-bg: #000000;
+  --site-surface: #0b0b0b;
+  --site-text: #f2efe9;
+  --site-muted: #a8a39b;
+  --site-line: rgba(242, 239, 233, 0.14);
+  --maroon: #8b1c1c;
+  --maroon-bright: #b3262b;
+  --rose: #e6a3a3;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--site-bg);
+  color: var(--site-text);
+  font-family: var(--font-body);
+}
+
+.site h1,
+.site h2,
+.site h3 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.site-container {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Visible focus ring for keyboard users, on every link and button */
+.site a:focus-visible,
+.site button:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---------- Top bar ---------- */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid transparent;
+  background: var(--site-bg);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* After scrolling a little: see-through, with the page blurred behind it */
+.site-header.scrolled {
+  border-bottom-color: var(--site-line);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 76px;
+}
+
+.site-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--site-text);
+  text-decoration: none;
+}
+
+.site-brand:hover {
+  text-decoration: none;
+}
+
+/* The logo sits on a small off-white tile, so it looks right on black */
+.site-brand-logo {
+  width: 46px;
+  height: 46px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #f2efe9;
+  object-fit: contain;
+}
+
+.site-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.site-brand-text strong {
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+}
+
+.site-brand-full {
+  color: var(--site-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-left: auto;
+}
+
+.site-nav-link {
+  position: relative;
+  padding: 8px 2px;
+  color: var(--site-muted);
+  font-size: 0.98rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-nav-link:hover,
+.site-nav-link.active {
+  color: var(--site-text);
+  text-decoration: none;
+}
+
+/* The maroon line under the current page; Motion slides it between links */
+.site-nav-underline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--maroon-bright);
+}
+
+/* Exec login: outlined, and a maroon gradient fades in on hover */
+.site-login {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1px solid var(--site-line);
+  border-radius: 10px;
+  color: var(--site-text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.25s ease;
+}
+
+.site-login::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(120deg, var(--maroon), var(--maroon-bright));
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.site-login:hover {
+  border-color: var(--maroon-bright);
+  text-decoration: none;
+}
+
+.site-login:hover::before {
+  opacity: 1;
+}
+
+/* The ☰ button (phones and small windows only) */
+.site-menu-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  min-height: 0;
+  margin-left: auto;
+  padding: 0;
+  border: 1px solid var(--site-line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--site-text);
+}
+
+.site-menu-button:hover {
+  background: rgba(242, 239, 233, 0.08);
+}
+
+/* ---------- Full-screen phone menu ---------- */
+
+.site-mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 18px 20px 40px;
+  background: var(--site-bg);
+}
+
+.site-menu-close {
+  display: flex;
+  align-self: flex-end;
+}
+
+.site-mobile-menu nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.site-mobile-menu nav a:not(.site-login) {
+  display: block;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--site-line);
+  color: var(--site-text);
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-mobile-menu nav a.active {
+  color: var(--rose);
+}
+
+.site-mobile-menu .site-login {
+  align-self: flex-start;
+  margin-top: 28px;
+  padding: 12px 20px;
+  font-size: 1rem;
+}
+
+/* ---------- Page content ---------- */
+
+.site-main {
+  flex: 1;
+}
+
+.site-eyebrow {
+  margin: 0;
+  color: var(--rose);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-lead {
+  max-width: 640px;
+  margin: 0;
+  color: var(--site-muted);
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+/* The main maroon button. Its gradient slides across on hover. */
+.site-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 12px 26px;
+  border-radius: 12px;
+  background: linear-gradient(120deg, var(--maroon), var(--maroon-bright), var(--maroon));
+  background-size: 200% 100%;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-position 0.5s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.site-button:hover {
+  background-position: 100% 0;
+  box-shadow: 0 10px 30px rgba(179, 38, 43, 0.35);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+/* Placeholder pages: a title over the faint chessboard */
+.site-placeholder {
+  position: relative;
+  padding: 96px 0 120px;
+}
+
+.site-placeholder::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: conic-gradient(
+    rgba(242, 239, 233, 0.06) 25%,
+    transparent 0 50%,
+    rgba(242, 239, 233, 0.06) 0 75%,
+    transparent 0
+  );
+  background-size: 112px 112px;
+  mask-image: linear-gradient(to bottom, transparent, #000000 160px, #000000 70%, transparent);
+  pointer-events: none;
+}
+
+.site-placeholder .site-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.site-placeholder h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 3.8rem);
+  line-height: 1.1;
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  border-top: 1px solid var(--site-line);
+  background: var(--site-surface);
+  color: var(--site-muted);
+}
+
+.site-footer-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr 0.9fr;
+  gap: 40px;
+  padding-top: 56px;
+  padding-bottom: 40px;
+}
+
+.site-footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.site-footer-brand .site-brand-logo {
+  width: 64px;
+  height: 64px;
+}
+
+.site-footer-name {
+  margin: 4px 0 0;
+  color: var(--site-text);
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.site-footer-tagline {
+  margin: 0;
+  font-style: italic;
+}
+
+.site-footer-title {
+  margin: 0 0 16px;
+  color: var(--site-text);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+.site-footer-list,
+.site-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.site-footer-list svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--rose);
+}
+
+.site-footer a {
+  color: var(--site-muted);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-footer a:hover {
+  color: var(--site-text);
+  text-decoration: none;
+}
+
+.site-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 20px;
+  padding-bottom: 28px;
+  border-top: 1px solid var(--site-line);
+  font-size: 0.9rem;
+}
+
+/* ---------- Smaller screens ---------- */
+
+/* Laptops with a narrow window and tablets: the menu folds into ☰ */
+@media (max-width: 1080px) {
+  .site-nav,
+  .site-header .site-login {
+    display: none;
+  }
+
+  .site-menu-button {
+    display: inline-flex;
+  }
+
+  .site-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-header-inner {
+    min-height: 66px;
+  }
+
+  .site-brand-full {
+    display: none;
+  }
+
+  .site-placeholder {
+    padding: 64px 0 88px;
+  }
+
+  .site-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
