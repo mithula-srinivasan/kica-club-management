@@ -30,6 +30,7 @@ import PublicLayout from './public-site/PublicLayout'
 import PublicPlaceholder from './public-site/PublicPlaceholder'
 import HomePage from './public-site/HomePage'
 import AuthLayout from './components/AuthLayout'
+import AboutPage from './public-site/AboutPage'
 
 
 
@@ -43,10 +44,7 @@ export default function App() {
               path="/"
               element={<HomePage />}
             />
-            <Route
-              path="/about"
-              element={<PublicPlaceholder title="About KICA" text="Who we are, our facilities and our training programs. Coming soon." />}
-            />
+            <Route path="/about" element={<AboutPage />} />
             <Route
               path="/activities"
               element={<PublicPlaceholder title="Activities & Tournaments" text="Our tournaments, lectures and club activities. Coming soon." />}
