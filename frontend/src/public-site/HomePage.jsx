@@ -27,11 +27,11 @@ function photoName(path) {
 // A smooth "ease out" curve: starts quickly, then settles gently
 const SMOOTH = [0.22, 1, 0.36, 1]
 
-const FOUNDED = 2006
+const FOUNDED = 2016
 
 // The highlight figures. Those with a number count up when they scroll into view.
 const HIGHLIGHTS = [
-  { number: new Date().getFullYear() - FOUNDED, label: 'Years bringing chess players together' },
+  { number: new Date().getFullYear() - FOUNDED, label: 'Years of bringing chess players together' },
   { number: 200, suffix: '+', label: 'Players at our largest tournaments' },
   { number: 2, label: 'Club days every week: Friday & Saturday' },
   { text: 'FIDE', label: 'Certified arbiters on our team' },
@@ -45,7 +45,7 @@ const SECTIONS = [
     eyebrow: 'About KICA',
     title: 'A Passion for Chess. A Community for Everyone.',
     text:
-      'For two decades, our volunteers have been bringing chess lovers together in Kuwait. ' +
+      'For ten years, our volunteers have been bringing chess lovers together in Kuwait. ' +
       'Get to know the people, the history and the spirit behind the club.',
     button: 'About Us',
     to: '/about',

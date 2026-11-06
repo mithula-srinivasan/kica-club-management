@@ -24,8 +24,8 @@ export default function AboutPage() {
   return (
     <>
       <PageIntro eyebrow="About KICA" title="A Passion for Chess. A Community for Everyone.">
-        Established in 2006, the Kuwait Indian Chess Association (KICA) has been bringing chess
-        enthusiasts together for two decades, fostering a shared passion for the game and
+        Established in 2016, the Kuwait Indian Chess Association (KICA) has been bringing chess
+        enthusiasts together for ten years, fostering a shared passion for the game and
         contributing to the development of chess in Kuwait.
       </PageIntro>
 
@@ -88,7 +88,7 @@ function OurStory() {
 const EXECUTIVES = [
   'Soni Francis',
   'Srinivasan',
-  'Sivanand',
+  'Sivanantham',
   'Gowri Shankar',
   'Muthukumar',
   'Vidhyasagar',
