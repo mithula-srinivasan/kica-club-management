@@ -70,7 +70,7 @@ function OurStory() {
           className="about-story-photo"
           initial={{ opacity: 0, x: 60 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, some: 0.25 }}
+          viewport={{ once: true, amount: 'some' }}
           transition={{ duration: 0.8, ease: SMOOTH }}
         >
           <img src={teamPhoto} alt="The KICA team standing beside the club banner" loading="lazy" />

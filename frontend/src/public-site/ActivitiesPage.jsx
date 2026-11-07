@@ -64,13 +64,14 @@ const SERVICES = [
 ]
 
 const PARTNERS = [
-  'Tamil Nadu Engineering Forum (TEF)',
-  'Institute of Chartered Accountants of India (ICAI) – Kuwait Chapter',
-  'The Indian Community School (TKS)',
-  'KMSA (Kuwait Mind Sports Association)',
-  'Chess House Academy',
-  'Indians In Kuwait',
-  'Al-Mulla',
+  'Kuwait Mind Sports Association (KMSA)',
+  'Tamil Nadu Engineers Forum (TEF)',
+  'ICAI – Kuwait Chapter',
+  'Telugu Kala Samithi (TKS)',
+  'Kerala Engineers Forum (KEF)',
+  'Chess House Academy (CHA)',
+  'Indians In Kuwait (IIK)',
+  'Al-Mulla Exchange',
   'Best Al-Yousifi',
 ]
 
@@ -160,7 +161,7 @@ function PhotoSection({ photo, alt, eyebrow, title, photoOnRight = false, childr
           className="page-split-photo"
           initial={{ opacity: 0, x: photoOnRight ? 60 : -60 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, some: 0.25 }}
+          viewport={{ once: true, amount: 'some' }}
           transition={{ duration: 0.8, ease: SMOOTH }}
         >
           <img src={photo} alt={alt} loading="lazy" />
@@ -257,7 +258,7 @@ function Training() {
                 className="journey-step"
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, some: 0.6 }}
+                viewport={{ once: true, amount: 'some' }}
                 transition={{ duration: 0.6, delay: 0.3 + index * 0.35, ease: SMOOTH }}
               >
                 <span className="journey-icon">
