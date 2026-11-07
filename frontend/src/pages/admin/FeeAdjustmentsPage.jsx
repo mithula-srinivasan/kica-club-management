@@ -48,8 +48,6 @@ export default function FeeAdjustmentsPage() {
 
       <AdjustmentForm players={players} onSaved={reloadHistory} />
     
-      <AdjustmentForm players={players} onSaved={reloadHistory} />
-
       <section className="card">
         <h2>Recent adjustments</h2>
 
