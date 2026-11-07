@@ -160,7 +160,7 @@ function PhotoSection({ photo, alt, eyebrow, title, photoOnRight = false, childr
           className="page-split-photo"
           initial={{ opacity: 0, x: photoOnRight ? 60 : -60 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
+          viewport={{ once: true, some: 0.25 }}
           transition={{ duration: 0.8, ease: SMOOTH }}
         >
           <img src={photo} alt={alt} loading="lazy" />
@@ -257,7 +257,7 @@ function Training() {
                 className="journey-step"
                 initial={{ opacity: 0, x: 30 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.6 }}
+                viewport={{ once: true, some: 0.6 }}
                 transition={{ duration: 0.6, delay: 0.3 + index * 0.35, ease: SMOOTH }}
               >
                 <span className="journey-icon">

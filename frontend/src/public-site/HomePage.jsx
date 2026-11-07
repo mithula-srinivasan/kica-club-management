@@ -103,7 +103,6 @@ function Hero() {
           <img src="/kica-logo.png" alt="" className="home-hero-logo" />
           <h1>{CLUB.name}</h1>
           <p className="home-hero-subtitle">Bringing Chess Enthusiasts Together Since {FOUNDED}</p>
-          <p className="home-hero-words">Learn • Play • Compete • Grow</p>
 
           <div className="home-hero-buttons">
             <Link to="/membership" className="site-button">
@@ -208,7 +207,7 @@ function Welcome() {
               className="home-highlight"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
+              viewport={{ once: true, some: 0.6 }}
               transition={{ duration: 0.6, delay: index * 0.1, ease: SMOOTH }}
             >
               <strong>
@@ -276,7 +275,7 @@ function PhotoBelt() {
       aria-label="Photos from KICA events"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true, some: 0.2 }}
       transition={{ duration: 0.8 }}
     >
       <div
@@ -305,7 +304,7 @@ function FeatureSection({ photo, alt, eyebrow, title, text, button, to, photoOnR
           className="home-feature-photo site-photo"
           initial={{ opacity: 0, x: photoOnRight ? 60 : -60 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: true, some: 0.3 }}
           transition={{ duration: 0.8, ease: SMOOTH }}
         >
           <img src={photo} alt={alt} loading="lazy" />
@@ -315,7 +314,7 @@ function FeatureSection({ photo, alt, eyebrow, title, text, button, to, photoOnR
           className="home-feature-text"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: true, some: 0.3 }}
           transition={{ duration: 0.8, delay: 0.15, ease: SMOOTH }}
         >
           <p className="site-eyebrow">{eyebrow}</p>

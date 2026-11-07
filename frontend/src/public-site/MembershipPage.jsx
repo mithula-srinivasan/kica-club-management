@@ -100,7 +100,7 @@ function WhyJoin() {
           className="page-split-photo"
           initial={{ opacity: 0, x: -60 }}
           whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
+          viewport={{ once: true, some: 0.25 }}
           transition={{ duration: 0.8, ease: SMOOTH }}
         >
           <img
@@ -141,7 +141,7 @@ function Benefits() {
               key={benefit.text}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.6 }}
+              viewport={{ once: true, some: 0.6 }}
               transition={{ duration: 0.5, delay: (index % 2) * 0.1, ease: SMOOTH }}
             >
               <span className="benefits-icon">

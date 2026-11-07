@@ -68,7 +68,9 @@ export default function SignupPage() {
           }}
         />
         <h1>Create an account</h1>
-
+        <p className="warning">
+          For the KICA executive team only. Not for players or parents.
+        </p>
         {error && <p className="error">{error}</p>}
 
         <label>

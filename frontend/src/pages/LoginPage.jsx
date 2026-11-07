@@ -43,7 +43,10 @@ export default function LoginPage() {
             event.currentTarget.style.display = 'none'
           }}
         />
-        <h1>KICA login</h1>
+        <h1>KICA Executive Login</h1>
+        <p className="warning">
+          For the KICA executive team only. Not for players or parents.
+        </p>
 
         {error && <p className="error">{error}</p>}
 

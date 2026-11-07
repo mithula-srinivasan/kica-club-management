@@ -97,7 +97,6 @@ export default function DashboardPage() {
           <Figure label="Fees received" value={kwd(summary.payments_received)} />
           <Figure label="Income received" value={kwd(summary.income_received)} />
           <Figure label="Expenses paid" value={kwd(summary.expenses_paid)} />
-          <Figure label="Expenses paid" value={kwd(summary.expenses_paid)} />
         </div>
 
         <p className="section-link">

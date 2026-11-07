@@ -11,11 +11,11 @@
   /* Off-white lines, slightly softened so they don't overpower the content */
   --border: rgba(242, 239, 233, 0.3);
 
-  /* Lilac for highlights; a paler lilac for text, so it stays readable */
-  --accent: #b794f4;
-  --accent-hover: #c4a7f7;
-  --accent-text: #dcc6ff;
-  --accent-soft: rgba(183, 148, 244, 0.16);
+  /* Soft red for highlights (matches the public website); a lighter red for text, so it stays readable */
+  --accent: #d06b6b;
+  --accent-hover: #da8282;
+  --accent-text: #e29494;
+  --accent-soft: rgba(208, 107, 107, 0.18);
 
   /* Red is kept only for danger: errors, delete, reverse */
   --danger: #dc2626;
