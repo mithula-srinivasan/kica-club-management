@@ -158,7 +158,7 @@ export default function JoinRegisterPage() {
                   </div>
                 </fieldset>
 
-                <Field label="Country">
+                <Field label="Nationality">
                   <select {...field('country')} required>
                     <CountryOptions countries={countries} />
                   </select>
