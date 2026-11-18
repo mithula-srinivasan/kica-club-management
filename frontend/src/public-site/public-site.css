@@ -967,20 +967,19 @@
   line-height: 1.4;
   letter-spacing: -0.01em;
 }
-/* ---------- The executives: a vertical list with pawns as bullet points ---------- */
-/* ---------- The executives (left) and the big quote (right) ---------- */
+/* ---------- The executives (a 3 x 3 grid), with the big quote underneath ---------- */
 
 .team-and-quote {
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  align-items: center;
-  gap: clamp(32px, 6vw, 96px);
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(40px, 5vw, 64px);
 }
 
+/* 3 names per row, filled left to right, so the order in EXECUTIVES is kept */
 .executives-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 32px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1007,6 +1006,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+  max-width: 900px;
   padding-left: clamp(20px, 3vw, 40px);
   border-left: 2px solid var(--maroon-bright);
 }
@@ -1757,7 +1757,8 @@
   }
 
 
+    /* Phones: one name per row, still in the same order */
     .executives-list {
-    columns: 1;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
